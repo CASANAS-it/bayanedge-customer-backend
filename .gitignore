@@ -1,0 +1,6 @@
+/node_modules/*
+/.skaffolder/*
+/.vs/*
+/.vscode/*
+package-lock.json
+.env

@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    name: "evoucherks-backend-dev"
+    labels:
+        app: "evoucherks-backend-dev"
+    annotations:
+        kubernetes.io/ingress.class: addon-http-application-routing
+spec:
+    rules:
+        - host: bentestaksb3c1-evoucherks-backend-dev.55fb126464b144748328.southeastasia.aksapp.io
+          http:
+            paths:
+            - path: /
+              backend:
+                serviceName: "evoucherks-backend-dev"
+                servicePort: 3000
