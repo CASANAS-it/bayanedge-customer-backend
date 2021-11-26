@@ -1,0 +1,306 @@
+openapi: 3.0.0
+info:
+  title: eVoucher
+  description: You can obtain JWT token from login API
+  version: "0.1"
+servers:
+- url: http://20.195.112.136/api
+  description: Dev server for testing
+- url: http://localhost:3000/api
+  description: Local server for testing
+- url: https://evoucher-api.azure-api.net/api
+  description: Proxy server for testing
+security:
+- bearerAuth: []
+paths:
+  /authenticate:
+    post:
+      tags:
+      - Security
+      summary: This API is to be used to determine and validate merchant credentials.
+      operationId: authenticatePOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      security: []
+      x-swagger-router-controller: Security
+  /inquiry:
+    post:
+      tags:
+      - Transaction
+      summary: As to be able to check the status or the details of the transactions
+        that were sent previously
+      operationId: inquiryPOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_1'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inquiry'
+      x-swagger-router-controller: Transaction
+  /transaction_list:
+    get:
+      tags:
+      - Transaction
+      summary: As to be able to get the list of transactions and its details
+      operationId: transaction_listGET
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                - transaction_type: BUY
+                  from_merchant:
+                    code: MERCH-01
+                    name: Merchant 01
+                  to_merchant:
+                    code: MERCH-02
+                    name: Merchant 02
+                    voucher_code: VC-5000
+                    amount: "5000"
+                    sender: 0917-1111111
+                    recipient: 0918-1111111
+                    reference_number: "1234567890"
+                    transaction_number: c3526c8469e5493883e211dfd561a4f2
+                    transaction_date": 2020-12-20 04:00:00
+                    status:
+                      code: "0"
+                      message: Success
+                - transaction_type: CASHOUT
+                  from_merchant:
+                    code: MERCH-02
+                    name: Merchant 02
+                  to_merchant:
+                    code: MERCH-01
+                    name: Merchant 01
+                    voucher_code: VC-1000
+                    amount: "1000"
+                    sender: 0917-1111111
+                    recipient: 0918-1111111
+                    reference_number: "1234567890"
+                    transaction_number: c3526c8469e5493883e211dfd561a4f2
+                    transaction_date": 2020-12-20 04:00:00
+                    status:
+                      code: "0"
+                      message: Success
+                items:
+                  $ref: '#/components/schemas/Transaction'
+                x-content-type: application/json
+      x-swagger-router-controller: Transaction
+  /transact:
+    post:
+      tags:
+      - Transaction
+      summary: As to process the details of the transactions
+      operationId: transactPOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/body_2'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+      x-swagger-router-controller: Transaction
+  /voucher_list:
+    get:
+      tags:
+      - Voucher
+      summary: As to be able to check the details of the transactions that were sent
+        previously, this API may be used.
+      operationId: voucher_listGET
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Voucher'
+                x-content-type: application/json
+              example:
+              - merchant_code: MERCH_02
+                merchant_date:
+                - category: Tickets
+                  vouchers:
+                  - code: TK-0500
+                    amount: "500"
+                  - code: TK-1000
+                    amount: "1000"
+                  - code: TK-1500
+                    amount: "1500"
+      x-swagger-router-controller: Voucher
+components:
+  schemas:
+    User:
+      required:
+      - login_id
+      - password
+      properties:
+        login_id:
+          type: string
+        password:
+          type: string
+      example:
+        login_id: login_id
+        password: password
+    Inquiry:
+      required:
+      - reference_number
+      properties:
+        reference_number:
+          type: string
+      example:
+        reference_number: reference_number
+    Transaction:
+      properties:
+        transaction_type:
+          type: string
+        merchant_code:
+          type: string
+        voucher_code:
+          type: string
+        amount:
+          type: string
+        sender:
+          type: string
+        receiver:
+          type: string
+        recipient:
+          type: string
+        reference_number:
+          type: string
+      example:
+        merchant_code: merchant_code
+        amount: amount
+        receiver: receiver
+        sender: sender
+        recipient: recipient
+        voucher_code: voucher_code
+        transaction_type: transaction_type
+        reference_number: reference_number
+    Voucher:
+      properties:
+        merchant_code:
+          type: string
+        merchant_data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Voucher_merchant_data'
+      example:
+        merchant_code: merchant_code
+        merchant_data:
+        - category: category
+          vouchers:
+          - amount: amount
+            code: code
+          - amount: amount
+            code: code
+        - category: category
+          vouchers:
+          - amount: amount
+            code: code
+          - amount: amount
+            code: code
+    body:
+      type: object
+      properties:
+        login_id:
+          type: string
+        password:
+          type: string
+      example:
+        login_id: admin
+        password: password
+    body_1:
+      type: object
+      properties:
+        transaction_number:
+          type: string
+      example:
+        transaction_number: "1234567890"
+    body_2:
+      type: object
+      properties:
+        transaction_type:
+          type: string
+        merchant_code:
+          type: string
+        voucher_code:
+          type: string
+        amount:
+          type: string
+        sender:
+          type: string
+        receiver:
+          type: string
+        recipient:
+          type: string
+        reference_number:
+          type: string
+      example:
+        transaction_type: BUY
+        merchant_code: MERCH-02
+        voucher_code: TK-0500
+        amount: "500"
+        sender: "09171643034"
+        receiver: "09171643034"
+        recipient: "09171643034"
+        reference_number: "12345678"
+    Voucher_vouchers:
+      type: object
+      properties:
+        code:
+          type: string
+        amount:
+          type: string
+      example:
+        amount: amount
+        code: code
+    Voucher_merchant_data:
+      type: object
+      properties:
+        category:
+          type: string
+        vouchers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Voucher_vouchers'
+      example:
+        category: category
+        vouchers:
+        - amount: amount
+          code: code
+        - amount: amount
+          code: code
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
