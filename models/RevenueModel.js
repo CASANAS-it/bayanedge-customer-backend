@@ -12,6 +12,9 @@ const customModel = {
       id: {
         type: 'String'
       },
+      client_id: {
+        type: 'String'
+      },
       name: {
         type: 'String'
       },
@@ -51,9 +54,16 @@ const customModel = {
       .select(['-_id', '-__v'])
       .lean()
   },
-  getPaginatedItems: async (limit, offset) => {
-    return await customModel.getModel().paginate({ is_active: true }, { offset: offset, limit: limit })
-
+  getByClientId: async (id) => {
+    const items = await customModel.model
+      .findOne({
+        client_id: id,
+      })
+      .lean()
+    return items
+  },
+  getPaginatedItems: async (limit, offset, client_id) => {
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, { offset: offset, limit: limit })
   },
   getByRevenueId: async (id) => {
     const revenue = await customModel.model
@@ -67,7 +77,7 @@ const customModel = {
   update: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ id: params.id }, {
       name: params.name,
-      type : params.type,
+      type: params.type,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -87,6 +97,7 @@ const customModel = {
     const revenue = new customModel.model({
       id: id,
       name: params.name,
+      client_id: params.client_id,
       type: params.type,
       is_active: true,
       created_by: params.admin_id,

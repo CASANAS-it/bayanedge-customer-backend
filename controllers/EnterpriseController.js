@@ -1,38 +1,97 @@
-import CommonMessage from "../classes/CommonMessage"
-import ErrorManager from "../classes/ErrorManager"
-import properties from "../properties";
-import enterpriseService from "../services/enterprise.service";
-const enterpriseController = {
+
+// Properties
+import Properties from '../properties'
+
+// Database
+import UserModel from '../models/UserModel'
+
+// Security
+import { authorize } from '../security/SecurityManager'
+
+import CommonMessage from '../classes/CommonMessage'
+// Errors
+import Errors from '../classes/Errors'
+import ErrorManager from '../classes/ErrorManager'
+import { enterpriseService } from '../services/EnterpriseService'
+import { UserType } from '../classes/Constants'
+import { getPagination, getPagingData } from '../utils/CommonUtil'
+
+const customControllers = {
     init: router => {
-        const baseUrl = `${properties.api}/enterprise`;
-        router.post(baseUrl + '/add', enterpriseController.addEnterprise)
-        router.get(baseUrl, enterpriseController.getAll)
-    },
-    addEnterprise: async (req, res) => {
-        try {
-
-            await enterpriseService.addEnterprise(req.body)
-            res.send(new CommonMessage({}))
-        }
-        catch (err) {
-            const safeErr = ErrorManager.getSafeError(err)
-            res.status(safeErr.status).json(safeErr.body)
-        }
+        const baseUrl = `${Properties.api}/enterprise`
+        router.post(baseUrl + '/save', authorize(), customControllers.save)
+        router.post(baseUrl + '/', authorize(), customControllers.getById)
     },
 
-    getAll: async (req, res) => {
+
+    get: async (req, res) => {
         try {
 
+            const { pageNo, pageSize, client_id } = req.body;
 
-            res.send(new CommonMessage({ data: await enterpriseService.getAll() }))
-        }
-        catch (err) {
+            const { limit, offset } = getPagination(pageNo, pageSize);
+            enterpriseService.getAll(limit, offset,client_id).then(data => {
+                const response = getPagingData(data, pageNo, limit);
+                res.send(
+                    new CommonMessage({
+                        data: response
+                    })
+                )
+            })
+
+        } catch (err) {
             const safeErr = ErrorManager.getSafeError(err)
-            res.status(safeErr.status).json(safeErr.body)
+            res.status(safeErr.status).json(safeErr)
         }
-    }
+    },
+    getById: async (req, res) => {
+        try {
+
+            const { id } = req.body;
+            res.send(
+                new CommonMessage({
+                    data: await enterpriseService.getById(id)
+                })
+            )
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
+    save: async (req, res) => {
+        try {
+            var data;
+            if (!req.body.id) {
+                data = await enterpriseService.create(req.body)
+            } else {
+                data = await enterpriseService.update(req.body)
+            }
+            res.send(
+                new CommonMessage({
+                    data: data
+                })
+            )
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
+    delete: async (req, res) => {
+        try {
+            var data = await enterpriseService.delete(req.body)
+
+            res.send(
+                new CommonMessage({
+                    data: data
+                })
+            )
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
 }
 
-
-
-export default enterpriseController
+export default {
+    ...customControllers
+}

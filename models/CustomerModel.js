@@ -12,6 +12,9 @@ const customModel = {
       id: {
         type: 'String'
       },
+      client_id: {
+        type: 'String'
+      },
       name: {
         type: 'String'
       },
@@ -37,7 +40,7 @@ const customModel = {
         type: 'Date'
       },
     })
-    customerSchema.plugin(mongoosePaginate) 
+    customerSchema.plugin(mongoosePaginate)
     customModel.setModel(db.connection.model('customers', customerSchema))
 
     return customerSchema
@@ -54,14 +57,22 @@ const customModel = {
       .select(['-_id', '-__v'])
       .lean()
   },
-  getPaginatedItems : async (limit,offset) => {
-    return await customModel.getModel().paginate({ is_active: true }, { offset: offset, limit: limit })    
+  getPaginatedItems: async (limit, offset, client_id) => {
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, { offset: offset, limit: limit })
+  },
+  getByClientId: async (id) => {
+    const customer = await customModel.model
+      .findOne({
+        client_id: id,
+      })
+      .lean()
+    return customer
   },
   getByCustomerId: async (id) => {
     const customer = await customModel.model
       .findOne({
         id: id,
-        is_active : true
+        is_active: true
       })
       .lean()
     return customer
@@ -69,7 +80,7 @@ const customModel = {
   update: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ id: params.id }, {
       name: params.name,
-      addresses: params.addresses,
+      address: params.address,
       contact_information: params.contact_information,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -78,7 +89,7 @@ const customModel = {
   },
   delete: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ id: params.id }, {
-      is_active : false,
+      is_active: false,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -90,9 +101,10 @@ const customModel = {
     const customer = new customModel.model({
       id: id,
       name: params.name,
+      client_id: params.client_id,
       address: params.address,
       contact_information: params.contact_information,
-      is_active : true,
+      is_active: true,
       created_by: params.admin_id,
       create_date: new Date(),
       modified_by: params.admin_id,

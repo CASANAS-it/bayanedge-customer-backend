@@ -2,8 +2,12 @@ import Errors from '../classes/Errors'
 import CustomerModel from '../models/CustomerModel'
 
 const customerService = {
-  getAll: async (limit, offset) => {
-    return await CustomerModel.getPaginatedItems(limit, offset)
+  getAll: async (limit, offset,client_id) => {
+    return await CustomerModel.getPaginatedItems(limit, offset,client_id)
+  },
+  hasCustomerByClient: async (id) => {
+    var items = await CustomerModel.getByClientId(id)
+    return items !== null ? true  : false
   },
   getById: async (id) => {
     var customer = await CustomerModel.getByCustomerId(id)

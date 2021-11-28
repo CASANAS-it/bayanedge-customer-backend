@@ -33,6 +33,8 @@ export const authorize = (accessLevel) => {
         let decodedUser = null
         try {
           decodedUser = jsonwebtoken.verify(token, properties.tokenSecret)
+          req.body.admin_id = decodedUser.id
+          req.body.client_id = decodedUser.client_id
         } catch (err) {
           // Token not valid
           const safeErr = ErrorManager.getSafeError(new Errors.JWT_INVALID())
