@@ -63,7 +63,7 @@ const customControllers = {
     save: async (req, res) => {
         try {
             var data;
-            if (!req.body.id) {
+            if (!req.body.customer_id) {
                 data = await customerService.create(req.body)
             } else {
                 data = await customerService.update(req.body)

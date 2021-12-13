@@ -1,3 +1,8 @@
+const TransactionType = Object.freeze({
+  CASH: 'Cash',
+  ACCOUNT: 'Account',
+})
+
 const AssetType = Object.freeze({
   CASH: 'Cash',
   CASH_IN_BANK: 'Cash in Bank',
@@ -55,4 +60,5 @@ export {
   ExpenseType,
   UserType,
   EquityType,
+  TransactionType
 }

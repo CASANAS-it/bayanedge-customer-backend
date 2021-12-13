@@ -8,13 +8,13 @@ const customModel = {
   init() {
     const db = Database.getConnection()
     const vendorSchema = new mongoose.Schema({
-      id: {
+      vendor_id: {
         type: 'String'
       },
       client_id: {
         type: 'String'
       },
-      name: {
+      vendor_name: {
         type: 'String'
       },
       address: {
@@ -60,6 +60,15 @@ const customModel = {
       .select(['-_id', '-__v'])
       .lean()
   },
+  
+  getAllByClientId: async (id) => {
+    const items = await customModel.model
+      .find({
+        client_id: id,
+      })
+      .lean()
+    return items
+  },
   getByClientId: async (id) => {
     const items = await customModel.model
       .findOne({
@@ -74,15 +83,15 @@ const customModel = {
   getByVendorId: async (id) => {
     const vendor = await customModel.model
       .findOne({
-        id: id,
+        vendor_id: id,
         is_active: true
       })
       .lean()
     return vendor
   },
   update: async (params) => {
-    const item = await customModel.model.findOneAndUpdate({ id: params.id }, {
-      name: params.name,
+    const item = await customModel.model.findOneAndUpdate({ vendor_id: params.vendor_id }, {
+      vendor_name: params.vendor_name,
       address: params.address,
       contact_information: params.contact_information,
       account_number: params.account_number,
@@ -92,7 +101,7 @@ const customModel = {
     return item
   },
   delete: async (params) => {
-    const item = await customModel.model.findOneAndUpdate({ id: params.id }, {
+    const item = await customModel.model.findOneAndUpdate({ vendor_id: params.vendor_id }, {
       is_active: false,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -100,11 +109,11 @@ const customModel = {
     return item
   },
   create: async (params) => {
-    Logger.info('Creating vendor ' + params.name)
+    Logger.info('Creating vendor ' + params.vendor_name)
     const id = generateId()
     const vendor = new customModel.model({
-      id: id,
-      name: params.name,
+      vendor_id: id,
+      vendor_name: params.vendor_name,
       client_id: params.client_id,
       address: params.address,
       contact_information: params.contact_information,

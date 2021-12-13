@@ -23,6 +23,9 @@ import ExpenseModel from '../models/ExpenseModel'
 import EquityModel from '../models/EquityModel'
 import ClientUserModel from '../models/ClientUserModel'
 import EnterpriseModel from '../models/EnterpriseModel'
+import TransactionTypeModel from '../models/TransactionTypeModel'
+import SalesModel from '../models/SalesModel'
+import LedgerModel from '../models/LedgerModel'
 /**
  * Connection to DB
  */
@@ -55,6 +58,9 @@ class Database {
     LiabilityModel.init()
     ClientUserModel.init()
     EnterpriseModel.init()
+    TransactionTypeModel.init()
+    SalesModel.init()
+    LedgerModel.init()
     // End Init Models
   }
 

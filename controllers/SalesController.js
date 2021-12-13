@@ -12,13 +12,13 @@ import CommonMessage from '../classes/CommonMessage'
 // Errors
 import Errors from '../classes/Errors'
 import ErrorManager from '../classes/ErrorManager'
-import { vendorService } from '../services/VendorService'
+import { salesService } from '../services/SalesService'
 import { UserType } from '../classes/Constants'
 import { getPagination, getPagingData } from '../utils/CommonUtil'
 
 const customControllers = {
     init: router => {
-        const baseUrl = `${Properties.api}/vendor`
+        const baseUrl = `${Properties.api}/sales`
         router.post(baseUrl + '/get', authorize(), customControllers.get)
         router.post(baseUrl + '/save', authorize(), customControllers.save)
         router.post(baseUrl + '/', authorize(), customControllers.getById)
@@ -32,7 +32,7 @@ const customControllers = {
             const { pageNo, pageSize, client_id } = req.body;
 
             const { limit, offset } = getPagination(pageNo, pageSize);
-            vendorService.getAll(limit, offset,client_id).then(data => {
+            salesService.getAll(limit, offset,client_id).then(data => {
                 const response = getPagingData(data, pageNo, limit);
                 res.send(
                     new CommonMessage({
@@ -52,7 +52,7 @@ const customControllers = {
             const { id } = req.body;
             res.send(
                 new CommonMessage({
-                    data: await vendorService.getById(id)
+                    data: await salesService.getById(id)
                 })
             )
         } catch (err) {
@@ -63,10 +63,10 @@ const customControllers = {
     save: async (req, res) => {
         try {
             var data;
-            if (!req.body.vendor_id) {
-                data = await vendorService.create(req.body)
+            if (!req.body.sales_id) {
+                data = await salesService.create(req.body)
             } else {
-                data = await vendorService.update(req.body)
+                data = await salesService.update(req.body)
             }
             res.send(
                 new CommonMessage({
@@ -78,10 +78,10 @@ const customControllers = {
             res.status(safeErr.status).json(safeErr)
         }
     },
-
     delete: async (req, res) => {
         try {
-            var data = await vendorService.delete(req.body)
+            var data = await salesService.delete(req.body)
+
             res.send(
                 new CommonMessage({
                     data: data

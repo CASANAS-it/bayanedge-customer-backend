@@ -23,6 +23,11 @@ const customControllers = {
     router.get(baseUrl + '/liability_type', authorize(), customControllers.getLiabilityType)
     router.get(baseUrl + '/expense_type', authorize(), customControllers.getExpenseType)
     router.get(baseUrl + '/equity_type', authorize(), customControllers.getEquityType)
+    router.get(baseUrl + '/transaction_type', authorize(), customControllers.getTransactionType)
+    router.get(baseUrl + '/customer', authorize(), customControllers.getCustomers)
+    router.get(baseUrl + '/vendor', authorize(), customControllers.getVendors)
+    router.get(baseUrl + '/inventory', authorize(), customControllers.getInventory)
+    
   },
 
   getAssetType: async (req, res) => {
@@ -80,6 +85,58 @@ const customControllers = {
   getRevenueType: async (req, res) => {
     try {
       const data = await lookupService.getAllRevenueType()
+      res.send(
+        new CommonMessage({
+          data: data
+        })
+      )
+    } catch (err) {
+      const safeErr = ErrorManager.getSafeError(err)
+      res.status(safeErr.status).json(safeErr)
+    }
+  },
+  getTransactionType: async (req, res) => {
+    try {
+      const data = await lookupService.getAllTransactionType()
+      res.send(
+        new CommonMessage({
+          data: data
+        })
+      )
+    } catch (err) {
+      const safeErr = ErrorManager.getSafeError(err)
+      res.status(safeErr.status).json(safeErr)
+    }
+  },
+  getCustomers: async (req, res) => {
+    try {
+      const data = await lookupService.getAllCustomer(req.body.client_id)
+      res.send(
+        new CommonMessage({
+          data: data
+        })
+      )
+    } catch (err) {
+      const safeErr = ErrorManager.getSafeError(err)
+      res.status(safeErr.status).json(safeErr)
+    }
+  },
+  getVendors: async (req, res) => {
+    try {
+      const data = await lookupService.getAllVendor(req.body.client_id)
+      res.send(
+        new CommonMessage({
+          data: data
+        })
+      )
+    } catch (err) {
+      const safeErr = ErrorManager.getSafeError(err)
+      res.status(safeErr.status).json(safeErr)
+    }
+  },
+  getInventory: async (req, res) => {
+    try {
+      const data = await lookupService.getAllItem(req.body.client_id)
       res.send(
         new CommonMessage({
           data: data

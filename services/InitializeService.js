@@ -5,6 +5,7 @@ import LiabilityTypeModel from '../models/LiabilityTypeModel'
 import ExpenseTypeModel from '../models/ExpenseTypeModel'
 import EquityTypeModel from '../models/EquityTypeModel'
 import UserModel from '../models/UserModel'
+import TransactionTypeModel from '../models/TransactionTypeModel'
 import {
   AssetType,
   LiabilityType,
@@ -12,6 +13,7 @@ import {
   ExpenseType,
   UserType,
   EquityType,
+  TransactionType,
 } from '../classes/Constants'
 
 const initializeService = {
@@ -42,6 +44,7 @@ const initializeService = {
     Logger.info('********************************')
 
 
+    await initTransactionType()
     await initAssetType()
     await initRevenueType()
     await initLiabilityType()
@@ -70,6 +73,16 @@ async function initAssetType() {
   await AssetTypeModel.createAssetType({ name: AssetType.FIXED_ASSET })
   await AssetTypeModel.createAssetType({ name: AssetType.ACCUMULATED_DEPRECIATION })
   await AssetTypeModel.createAssetType({ name: AssetType.OTHER_ASSETS })
+}
+
+
+async function initTransactionType() {
+  Logger.info('******************************')
+  Logger.info('****Initializing Transaction Type****')
+  Logger.info('******************************')
+
+  await TransactionTypeModel.createTransactionType({ name: TransactionType.CASH })
+  await TransactionTypeModel.createTransactionType({ name: TransactionType.ACCOUNT })
 }
 
 async function initRevenueType() {

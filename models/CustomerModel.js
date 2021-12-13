@@ -9,13 +9,13 @@ const customModel = {
   init() {
     const db = Database.getConnection()
     const customerSchema = new mongoose.Schema({
-      id: {
+      customer_id: {
         type: 'String'
       },
       client_id: {
         type: 'String'
       },
-      name: {
+      customer_name: {
         type: 'String'
       },
       address: {
@@ -39,6 +39,7 @@ const customModel = {
       modified_date: {
         type: 'Date'
       },
+      
     })
     customerSchema.plugin(mongoosePaginate)
     customModel.setModel(db.connection.model('customers', customerSchema))
@@ -68,10 +69,19 @@ const customModel = {
       .lean()
     return customer
   },
+  
+  getAllByClientId: async (id) => {
+    const customer = await customModel.model
+      .find({
+        client_id: id,
+      })
+      .lean()
+    return customer
+  },
   getByCustomerId: async (id) => {
     const customer = await customModel.model
       .findOne({
-        id: id,
+        customer_id: id,
         is_active: true
       })
       .lean()
@@ -79,7 +89,7 @@ const customModel = {
   },
   update: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ id: params.id }, {
-      name: params.name,
+      customer_name: params.customer_name,
       address: params.address,
       contact_information: params.contact_information,
       modified_by: params.admin_id,
@@ -96,11 +106,11 @@ const customModel = {
     return user
   },
   create: async (params) => {
-    Logger.info('Creating customer ' + params.name)
+    Logger.info('Creating customer ' + params.customer_name)
     const id = generateId()
     const customer = new customModel.model({
-      id: id,
-      name: params.name,
+      customer_id: id,
+      customer_name: params.customer_name,
       client_id: params.client_id,
       address: params.address,
       contact_information: params.contact_information,

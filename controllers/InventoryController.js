@@ -63,7 +63,7 @@ const customControllers = {
     save: async (req, res) => {
         try {
             var data;
-            if (!req.body.id) {
+            if (!req.body.item_id) {
                 data = await inventoryService.create(req.body)
             } else {
                 data = await inventoryService.update(req.body)

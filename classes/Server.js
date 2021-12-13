@@ -35,6 +35,8 @@ import EquityController from '../controllers/EquityController'
 import LiabilityController from '../controllers/LiabilityController'
 import RevenueController from '../controllers/RevenueController'
 import EnterpriseController from '../controllers/EnterpriseController'
+import SalesController from '../controllers/SalesController'
+import LedgerController from '../controllers/LedgerController'
 
 const cron = require('node-cron')
 // End Import Controllers
@@ -101,6 +103,8 @@ class Server {
     LiabilityController.init(router)
     RevenueController.init(router)
     EnterpriseController.init(router)
+    SalesController.init(router)
+    LedgerController.init(router)
     // End Init Controllers
 
     this.app.use('/', router)

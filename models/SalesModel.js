@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 import Database from '../classes/Database'
 import Logger from '../classes/Logger'
 import { encrypt, generateId, decrypt } from '../utils/Crypto'
@@ -9,26 +9,40 @@ const customModel = {
   init() {
     const db = Database.getConnection()
     const itemSchema = new mongoose.Schema({
-      item_id: {
+      sales_id: {
         type: 'String'
       },
       client_id: {
-        type: 'String'
+        type: 'String',
       },
-      name: {
-        type: 'String'
+      item_id: {
+        type: 'String',
+        ref: "items"
       },
       unit_cost: {
-        type: 'Number'
+        type: 'String'
       },
       unit_selling_price: {
-        type: 'Number'
+        type: 'String'
       },
       unit_of_measurement: {
         type: 'String'
       },
       quantity: {
-        type: 'Number'
+        type: 'String'
+      },
+      type_id: {
+        type: 'String'
+      },
+      customer_id: {
+        type: 'String',
+        ref: "customers"
+      },
+      date: {
+        type: 'String'
+      },
+      total : {
+        type : "Number"
       },
       is_active: {
         type: 'Boolean'
@@ -45,10 +59,28 @@ const customModel = {
       modified_date: {
         type: 'Date'
       },
-    })
+    },
+      {
+        toObject: { virtuals: true },
+      })
+
+
+    itemSchema.virtual('customer', {
+      ref: 'customers',
+      localField: 'customer_id',
+      foreignField: 'customer_id',
+      justOne: true // for many-to-1 relationships
+    });
+
+    itemSchema.virtual('item', {
+      ref: 'items',
+      localField: 'item_id',
+      foreignField: 'item_id',
+      justOne: true // for many-to-1 relationships
+    });
 
     itemSchema.plugin(mongoosePaginate)
-    customModel.setModel(db.connection.model('items', itemSchema))
+    customModel.setModel(db.connection.model('sales', itemSchema))
 
     return itemSchema
   },
@@ -76,54 +108,47 @@ const customModel = {
     const items = await customModel.model
       .findOne({
         client_id: id,
-      }).lean()
+      })
+      .lean()
     return items
   },
   getPaginatedItems: async (limit, offset, client_id) => {
-    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, { offset: offset, limit: limit })
+    var options = {
+      populate: ['item','customer'],
+      lean : true
+    }
+    return await customModel.getModel().paginate({is_active: true, client_id: client_id }, {...options, offset: offset, limit: limit })
+   
+    // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
-  getByItemId: async (id) => {
+  getById: async (id) => {
     const item = await customModel.model
       .findOne({
-        item_id: id,
+        sales_id: id,
         is_active: true
       })
       .lean()
     return item
   },
   update: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ item_id: params.item_id }, {
-      name: params.name,
-      unit_cost: parseFloat(params.unit_cost),
-      unit_selling_price: parseFloat(params.unit_selling_price),
+    const user = await customModel.model.findOneAndUpdate({ sales_id: params.sales_id }, {
+      client_id: params.client_id,
+      item_id: params.item_id,
+      unit_cost: params.unit_cost,
+      unit_selling_price: params.unit_selling_price,
       unit_of_measurement: params.unit_of_measurement,
       quantity: params.quantity,
-      modified_by: params.admin_id,
-      modified_date: new Date(),
-    })
-    return user
-  },
-
-  addQuantity: async (params) => {
-    console.log(params,'addQuantity')
-    const user = await customModel.model.findOneAndUpdate({ item_id: params.item_id }, {
-      $inc: { quantity: params.quantity },
-      modified_by: params.admin_id,
-      modified_date: new Date(),
-    })
-    return user
-  },
-
-  subtractQuantity: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ item_id: params.item_id }, {
-      $inc: { quantity: (params.quantity * -1) },
+      total: params.total,
+      type_id: params.type_id,
+      customer_id: params.customer_id,
+      date: params.date,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
     return user
   },
   delete: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ item_id: params.id }, {
+    const user = await customModel.model.findOneAndUpdate({ id: params.id }, {
       is_active: false,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -131,17 +156,20 @@ const customModel = {
     return user
   },
   create: async (params) => {
-    Logger.info('Creating item ' + params.name)
     const id = generateId()
     const item = new customModel.model({
-      item_id: id,
-      name: params.name,
+      sales_id: id,
       client_id: params.client_id,
-      unit_cost: parseFloat(params.unit_cost),
-      unit_selling_price: parseFloat(params.unit_selling_price),
+      item_id: params.item_id,
+      unit_cost: params.unit_cost,
+      unit_selling_price: params.unit_selling_price,
       unit_of_measurement: params.unit_of_measurement,
       quantity: params.quantity,
-      is_active: true,
+      total: params.total,
+      type_id: params.type_id,
+      customer_id: params.customer_id,
+      date: params.date,
+      is_active : true,
       created_by: params.admin_id,
       create_date: new Date(),
       modified_by: params.admin_id,
