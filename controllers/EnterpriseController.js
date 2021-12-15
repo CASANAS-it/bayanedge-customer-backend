@@ -27,11 +27,11 @@ const customControllers = {
     get: async (req, res) => {
         try {
 
-            const { pageNo, pageSize, client_id } = req.body;
+            const { pageIndex, pageSize, client_id } = req.body;
 
-            const { limit, offset } = getPagination(pageNo, pageSize);
+            const { limit, offset } = getPagination(pageIndex, pageSize);
             enterpriseService.getAll(limit, offset,client_id).then(data => {
-                const response = getPagingData(data, pageNo, limit);
+                const response = getPagingData(data, pageIndex, limit);
                 res.send(
                     new CommonMessage({
                         data: response

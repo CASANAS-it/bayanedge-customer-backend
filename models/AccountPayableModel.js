@@ -129,11 +129,12 @@ const customModel = {
   getPaginatedItems: async (limit, offset, client_id) => {
     var options = {
       populate: ['item', 'vendor'],
-      lean: true
+      lean: true,
+      offset: offset, limit: limit
     }
 
    
-    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, { ...options, offset: offset, limit: limit })
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, options)
 
     // return await customModel.getModel().find().select().populate('item').populate('vendor').lean()
   },

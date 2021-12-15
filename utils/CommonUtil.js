@@ -30,7 +30,9 @@ function validateStringValue(val) {
 function getPagination(page, size) {
   const limit = size ? +size : 3;
   const offset = page ? page * limit : 0;
-
+  
+  console.log(page,size)
+  console.log(offset,'offset')
   return { limit, offset };
 }
 

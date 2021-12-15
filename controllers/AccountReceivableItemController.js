@@ -29,11 +29,11 @@ const customControllers = {
     get: async (req, res) => {
         try {
 
-            const { pageNo, pageSize, client_id,is_paid } = req.body;
+            const { pageIndex, pageSize, client_id,is_paid } = req.body;
 
-            const { limit, offset } = getPagination(pageNo, pageSize);
+            const { limit, offset } = getPagination(pageIndex, pageSize);
             accountReceivableItemService.getAll(limit, offset,client_id,is_paid).then(data => {
-                const response = getPagingData(data, pageNo, limit);
+                const response = getPagingData(data, pageIndex, limit);
                 res.send(
                     new CommonMessage({
                         data: response

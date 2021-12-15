@@ -22,8 +22,8 @@ const customModel = {
       amount_to_be_paid_per_term: {
         type: "Number"
       },
-      balance : {
-        type : "Number"
+      balance: {
+        type: "Number"
       },
       is_paid: {
         type: 'Boolean'
@@ -96,10 +96,11 @@ const customModel = {
   getPaginatedItems: async (limit, offset, client_id, is_paid) => {
     var options = {
       populate: { path: "parent", populate: [{ path: "item" }, { path: "vendor" }] },
-      lean: true
+      lean: true,
+      offset: offset, limit: limit, sort: { is_paid: 1, transaction_date: -1 }
     }
     var date = new moment().format("YYYY-MM-DD")
-    return await customModel.getModel().paginate({ is_paid: is_paid, is_active: true, client_id: client_id, transaction_date: { $lte: date } }, { ...options, offset: offset, limit: limit,sort : {is_paid : 1,transaction_date : -1} })
+    return await customModel.getModel().paginate({ is_paid: is_paid, is_active: true, client_id: client_id, transaction_date: { $lte: date } }, options)
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean(),
   },
@@ -115,7 +116,7 @@ const customModel = {
     const user = await customModel.model.findOneAndUpdate({ child_id: params.child_id }, {
       is_paid: true,
       amount_to_be_paid_per_term: params.amount_to_be_paid_per_term,
-      balance : params.balance,
+      balance: params.balance,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -131,7 +132,7 @@ const customModel = {
       transaction_date: params.transaction_date,
       is_active: true,
       is_paid: false,
-      balance : params.balance,
+      balance: params.balance,
       created_by: params.admin_id,
       create_date: new Date(),
       modified_by: params.admin_id,

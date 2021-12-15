@@ -41,8 +41,8 @@ const customModel = {
       date: {
         type: 'String'
       },
-      total : {
-        type : "Number"
+      total: {
+        type: "Number"
       },
       is_active: {
         type: 'Boolean'
@@ -113,12 +113,14 @@ const customModel = {
     return items
   },
   getPaginatedItems: async (limit, offset, client_id) => {
+    console.log(limit,offset)
     var options = {
-      populate: ['item','vendor'],
-      lean : true
+      populate: ['item', 'vendor'],
+      lean: true,
+      offset: offset, limit: limit
     }
-    return await customModel.getModel().paginate({is_active: true, client_id: client_id }, {...options, offset: offset, limit: limit })
-   
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, options)
+
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
   getById: async (id) => {
@@ -169,7 +171,7 @@ const customModel = {
       type_id: params.type_id,
       vendor_id: params.vendor_id,
       date: params.date,
-      is_active : true,
+      is_active: true,
       created_by: params.admin_id,
       create_date: new Date(),
       modified_by: params.admin_id,

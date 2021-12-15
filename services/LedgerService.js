@@ -58,7 +58,6 @@ const ledgerService = {
     if (params.type_id === TransactionType.CASH) {
       // insert into cash journal
       var transaction = JSON.parse(JSON.stringify(params));
-      console.log(ledger,'hello')
       transaction.reference_id = ledger.ledger_id;
       transaction.total = transaction.total * -1;
       await CashJournalModel.create(transaction)
