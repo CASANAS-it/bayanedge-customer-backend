@@ -3,6 +3,11 @@ const TransactionType = Object.freeze({
   ACCOUNT: 'Account',
 })
 
+const TransType = Object.freeze({
+  SALES : "Sales",
+  ORDER : "Order"
+})
+
 const AssetType = Object.freeze({
   CASH: 'Cash',
   CASH_IN_BANK: 'Cash in Bank',

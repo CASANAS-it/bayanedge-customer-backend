@@ -42,11 +42,28 @@ function getPagingData(data, page, limit) {
   return { totalItems, rows, totalPages, currentPage };
 }
 
+
+function makeid(length) {
+  var result = '';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() *
+          charactersLength));
+  }
+  return result;
+}
+function generateAccountPayableId (){
+  var id = "00000" + (Date.now()) + makeid(4)
+  return id;
+}
+
 export {
   getUserFromToken,
   getTransactionType,
   getUserType,
   validateStringValue,
   getPagination,
-  getPagingData
+  getPagingData,
+  generateAccountPayableId
 }

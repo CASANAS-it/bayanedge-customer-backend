@@ -26,6 +26,11 @@ import EnterpriseModel from '../models/EnterpriseModel'
 import TransactionTypeModel from '../models/TransactionTypeModel'
 import SalesModel from '../models/SalesModel'
 import LedgerModel from '../models/LedgerModel'
+import CashJournalModel from '../models/CashJournalModel'
+import AccountPayableModel from '../models/AccountPayableModel'
+import AccountPayableItemModel from '../models/AccountPayableItemModel'
+import AccountReceivableItemModel from '../models/AccountReceivableItemModel'
+import AccountReceivableModel from '../models/AccountReceivableModel'
 /**
  * Connection to DB
  */
@@ -61,6 +66,11 @@ class Database {
     TransactionTypeModel.init()
     SalesModel.init()
     LedgerModel.init()
+    CashJournalModel.init()
+    AccountPayableModel.init()
+    AccountPayableItemModel.init()
+    AccountReceivableItemModel.init()
+    AccountReceivableModel.init()
     // End Init Models
   }
 
