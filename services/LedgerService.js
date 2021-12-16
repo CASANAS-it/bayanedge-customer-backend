@@ -3,7 +3,7 @@ import VendorModel from '../models/VendorModel'
 import LedgerModel from '../models/LedgerModel'
 import InventoryModel from '../models/InventoryModel'
 import CashJournalModel from '../models/CashJournalModel'
-import { TransactionType } from '../classes/Constants'
+import { TransactionType, TransType } from '../classes/Constants'
 import AccountPayableModel from '../models/AccountPayableModel'
 
 const ledgerService = {
@@ -60,6 +60,7 @@ const ledgerService = {
       var transaction = JSON.parse(JSON.stringify(params));
       transaction.reference_id = ledger.ledger_id;
       transaction.total = transaction.total * -1;
+      transaction.type_id = TransType.ORDER;
       await CashJournalModel.create(transaction)
     }else{
       params.ledger_id = ledger.ledger_id

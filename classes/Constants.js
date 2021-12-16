@@ -65,5 +65,6 @@ export {
   ExpenseType,
   UserType,
   EquityType,
-  TransactionType
+  TransactionType,
+  TransType
 }

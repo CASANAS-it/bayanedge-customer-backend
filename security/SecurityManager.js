@@ -38,7 +38,7 @@ export const authorize = (accessLevel) => {
         } catch (err) {
           // Token not valid
           const safeErr = ErrorManager.getSafeError(new Errors.JWT_INVALID())
-          return res.status(safeErr.status).json(safeErr.body)
+          return res.status(401).json(safeErr.body)
         }
 
         // const hasAccess = await AccessModel.getUserByAccessLevel({ accessLevel, loginId: decodedUser.login_id })

@@ -4,7 +4,7 @@ import CustomerModel from '../models/CustomerModel'
 import SalesModel from '../models/SalesModel'
 import InventoryModel from '../models/InventoryModel'
 import CashJournalModel from '../models/CashJournalModel'
-import { TransactionType } from '../classes/Constants'
+import { TransactionType, TransType } from '../classes/Constants'
 import AccountPayableModel from '../models/AccountPayableModel'
 import AccountReceivableModel from '../models/AccountReceivableModel'
 
@@ -61,6 +61,7 @@ const salesService = {
       // insert into cash journal
       var transaction = params;
       transaction.reference_id = sales.sales_id;
+      transaction.type_id = TransType.SALES;
       await CashJournalModel.create(transaction)
     }else{
       params.sales_id = sales.sales_id;

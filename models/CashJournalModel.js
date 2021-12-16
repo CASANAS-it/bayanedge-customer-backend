@@ -129,12 +129,12 @@ const customModel = {
       .lean()
     return items
   },
-  getPaginatedItems: async (limit, offset, client_id) => {
+  getPaginatedItems: async (limit, offset, client_id,type_id) => {
     var options = {
       populate: ['item', 'customer', 'vendor'],
       lean: true
     }
-    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, { ...options, offset: offset, limit: limit })
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id,type_id : type_id }, { ...options, offset: offset, limit: limit })
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
@@ -144,7 +144,7 @@ const customModel = {
         transaction_id: id,
         is_active: true
       })
-      .lean()
+      .lean().populate(['item','customer','vendor'])
     return item
   },
   update: async (params) => {

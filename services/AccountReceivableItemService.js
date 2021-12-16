@@ -1,4 +1,5 @@
 import moment from 'moment'
+import { TransType } from '../classes/Constants'
 import Errors from '../classes/Errors'
 import AccountReceivableItemModel from '../models/AccountReceivableItemModel'
 import AccountReceivableModel from '../models/AccountReceivableModel'
@@ -42,9 +43,10 @@ const accountReceivableItemService = {
 
     var cashJournal = JSON.parse(JSON.stringify(current.parent));
     
-    cashJournal.transaction_id = generateId();
+    
     cashJournal.reference_id = params.child_id;
     cashJournal.total =  params.amount_to_be_paid_per_term * -1;
+    cashJournal.type_id = TransType.SALES;
     await CashJournalModel.create(cashJournal)
 
     return ap
