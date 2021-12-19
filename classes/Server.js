@@ -42,6 +42,8 @@ import AccountPayableItemController from '../controllers/AccountPayableItemContr
 import AccountReceivableController from '../controllers/AccountReceivableController'
 import AccountReceivableItemController from '../controllers/AccountReceivableItemController'
 import CashJournalController from '../controllers/CashJournalController'
+import LoansPayableController from '../controllers/LoansPayableController'
+import LoansPayableItemController from '../controllers/LoansPayableItemController'
 
 const cron = require('node-cron')
 // End Import Controllers
@@ -115,6 +117,8 @@ class Server {
     AccountReceivableController.init(router)
     AccountReceivableItemController.init(router)
     CashJournalController.init(router)
+    LoansPayableController.init(router)
+    LoansPayableItemController.init(router)
     // End Init Controllers
 
     this.app.use('/', router)

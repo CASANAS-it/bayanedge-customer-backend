@@ -3,6 +3,7 @@ import Database from '../classes/Database'
 import Logger from '../classes/Logger'
 import { encrypt, generateId, decrypt } from '../utils/Crypto'
 import mongoosePaginate from 'mongoose-paginate'
+import { TransType } from '../classes/Constants'
 
 const customModel = {
 
@@ -129,12 +130,28 @@ const customModel = {
       .lean()
     return items
   },
-  getPaginatedItems: async (limit, offset, client_id,type_id) => {
+  getPaginatedItems: async (limit, offset, client_id, type_id) => {
     var options = {
       populate: ['item', 'customer', 'vendor'],
       lean: true
     }
-    return await customModel.getModel().paginate({ is_active: true, client_id: client_id,type_id : type_id }, { ...options, offset: offset, limit: limit })
+    var condition = {};
+    if (type_id === TransType.SALES)
+      condition = {
+        $or: [
+          { type_id: TransType.SALES },
+          { type_id: TransType.LOANS_PAYABLE },
+        ]
+      }
+    else 
+    condition = {
+      $or: [
+        { type_id: TransType.ORDER },
+        { type_id: TransType.LOANS_PAYABLE_OUTFLOW },
+      ]
+    }
+
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, { ...options, offset: offset, limit: limit })
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
@@ -144,7 +161,7 @@ const customModel = {
         transaction_id: id,
         is_active: true
       })
-      .lean().populate(['item','customer','vendor'])
+      .lean().populate(['item', 'customer', 'vendor'])
     return item
   },
   update: async (params) => {

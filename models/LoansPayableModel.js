@@ -4,44 +4,21 @@ import Logger from '../classes/Logger'
 import { encrypt, generateId, decrypt } from '../utils/Crypto'
 import mongoosePaginate from 'mongoose-paginate'
 import { generateDisplayId } from '../utils/CommonUtil'
-import moment from 'moment'
+import { Config } from '../classes/Constants'
 
 const customModel = {
 
   init() {
     const db = Database.getConnection()
     const itemSchema = new mongoose.Schema({
-      ledger_id: {
+      loan_payable_id: {
         type: 'String'
       },
       display_id: {
-        type: 'String'
+        type : 'String'
       },
       client_id: {
         type: 'String',
-      },
-      item_id: {
-        type: 'String',
-        ref: "items"
-      },
-      unit_cost: {
-        type: 'String'
-      },
-      unit_selling_price: {
-        type: 'String'
-      },
-      unit_of_measurement: {
-        type: 'String'
-      },
-      quantity: {
-        type: 'String'
-      },
-      type_id: {
-        type: 'String'
-      },
-      vendor_id: {
-        type: 'String',
-        ref: "vendors"
       },
       date: {
         type: 'String'
@@ -56,7 +33,7 @@ const customModel = {
         type: "Number"
       },
       is_completed: {
-        type: 'Boolean',
+        type : 'Boolean',
       },
       is_active: {
         type: 'Boolean'
@@ -78,23 +55,8 @@ const customModel = {
         toObject: { virtuals: true },
       })
 
-
-    itemSchema.virtual('vendor', {
-      ref: 'vendors',
-      localField: 'vendor_id',
-      foreignField: 'vendor_id',
-      justOne: true // for many-to-1 relationships
-    });
-
-    itemSchema.virtual('item', {
-      ref: 'items',
-      localField: 'item_id',
-      foreignField: 'item_id',
-      justOne: true // for many-to-1 relationships
-    });
-
     itemSchema.plugin(mongoosePaginate)
-    customModel.setModel(db.connection.model('account_payables', itemSchema))
+    customModel.setModel(db.connection.model('loan_payable', itemSchema))
 
     return itemSchema
   },
@@ -127,55 +89,47 @@ const customModel = {
     return items
   },
   getPaginatedItems: async (limit, offset, client_id) => {
-    var options = {
-      populate: ['item', 'vendor'],
-      lean: true,
-      offset: offset, limit: limit
-    }
+    // var options = {
+    //   populate: ['item', 'customer'],
+    //   lean: true
+    // }
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, { offset: offset, limit: limit })
 
-   
-    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, options)
-
-    // return await customModel.getModel().find().select().populate('item').populate('vendor').lean()
+    // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
   getById: async (id) => {
     const item = await customModel.model
       .findOne({
-        ledger_id: id,
+        loan_payable_id: id,
         is_active: true
       })
       .lean()
     return item
   },
   updateTerms: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ ledger_id: params.ledger_id }, {
+    const user = await customModel.model.findOneAndUpdate({ loan_payable_id: params.loan_payable_id }, {
       payment_terms: params.payment_terms,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
     return user
   },
-  updateBalance: async (params) => {
-
-    const user = await customModel.model.findOneAndUpdate({ ledger_id: params.ledger_id }, {
-      $inc: { balance: params.amount },
+  updateBalance : async(params)=>{
+    
+    const user = await customModel.model.findOneAndUpdate({ loan_payable_id: params.loan_payable_id }, {
+      $inc : {balance : (params.amount_to_be_paid_per_term * -1)},
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
     return user
   },
   update: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ ledger_id: params.ledger_id }, {
+    const user = await customModel.model.findOneAndUpdate({ loan_payable_id: params.loan_payable_id }, {
       client_id: params.client_id,
-      item_id: params.item_id,
-      unit_cost: params.unit_cost,
-      unit_selling_price: params.unit_selling_price,
-      unit_of_measurement: params.unit_of_measurement,
-      quantity: params.quantity,
       total: params.total,
-      type_id: params.type_id,
-      vendor_id: params.vendor_id,
+      customer_id: params.customer_id,
       date: params.date,
+      payment_terms  : Config.PAYMENT_TERMS,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -189,9 +143,9 @@ const customModel = {
     })
     return user
   },
-  markAsComplete: async (id, admin_id) => {
-
-    const user = await customModel.model.findOneAndUpdate({ ledger_id: id }, {
+  markAsComplete : async (id,admin_id) => {
+    
+    const user = await customModel.model.findOneAndUpdate({ loan_payable_id: id }, {
       is_completed: true,
       modified_by: admin_id,
       modified_date: new Date(),
@@ -200,23 +154,18 @@ const customModel = {
   },
   permanentDelete: async (id) => {
     const user = await customModel.model.deleteOne(
-      { ledger_id: id })
+      { loan_payable_id: id })
     return user
   },
   create: async (params) => {
     const item = new customModel.model({
-      display_id: generateDisplayId(),
-      ledger_id: params.ledger_id,
+      display_id : generateDisplayId(),
       client_id: params.client_id,
-      item_id: params.item_id,
-      unit_cost: params.unit_cost,
-      unit_selling_price: params.unit_selling_price,
-      unit_of_measurement: params.unit_of_measurement,
-      quantity: params.quantity,
+    
+      loan_payable_id: generateId(),
       total: params.total,
-      balance: params.total,
-      type_id: params.type_id,
-      vendor_id: params.vendor_id,
+      balance : params.total,
+      payment_terms  : Config.PAYMENT_TERMS,
       date: params.date,
       is_active: true,
       is_completed: false,

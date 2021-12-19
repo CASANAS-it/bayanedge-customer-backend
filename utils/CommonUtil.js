@@ -52,7 +52,7 @@ function makeid(length) {
   }
   return result;
 }
-function generateAccountPayableId (){
+function generateDisplayId (){
   var id = "00000" + (Date.now()) + makeid(4)
   return id;
 }
@@ -64,5 +64,5 @@ export {
   validateStringValue,
   getPagination,
   getPagingData,
-  generateAccountPayableId
+  generateDisplayId
 }

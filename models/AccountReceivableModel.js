@@ -3,7 +3,7 @@ import Database from '../classes/Database'
 import Logger from '../classes/Logger'
 import { encrypt, generateId, decrypt } from '../utils/Crypto'
 import mongoosePaginate from 'mongoose-paginate'
-import { generateAccountPayableId } from '../utils/CommonUtil'
+import { generateDisplayId } from '../utils/CommonUtil'
 
 const customModel = {
 
@@ -201,7 +201,7 @@ const customModel = {
   },
   create: async (params) => {
     const item = new customModel.model({
-      display_id : generateAccountPayableId(),
+      display_id : generateDisplayId(),
       sales_id: params.sales_id,
       client_id: params.client_id,
       item_id: params.item_id,
