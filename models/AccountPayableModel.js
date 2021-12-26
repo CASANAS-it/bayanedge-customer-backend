@@ -197,7 +197,7 @@ const customModel = {
     return user
   },
   delete: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ id: params.id }, {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
       is_active: false,
       modified_by: params.admin_id,
       modified_date: new Date(),
