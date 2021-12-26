@@ -3,13 +3,17 @@ import Database from '../classes/Database'
 import Logger from '../classes/Logger'
 import { encrypt, generateId, decrypt } from '../utils/Crypto'
 import mongoosePaginate from 'mongoose-paginate'
+import { padZeroes } from '../utils/CommonUtil'
 
 const customModel = {
 
   init() {
     const db = Database.getConnection()
     const itemSchema = new mongoose.Schema({
-      ledger_id: {
+      transaction_id: {
+        type: 'String'
+      },
+      display_id: {
         type: 'String'
       },
       client_id: {
@@ -22,21 +26,8 @@ const customModel = {
       unit_cost: {
         type: 'String'
       },
-      unit_selling_price: {
-        type: 'String'
-      },
-      unit_of_measurement: {
-        type: 'String'
-      },
       quantity: {
         type: 'String'
-      },
-      type_id: {
-        type: 'String'
-      },
-      vendor_id: {
-        type: 'String',
-        ref: "vendors"
       },
       date: {
         type: 'String'
@@ -63,14 +54,6 @@ const customModel = {
       {
         toObject: { virtuals: true },
       })
-
-
-    itemSchema.virtual('vendor', {
-      ref: 'vendors',
-      localField: 'vendor_id',
-      foreignField: 'vendor_id',
-      justOne: true // for many-to-1 relationships
-    });
 
     itemSchema.virtual('item', {
       ref: 'items',
@@ -113,9 +96,9 @@ const customModel = {
     return items
   },
   getPaginatedItems: async (limit, offset, client_id) => {
-    console.log(limit,offset)
+    console.log(limit, offset)
     var options = {
-      populate: ['item', 'vendor'],
+      populate: ['item'],
       lean: true,
       offset: offset, limit: limit
     }
@@ -126,23 +109,19 @@ const customModel = {
   getById: async (id) => {
     const item = await customModel.model
       .findOne({
-        ledger_id: id,
+        transaction_id: id,
         is_active: true
       })
       .lean()
     return item
   },
   update: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ ledger_id: params.ledger_id }, {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
       client_id: params.client_id,
       item_id: params.item_id,
       unit_cost: params.unit_cost,
-      unit_selling_price: params.unit_selling_price,
-      unit_of_measurement: params.unit_of_measurement,
       quantity: params.quantity,
       total: params.total,
-      type_id: params.type_id,
-      vendor_id: params.vendor_id,
       date: params.date,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -150,7 +129,7 @@ const customModel = {
     return user
   },
   delete: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ ledger_id: params.ledger_id }, {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
       is_active: false,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -158,22 +137,27 @@ const customModel = {
     return user
   },
   create: async (params) => {
+    var displayId = "IN000001"
+    const previousId = await customModel.model.findOne({ client_id: params.client_id }).sort({ display_id: -1 });
+    if (previousId) {
+      var disId = previousId.display_id
+      disId = parseInt(disId.substring(2)) + 1;
+      displayId = "IN" + padZeroes(disId)
+    }
+
     const id = generateId()
     const item = new customModel.model({
-      ledger_id: id,
+      transaction_id: id,
       client_id: params.client_id,
+      display_id: displayId,
       item_id: params.item_id,
       unit_cost: params.unit_cost,
-      unit_selling_price: params.unit_selling_price,
-      unit_of_measurement: params.unit_of_measurement,
       quantity: params.quantity,
       total: params.total,
-      type_id: params.type_id,
-      vendor_id: params.vendor_id,
       date: params.date,
       is_active: true,
       created_by: params.admin_id,
-      create_date: new Date(),
+      created_date: new Date(),
       modified_by: params.admin_id,
       modified_date: new Date(),
     })

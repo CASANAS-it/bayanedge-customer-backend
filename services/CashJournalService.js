@@ -3,7 +3,7 @@ import VendorModel from '../models/VendorModel'
 import CustomerModel from '../models/CustomerModel'
 import CashJournalModel from '../models/CashJournalModel'
 import InventoryModel from '../models/InventoryModel'
-import { TransType } from '../classes/Constants'
+import { FlowType, TransType } from '../classes/Constants'
 
 const cashJournalService = {
   getAll: async (limit, offset, client_id, type) => {
@@ -22,12 +22,12 @@ const cashJournalService = {
     var inflowTotal = 0;
     var outflowTotal = 0;
     cj.forEach(element => {
-      total += element.total;
-      if (element.type_id === TransType.SALES)
+      if (element.flow_type_id === FlowType.INFLOW)
         inflowTotal += element.total
       else
         outflowTotal += element.total
     });
+    total = inflowTotal - outflowTotal;
     var result = {
       total: total,
       inflowTotal: inflowTotal,

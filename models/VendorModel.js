@@ -120,7 +120,7 @@ const customModel = {
       account_number: params.account_number,
       is_active: true,
       created_by: params.admin_id,
-      create_date: new Date(),
+      created_date: new Date(),
       modified_by: params.admin_id,
       modified_date: new Date(),
     })

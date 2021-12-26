@@ -113,7 +113,7 @@ const customModel = {
       middle_name: '',
       last_name: '',
       created_by: id,
-      create_date: new Date(),
+      created_date: new Date(),
       modified_by: id,
       modified_date: new Date(),
       password: hashPassword
@@ -136,7 +136,7 @@ const customModel = {
       middle_name: middleName,
       last_name: lastName,
       created_by: adminId,
-      create_date: new Date(),
+      created_date: new Date(),
       modified_by: adminId,
       modified_date: new Date(),
       password: hashPassword

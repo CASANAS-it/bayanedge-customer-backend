@@ -9,8 +9,11 @@ const customModel = {
   init() {
     const db = Database.getConnection()
     const itemSchema = new mongoose.Schema({
-      sales_id: {
+      transaction_id: {
         type: 'String'
+      },
+      display_id : {
+        type : 'String'
       },
       client_id: {
         type: 'String',
@@ -19,24 +22,11 @@ const customModel = {
         type: 'String',
         ref: "items"
       },
-      unit_cost: {
-        type: 'String'
-      },
       unit_selling_price: {
-        type: 'String'
-      },
-      unit_of_measurement: {
         type: 'String'
       },
       quantity: {
         type: 'String'
-      },
-      type_id: {
-        type: 'String'
-      },
-      customer_id: {
-        type: 'String',
-        ref: "customers"
       },
       date: {
         type: 'String'
@@ -63,14 +53,6 @@ const customModel = {
       {
         toObject: { virtuals: true },
       })
-
-
-    itemSchema.virtual('customer', {
-      ref: 'customers',
-      localField: 'customer_id',
-      foreignField: 'customer_id',
-      justOne: true // for many-to-1 relationships
-    });
 
     itemSchema.virtual('item', {
       ref: 'items',
@@ -124,23 +106,19 @@ const customModel = {
   getById: async (id) => {
     const item = await customModel.model
       .findOne({
-        sales_id: id,
+        transaction_id: id,
         is_active: true
       })
       .lean()
     return item
   },
   update: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ sales_id: params.sales_id }, {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
       client_id: params.client_id,
       item_id: params.item_id,
-      unit_cost: params.unit_cost,
       unit_selling_price: params.unit_selling_price,
-      unit_of_measurement: params.unit_of_measurement,
       quantity: params.quantity,
       total: params.total,
-      type_id: params.type_id,
-      customer_id: params.customer_id,
       date: params.date,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -148,7 +126,7 @@ const customModel = {
     return user
   },
   delete: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ sales_id: params.id }, {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.id }, {
       is_active: false,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -156,22 +134,27 @@ const customModel = {
     return user
   },
   create: async (params) => {
+
+    var displayId = "SA000001"
+    const previousId = await customModel.model.findOne({ client_id: params.client_id }).sort({ display_id: -1 });
+    if (previousId) {
+      var disId = previousId.display_id
+      disId = parseInt(disId.substring(2)) + 1;
+      displayId = "SA" + padZeroes(disId)
+    }
     const id = generateId()
     const item = new customModel.model({
-      sales_id: id,
+      transaction_id: id,
+      display_id : displayId,
       client_id: params.client_id,
       item_id: params.item_id,
-      unit_cost: params.unit_cost,
       unit_selling_price: params.unit_selling_price,
-      unit_of_measurement: params.unit_of_measurement,
       quantity: params.quantity,
       total: params.total,
-      type_id: params.type_id,
-      customer_id: params.customer_id,
       date: params.date,
       is_active : true,
       created_by: params.admin_id,
-      create_date: new Date(),
+      created_date: new Date(),
       modified_by: params.admin_id,
       modified_date: new Date(),
     })

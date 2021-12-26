@@ -3,7 +3,7 @@ import Database from '../classes/Database'
 import Logger from '../classes/Logger'
 import { encrypt, generateId, decrypt } from '../utils/Crypto'
 import mongoosePaginate from 'mongoose-paginate'
-import { generateDisplayId } from '../utils/CommonUtil'
+import { generateDisplayId, padZeroes } from '../utils/CommonUtil'
 import moment from 'moment'
 
 const customModel = {
@@ -11,7 +11,7 @@ const customModel = {
   init() {
     const db = Database.getConnection()
     const itemSchema = new mongoose.Schema({
-      ledger_id: {
+      transaction_id: {
         type: 'String'
       },
       display_id: {
@@ -27,23 +27,13 @@ const customModel = {
       unit_cost: {
         type: 'String'
       },
-      unit_selling_price: {
-        type: 'String'
-      },
-      unit_of_measurement: {
-        type: 'String'
-      },
       quantity: {
         type: 'String'
       },
-      type_id: {
+      date: {
         type: 'String'
       },
-      vendor_id: {
-        type: 'String',
-        ref: "vendors"
-      },
-      date: {
+      next_payment_date: {
         type: 'String'
       },
       total: {
@@ -79,12 +69,12 @@ const customModel = {
       })
 
 
-    itemSchema.virtual('vendor', {
-      ref: 'vendors',
-      localField: 'vendor_id',
-      foreignField: 'vendor_id',
-      justOne: true // for many-to-1 relationships
-    });
+    // itemSchema.virtual('vendor', {
+    //   ref: 'vendors',
+    //   localField: 'vendor_id',
+    //   foreignField: 'vendor_id',
+    //   justOne: true // for many-to-1 relationships
+    // });
 
     itemSchema.virtual('item', {
       ref: 'items',
@@ -128,12 +118,12 @@ const customModel = {
   },
   getPaginatedItems: async (limit, offset, client_id) => {
     var options = {
-      populate: ['item', 'vendor'],
+      populate: ['item'],
       lean: true,
       offset: offset, limit: limit
     }
 
-   
+
     return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, options)
 
     // return await customModel.getModel().find().select().populate('item').populate('vendor').lean()
@@ -141,14 +131,14 @@ const customModel = {
   getById: async (id) => {
     const item = await customModel.model
       .findOne({
-        ledger_id: id,
+        transaction_id: id,
         is_active: true
       })
       .lean()
     return item
   },
   updateTerms: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ ledger_id: params.ledger_id }, {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
       payment_terms: params.payment_terms,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -157,7 +147,7 @@ const customModel = {
   },
   updateBalance: async (params) => {
 
-    const user = await customModel.model.findOneAndUpdate({ ledger_id: params.ledger_id }, {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
       $inc: { balance: params.amount },
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -165,17 +155,42 @@ const customModel = {
     return user
   },
   update: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ ledger_id: params.ledger_id }, {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
       client_id: params.client_id,
       item_id: params.item_id,
       unit_cost: params.unit_cost,
-      unit_selling_price: params.unit_selling_price,
-      unit_of_measurement: params.unit_of_measurement,
       quantity: params.quantity,
-      total: params.total,
-      type_id: params.type_id,
-      vendor_id: params.vendor_id,
+      total: params.total, payment_terms: params.payment_terms,
+      balance: params.total,
       date: params.date,
+      next_payment_date: params.next_payment_date,
+      modified_by: params.admin_id,
+      modified_date: new Date(),
+    })
+    return user
+  },
+
+  updateTerms: async (params) => {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
+      payment_terms: params.payment_terms,
+      modified_by: params.admin_id,
+      modified_date: new Date(),
+    })
+    return user
+  },
+  updateBalance: async (params) => {
+
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
+      $inc: { balance: params.amount },
+      modified_by: params.admin_id,
+      modified_date: new Date(),
+    })
+    return user
+  },
+  pay: async (params) => {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
+      balance: params.balance,
+      next_payment_date: params.next_payment_date,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -190,8 +205,7 @@ const customModel = {
     return user
   },
   markAsComplete: async (id, admin_id) => {
-
-    const user = await customModel.model.findOneAndUpdate({ ledger_id: id }, {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: id }, {
       is_completed: true,
       modified_by: admin_id,
       modified_date: new Date(),
@@ -200,28 +214,34 @@ const customModel = {
   },
   permanentDelete: async (id) => {
     const user = await customModel.model.deleteOne(
-      { ledger_id: id })
+      { transaction_id: id })
     return user
   },
   create: async (params) => {
+    var displayId = "AP000001"
+    const previousId = await customModel.model.findOne({ client_id: params.client_id }).sort({ display_id: -1 });
+    if (previousId) {
+      var disId = previousId.display_id
+      disId = parseInt(disId.substring(2)) + 1;
+      displayId = "AP" + padZeroes(disId)
+    }
     const item = new customModel.model({
-      display_id: generateDisplayId(),
-      ledger_id: params.ledger_id,
+      display_id: displayId,
+      transaction_id: generateId(),
       client_id: params.client_id,
       item_id: params.item_id,
       unit_cost: params.unit_cost,
-      unit_selling_price: params.unit_selling_price,
-      unit_of_measurement: params.unit_of_measurement,
       quantity: params.quantity,
       total: params.total,
       balance: params.total,
       type_id: params.type_id,
-      vendor_id: params.vendor_id,
+      payment_terms: params.payment_terms,
+      next_payment_date: params.next_payment_date,
       date: params.date,
       is_active: true,
       is_completed: false,
       created_by: params.admin_id,
-      create_date: new Date(),
+      created_date: new Date(),
       modified_by: params.admin_id,
       modified_date: new Date(),
     })

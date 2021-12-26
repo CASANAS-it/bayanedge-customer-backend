@@ -1,7 +1,6 @@
 import moment from 'moment'
-import { TransType } from '../classes/Constants'
+import { FlowType, TransType } from '../classes/Constants'
 import Errors from '../classes/Errors'
-import AccountPayableItemModel from '../models/AccountPayableItemModel'
 import AccountPayableModel from '../models/AccountPayableModel'
 import CashJournalModel from '../models/CashJournalModel'
 import { generateId } from '../utils/Crypto'
@@ -18,29 +17,44 @@ const accountPayableService = {
     return accountPayable
   },
   update: async (params) => {
-
-    var ap = await AccountPayableModel.updateTerms(params);
     var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
+    params.next_payment_date = date;
+    return await AccountPayableModel.update(params)
+  },
+  create: async (params) => {
+    var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
+    params.next_payment_date = date;
+    var ap = await AccountPayableModel.create(params);
 
-    var item = {
-      parent_id: params.ledger_id,
-      client_id: params.client_id,
-      transaction_date: date,
-      admin_id: params.admin_id,
-      balance : params.total
+    return ap
+  },
+  pay: async (params) => {
+    var current = await AccountPayableModel.getById(params.transaction_id)
+  
+    var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
+    var date = moment(current.next_payment_date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
+    params.next_payment_date = date;
+    params.balance = newBalance
+
+    current.next_payment_date = date;
+    current.balance = newBalance
+
+
+    var ap = await AccountPayableModel.pay(params);
+    if (newBalance === 0) {
+      await AccountPayableModel.markAsComplete(params.transaction_id, params.admin_id)
     }
-    var item = await AccountPayableItemModel.create(item)
-
     var cashJournal = JSON.parse(JSON.stringify(params));
-    
-    
-    cashJournal.reference_id = item.child_id;
-    cashJournal.total =  params.amount_to_be_paid_per_term;
-    cashJournal.type_id = TransType.ORDER;
+
+    cashJournal.reference_id = current.transaction_id;
+    cashJournal.total = params.amount_paid;
+    cashJournal.display_id = params.display_id;
+    cashJournal.details = current;
+    cashJournal.type_id = TransType.ACCOUNTS_PAYABLE;
+    cashJournal.flow_type_id = FlowType.OUTFLOW
     await CashJournalModel.create(cashJournal)
     return ap
   },
-
 }
 
 export {

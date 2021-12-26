@@ -57,6 +57,12 @@ function generateDisplayId (){
   return id;
 }
 
+function padZeroes(num, size = 6) {
+  num = num.toString();
+  while (num.length < size) num = "0" + num;
+  return num;
+}
+
 export {
   getUserFromToken,
   getTransactionType,
@@ -64,5 +70,6 @@ export {
   validateStringValue,
   getPagination,
   getPagingData,
-  generateDisplayId
+  generateDisplayId,
+  padZeroes
 }

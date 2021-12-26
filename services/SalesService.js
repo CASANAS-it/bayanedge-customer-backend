@@ -4,7 +4,7 @@ import CustomerModel from '../models/CustomerModel'
 import SalesModel from '../models/SalesModel'
 import InventoryModel from '../models/InventoryModel'
 import CashJournalModel from '../models/CashJournalModel'
-import { TransactionType, TransType } from '../classes/Constants'
+import { FlowType, TransactionType, TransType } from '../classes/Constants'
 import AccountPayableModel from '../models/AccountPayableModel'
 import AccountReceivableModel from '../models/AccountReceivableModel'
 
@@ -26,23 +26,21 @@ const salesService = {
     }
 
     // revert quantity for inventory
-    var oldSales = await SalesModel.getById(params.sales_id);
+    var oldSales = await SalesModel.getById(params.transaction_id);
     var revertInventory = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: oldSales.item_id, quantity: oldSales.quantity })
     // -----------------------------
     var sales = await SalesModel.update(params)
     var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
 
-    if (params.type_id === TransactionType.CASH) {
-      // insert into cash journal
-      var transaction = params;
-      transaction.reference_id = params.reference_id;
-      await CashJournalModel.update(transaction)
-      await AccountReceivableModel.permanentDelete(params.sales_id)
-    } else {
-      await CashJournalModel.permanentDelete(params.sales_id)
-      // await AccountPayableModel.update(params)
-      await AccountReceivableModel.update(params)
-    }
+    await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
+
+    var transaction = params;
+    transaction.reference_id = sales.transaction_id;
+    transaction.type_id = TransType.SALES;
+    transaction.flow_type_id = FlowType.INFLOW
+    transaction.details = sales;
+    transaction.display_id = sales.display_id
+    await CashJournalModel.create(transaction)
 
     return sales
   },
@@ -50,24 +48,18 @@ const salesService = {
     return await SalesModel.delete(params)
   },
   create: async (params) => {
-    if (!params.customer_id) {
-      var customer = await CustomerModel.create(params)
-      params.customer_id = customer.customer_id
-    }
+
     var sales = await SalesModel.create(params)
     var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
 
-    if (params.type_id === TransactionType.CASH) {
-      // insert into cash journal
-      var transaction = params;
-      transaction.reference_id = sales.sales_id;
-      transaction.type_id = TransType.SALES;
-      await CashJournalModel.create(transaction)
-    }else{
-      params.sales_id = sales.sales_id;
-      params.balance = params.total
-      await AccountReceivableModel.create(params);
-    }
+    var transaction = params;
+    transaction.reference_id = sales.transaction_id;
+    transaction.type_id = TransType.SALES;
+    transaction.flow_type_id = FlowType.INFLOW
+    transaction.details = sales;
+    transaction.display_id = sales.display_id
+    await CashJournalModel.create(transaction)
+
 
     return sales
   }

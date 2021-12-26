@@ -12,17 +12,18 @@ import CommonMessage from '../classes/CommonMessage'
 // Errors
 import Errors from '../classes/Errors'
 import ErrorManager from '../classes/ErrorManager'
-import { salesService } from '../services/SalesService'
 import { UserType } from '../classes/Constants'
 import { getPagination, getPagingData } from '../utils/CommonUtil'
+import { loansProceedService } from '../services/LoansProceedService'
 
 const customControllers = {
     init: router => {
-        const baseUrl = `${Properties.api}/sales`
+        const baseUrl = `${Properties.api}/loans_proceed`
         router.post(baseUrl + '/get', authorize(), customControllers.get)
         router.post(baseUrl + '/save', authorize(), customControllers.save)
         router.post(baseUrl + '/', authorize(), customControllers.getById)
-        router.post(baseUrl + '/delete', authorize(), customControllers.delete)
+        router.post(baseUrl + '/pay', authorize(), customControllers.pay)
+        // router.post(baseUrl + '/delete', authorize(), customControllers.delete)
     },
 
 
@@ -32,7 +33,7 @@ const customControllers = {
             const { pageIndex, pageSize, client_id } = req.body;
 
             const { limit, offset } = getPagination(pageIndex, pageSize);
-            salesService.getAll(limit, offset,client_id).then(data => {
+            loansProceedService.getAll(limit, offset, client_id).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
                 res.send(
                     new CommonMessage({
@@ -52,7 +53,7 @@ const customControllers = {
             const { id } = req.body;
             res.send(
                 new CommonMessage({
-                    data: await salesService.getById(id)
+                    data: await loansProceedService.getById(id)
                 })
             )
         } catch (err) {
@@ -62,11 +63,12 @@ const customControllers = {
     },
     save: async (req, res) => {
         try {
+
             var data;
             if (!req.body.transaction_id) {
-                data = await salesService.create(req.body)
+                data = await loansProceedService.create(req.body)
             } else {
-                data = await salesService.update(req.body)
+                data = await loansProceedService.update(req.body)
             }
             res.send(
                 new CommonMessage({
@@ -80,7 +82,21 @@ const customControllers = {
     },
     delete: async (req, res) => {
         try {
-            var data = await salesService.delete(req.body)
+            var data = await loansProceedService.delete(req.body)
+
+            res.send(
+                new CommonMessage({
+                    data: data
+                })
+            )
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
+    pay: async (req, res) => {
+        try {
+            var data = await loansProceedService.pay(req.body)
 
             res.send(
                 new CommonMessage({

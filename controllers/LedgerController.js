@@ -63,7 +63,7 @@ const customControllers = {
     save: async (req, res) => {
         try {
             var data;
-            if (!req.body.ledger_id) {
+            if (!req.body.transaction_id) {
                 data = await ledgerService.create(req.body)
             } else {
                 data = await ledgerService.update(req.body)

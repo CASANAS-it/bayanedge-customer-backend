@@ -1,8 +1,6 @@
-import { application } from 'express'
 import moment from 'moment'
-import { TransType } from '../classes/Constants'
+import { FlowType, TransType } from '../classes/Constants'
 import Errors from '../classes/Errors'
-import AccountReceivableItemModel from '../models/AccountReceivableItemModel'
 import AccountReceivableModel from '../models/AccountReceivableModel'
 import CashJournalModel from '../models/CashJournalModel'
 import { generateId } from '../utils/Crypto'
@@ -19,30 +17,45 @@ const accountReceivableService = {
     return accountReceivable
   },
   update: async (params) => {
-    var newBalance = params.balance - params.amount_to_be_paid_per_term;
-  
-    var ap = await AccountReceivableModel.updateBalance(params);
-    if (newBalance === 0) {
-      await AccountReceivableModel.markAsComplete(params.sales_id)
-    }
-
-    var item = {
-      parent_id: params.sales_id,
-      client_id: params.client_id,
-      transaction_date: new moment().format("YYYY-MM-DD"),
-      amount_to_be_paid_per_term : params.amount_to_be_paid_per_term,
-      admin_id: params.admin_id,
-    }
-    const arItem = await AccountReceivableItemModel.create(item)
-    var cashJournal = JSON.parse(JSON.stringify(ap));
-    cashJournal.reference_id = arItem.child_id;
-    cashJournal.total =  params.amount_to_be_paid_per_term;
-    cashJournal.type_id = TransType.SALES;
-    await CashJournalModel.create(cashJournal)
+    var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
+    params.next_payment_date = date;
+    return await AccountReceivableModel.update(params)
+  },
+  create: async (params) => {
+    var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
+    params.next_payment_date = date;
+    var ap = await AccountReceivableModel.create(params);
 
     return ap
   },
+  
+  pay: async (params) => {
+    var current = await AccountReceivableModel.getById(params.transaction_id)
+  
+    var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
+    var date = moment(current.next_payment_date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
+    params.next_payment_date = date;
+    params.balance = newBalance
 
+    current.next_payment_date = date;
+    current.balance = newBalance
+
+
+    var ap = await AccountReceivableModel.pay(params);
+    if (newBalance === 0) {
+      await AccountReceivableModel.markAsComplete(params.transaction_id, params.admin_id)
+    }
+    var cashJournal = JSON.parse(JSON.stringify(params));
+
+    cashJournal.reference_id = current.transaction_id;
+    cashJournal.total = params.amount_paid;
+    cashJournal.details = current;
+    cashJournal.display_id = params.display_id;
+    cashJournal.type_id = TransType.ACCOUNTS_RECEIVABLE;
+    cashJournal.flow_type_id = FlowType.INFLOW
+    await CashJournalModel.create(cashJournal)
+    return ap
+  },
 }
 
 export {

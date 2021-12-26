@@ -3,6 +3,11 @@ const TransactionType = Object.freeze({
   ACCOUNT: 'Account',
 })
 
+const FlowType = Object.freeze({
+  INFLOW: 'Inflow',
+  OUTFLOW: 'Outflow',
+})
+
 const Config = Object.freeze({
   PAYMENT_TERMS : 30 // in days
 })
@@ -10,8 +15,11 @@ const Config = Object.freeze({
 const TransType = Object.freeze({
   SALES : "Sales",
   ORDER : "Order",
-  LOANS_PAYABLE : "Loans Payable Inflow",
-  LOANS_PAYABLE_OUTFLOW : "Loans Payable Outflow"
+  LEDGER : "Ledger",
+  ACCOUNTS_PAYABLE : "Accounts Payable",
+  ACCOUNTS_RECEIVABLE : "Accounts Receivable",
+  MICROSAVINGS : "Microsavings",
+  LOANS_PROCEED : "Loans Proceed"
 })
 
 const AssetType = Object.freeze({
@@ -73,5 +81,6 @@ export {
   EquityType,
   TransactionType,
   TransType,
-  Config
+  Config,
+  FlowType
 }

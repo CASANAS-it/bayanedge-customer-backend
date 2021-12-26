@@ -12,27 +12,26 @@ import CommonMessage from '../classes/CommonMessage'
 // Errors
 import Errors from '../classes/Errors'
 import ErrorManager from '../classes/ErrorManager'
+import { cashInflowService } from '../services/CashInflowService'
 import { UserType } from '../classes/Constants'
 import { getPagination, getPagingData } from '../utils/CommonUtil'
-import { accountReceivableItemService } from '../services/AccountReceivableItemService'
 
 const customControllers = {
     init: router => {
-        const baseUrl = `${Properties.api}/account_receivable/item`
+        const baseUrl = `${Properties.api}/cash_inflow`
         router.post(baseUrl + '/get', authorize(), customControllers.get)
         router.post(baseUrl + '/save', authorize(), customControllers.save)
-        router.post(baseUrl + '/', authorize(), customControllers.getById)
-        // router.post(baseUrl + '/delete', authorize(), customControllers.delete)
+        router.post(baseUrl + '/', customControllers.getById)
+        router.post(baseUrl + '/delete', authorize(), customControllers.delete)
     },
 
 
     get: async (req, res) => {
         try {
 
-            const { pageIndex, pageSize, client_id,is_paid } = req.body;
-
+            const { pageIndex, pageSize, client_id } = req.body;
             const { limit, offset } = getPagination(pageIndex, pageSize);
-            accountReceivableItemService.getAll(limit, offset,client_id,is_paid).then(data => {
+            cashInflowService.getAll(limit, offset,client_id).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
                 res.send(
                     new CommonMessage({
@@ -52,7 +51,7 @@ const customControllers = {
             const { id } = req.body;
             res.send(
                 new CommonMessage({
-                    data: await accountReceivableItemService.getById(id)
+                    data: await cashInflowService.getById(id)
                 })
             )
         } catch (err) {
@@ -62,7 +61,12 @@ const customControllers = {
     },
     save: async (req, res) => {
         try {
-            var  data = await accountReceivableItemService.update(req.body)
+            var data;
+            if (!req.body.transaction_id) {
+                data = await cashInflowService.create(req.body)
+            } else {
+                data = await cashInflowService.update(req.body)
+            }
             res.send(
                 new CommonMessage({
                     data: data
@@ -75,7 +79,7 @@ const customControllers = {
     },
     delete: async (req, res) => {
         try {
-            var data = await accountReceivableItemService.delete(req.body)
+            var data = await cashInflowService.delete(req.body)
 
             res.send(
                 new CommonMessage({

@@ -28,11 +28,10 @@ import SalesModel from '../models/SalesModel'
 import LedgerModel from '../models/LedgerModel'
 import CashJournalModel from '../models/CashJournalModel'
 import AccountPayableModel from '../models/AccountPayableModel'
-import AccountPayableItemModel from '../models/AccountPayableItemModel'
-import AccountReceivableItemModel from '../models/AccountReceivableItemModel'
 import AccountReceivableModel from '../models/AccountReceivableModel'
 import LoansPayableItemModel from '../models/LoansPayableItemModel'
 import LoansPayableModel from '../models/LoansPayableModel'
+import LoansProceedModel from '../models/LoansProceedModel'
 /**
  * Connection to DB
  */
@@ -70,11 +69,10 @@ class Database {
     LedgerModel.init()
     CashJournalModel.init()
     AccountPayableModel.init()
-    AccountPayableItemModel.init()
-    AccountReceivableItemModel.init()
     AccountReceivableModel.init()
     LoansPayableItemModel.init()
     LoansPayableModel.init()
+    LoansProceedModel.init()
     // End Init Models
   }
 

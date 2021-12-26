@@ -38,12 +38,13 @@ import EnterpriseController from '../controllers/EnterpriseController'
 import SalesController from '../controllers/SalesController'
 import LedgerController from '../controllers/LedgerController'
 import AccountPayableController from '../controllers/AccountPayableController'
-import AccountPayableItemController from '../controllers/AccountPayableItemController'
 import AccountReceivableController from '../controllers/AccountReceivableController'
-import AccountReceivableItemController from '../controllers/AccountReceivableItemController'
 import CashJournalController from '../controllers/CashJournalController'
 import LoansPayableController from '../controllers/LoansPayableController'
 import LoansPayableItemController from '../controllers/LoansPayableItemController'
+import CashInflowController from '../controllers/CashInflowController'
+import CashOutflowController from '../controllers/CashOutflowController'
+import LoansProceedController from '../controllers/LoansProceedController'
 
 const cron = require('node-cron')
 // End Import Controllers
@@ -113,12 +114,13 @@ class Server {
     SalesController.init(router)
     LedgerController.init(router)
     AccountPayableController.init(router)
-    AccountPayableItemController.init(router)
     AccountReceivableController.init(router)
-    AccountReceivableItemController.init(router)
     CashJournalController.init(router)
     LoansPayableController.init(router)
     LoansPayableItemController.init(router)
+    CashInflowController.init(router)
+    CashOutflowController.init(router)
+    LoansProceedController.init(router)
     // End Init Controllers
 
     this.app.use('/', router)

@@ -22,6 +22,7 @@ const customControllers = {
         router.post(baseUrl + '/get', authorize(), customControllers.get)
         router.post(baseUrl + '/save', authorize(), customControllers.save)
         router.post(baseUrl + '/', authorize(), customControllers.getById)
+        router.post(baseUrl + '/pay', authorize(), customControllers.pay)
         // router.post(baseUrl + '/delete', authorize(), customControllers.delete)
     },
 
@@ -32,7 +33,7 @@ const customControllers = {
             const { pageIndex, pageSize, client_id } = req.body;
 
             const { limit, offset } = getPagination(pageIndex, pageSize);
-            accountPayableService.getAll(limit, offset,client_id).then(data => {
+            accountPayableService.getAll(limit, offset, client_id).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
                 res.send(
                     new CommonMessage({
@@ -62,7 +63,13 @@ const customControllers = {
     },
     save: async (req, res) => {
         try {
-            var  data = await accountPayableService.update(req.body)
+
+            var data;
+            if (!req.body.transaction_id) {
+                data = await accountPayableService.create(req.body)
+            } else {
+                data = await accountPayableService.update(req.body)
+            }
             res.send(
                 new CommonMessage({
                     data: data
@@ -76,6 +83,20 @@ const customControllers = {
     delete: async (req, res) => {
         try {
             var data = await accountPayableService.delete(req.body)
+
+            res.send(
+                new CommonMessage({
+                    data: data
+                })
+            )
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
+    pay: async (req, res) => {
+        try {
+            var data = await accountPayableService.pay(req.body)
 
             res.send(
                 new CommonMessage({
