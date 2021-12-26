@@ -62,6 +62,7 @@ const customModel = {
     const asset = await customModel.model
       .findOne({
         client_id: id,
+        is_active : true
       })
       .lean()
     return asset

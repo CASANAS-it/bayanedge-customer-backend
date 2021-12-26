@@ -3,13 +3,15 @@ import { FlowType, TransType } from '../classes/Constants'
 import Errors from '../classes/Errors'
 import AccountPayableModel from '../models/AccountPayableModel'
 import CashJournalModel from '../models/CashJournalModel'
+import InventoryModel from '../models/InventoryModel'
 import { generateId } from '../utils/Crypto'
+import { beginningBalanceService } from './BeginningBalanceService'
 
 const accountPayableService = {
   getAll: async (limit, offset, client_id) => {
     return await AccountPayableModel.getPaginatedItems(limit, offset, client_id)
   },
-  
+
   hasDataByClient: async (id) => {
     var items = await AccountPayableModel.getByClientId(id)
     return items !== null ? true : false
@@ -22,20 +24,38 @@ const accountPayableService = {
     return accountPayable
   },
   update: async (params) => {
+
+    var oldData = await AccountPayableModel.getById(params.transaction_id);
+
+    if (oldData.total > oldData.balance) {
+      throw new Errors.EDIT_ERROR_WITH_EXISTING_DATA()
+    }
+
+    var revertInventory = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: oldData.item_id, quantity: oldData.quantity })
+    var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
+
     var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
     return await AccountPayableModel.update(params)
   },
   create: async (params) => {
+
+    var hasBeginining = await beginningBalanceService.hasDataByClient({ client_id: params.client_id, type_id: TransType.ACCOUNTS_PAYABLE })
+
+    if (!hasBeginining) {
+      throw new Errors.NO_BEGINNING_BALANCE()
+    }
+
     var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
     var ap = await AccountPayableModel.create(params);
+    var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
 
     return ap
   },
   pay: async (params) => {
     var current = await AccountPayableModel.getById(params.transaction_id)
-  
+
     var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
     var date = moment(current.next_payment_date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
@@ -62,12 +82,7 @@ const accountPayableService = {
   },
 
   delete: async (params) => {
-    var transaction = await AccountPayableModel.getById(params.transaction_id)
-  
-    if(transaction.total > transaction.balance) {
-      throw new Errors.TRANSACTION_DELETE_ERROR()
-    }
-
+    await CashJournalModel.permanentDeleteByRefId(params.id)
     await AccountPayableModel.delete(params)
   },
 }

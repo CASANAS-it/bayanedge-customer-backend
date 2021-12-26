@@ -112,6 +112,7 @@ const customModel = {
     const items = await customModel.model
       .findOne({
         client_id: id,
+        is_active : true
       })
       .lean()
     return items
@@ -197,7 +198,7 @@ const customModel = {
     return user
   },
   delete: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
+    const user = await customModel.model.findOneAndUpdate({ id: params.id }, {
       is_active: false,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -225,6 +226,7 @@ const customModel = {
       disId = parseInt(disId.substring(2)) + 1;
       displayId = "AP" + padZeroes(disId)
     }
+    
     const item = new customModel.model({
       display_id: displayId,
       transaction_id: generateId(),

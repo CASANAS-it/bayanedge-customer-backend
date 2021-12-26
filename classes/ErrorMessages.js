@@ -25,6 +25,9 @@ const ErrorMessages = Object.freeze({
   INVALID_VOUCHER_CODE: { status: 200, message: 'Invalid voucher code', code: 203 },
   INVALID_AMOUNT: { status: 200, message: 'Invalid amount', code: 204 },
   DUPLICATE_REFERENCE: { status: 200, message: 'Duplicate reference number', code: 205 },
+  NO_BEGINNING_BALANCE: { status: 200, message: 'Please set beginning balance first.',code : 206 },
+  BEGINNING_BALANCE_DELETE_ERROR_DATA: { status: 200, message: 'Can not delete beginning balance. Transaction already exists.',code : 207 },
+  EDIT_ERROR_WITH_EXISTING_DATA: { status: 200, message: 'Can not update data balance. Transaction already exists.',code : 207 },
 
   // 300 series
   API_RESPONSE: { status: 200, message: '{}', code: 300 },
@@ -44,10 +47,9 @@ const ErrorMessages = Object.freeze({
   UNKNOWN_DB: { status: 500, message: 'Unknown DB error' },
   OLD_PWD_NOT_VALID: { status: 500, message: 'Old password not valid' },
   PWD_ADMIN_NOT_VALID: { status: 500, message: 'Password admin not valid' },
-
-
   
-  TRANSACTION_DELETE_ERROR: { status: 400, message: 'Tranasction Completed, cannot delete the transaction' }
+  TRANSACTION_DELETE_ERROR: { status: 400, message: 'Tranasaction Completed, cannot delete the transaction' },
+  
 })
 
 export default ErrorMessages

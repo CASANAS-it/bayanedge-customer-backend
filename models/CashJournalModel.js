@@ -111,6 +111,7 @@ const customModel = {
     const items = await customModel.model
       .findOne({
         client_id: id,
+        is_active : true
       })
       .lean()
     return items
@@ -148,7 +149,17 @@ const customModel = {
       .lean()
     return item
   },
-
+  getByClientIdTypeId: async (id,type_id) => {
+    const items = await customModel.model
+      .findOne({
+        client_id: id,
+        type_id : type_id,
+        is_active : true,
+        is_beginning : false
+      })
+      .lean()
+    return items
+  },
   update: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
       client_id: params.client_id,
@@ -189,7 +200,7 @@ const customModel = {
   },
 
   permanentDeleteByRefId: async (id) => {
-    const user = await customModel.model.deleteOne(
+    const user = await customModel.model.deleteMany(
       { reference_id: id })
     return user
   },

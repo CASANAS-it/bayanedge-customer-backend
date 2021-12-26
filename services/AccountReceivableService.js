@@ -4,6 +4,7 @@ import Errors from '../classes/Errors'
 import AccountReceivableModel from '../models/AccountReceivableModel'
 import CashJournalModel from '../models/CashJournalModel'
 import { generateId } from '../utils/Crypto'
+import { beginningBalanceService } from './BeginningBalanceService'
 
 const accountReceivableService = {
   getAll: async (limit, offset, client_id) => {
@@ -22,14 +23,31 @@ const accountReceivableService = {
     return accountReceivable
   },
   update: async (params) => {
+    var oldData = await AccountReceivableModel.getById(params.transaction_id);
+
+    if (oldData.total > oldData.balance) {
+      throw new Errors.EDIT_ERROR_WITH_EXISTING_DATA()
+    }
+    
+    var revertInventory = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: oldData.item_id, quantity: oldData.quantity })
+    var inventor = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
+
     var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
     return await AccountReceivableModel.update(params)
   },
   create: async (params) => {
+
+    var hasBeginining = await beginningBalanceService.hasDataByClient({ client_id: params.client_id, type_id: TransType.ACCOUNTS_RECEIVABLE })
+
+    if (!hasBeginining) {
+      throw new Errors.NO_BEGINNING_BALANCE()
+    }
+
     var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
     var ap = await AccountReceivableModel.create(params);
+    var inventor = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
 
     return ap
   },
@@ -62,16 +80,11 @@ const accountReceivableService = {
     return ap
   },
 
-  
-  
-  delete: async (params) => {
-    var transaction = await AccountReceivableModel.getById(params.transaction_id)
-    
-    if(transaction.total > transaction.balance) {
-      throw new Errors.TRANSACTION_DELETE_ERROR()
-    }
 
-    await AccountReceivableModel.delete(params)
+
+  delete: async (params) => {
+    await CashJournalModel.permanentDeleteByRefId(params.id)
+    return await AccountReceivableModel.delete(params)
   },
 }
 

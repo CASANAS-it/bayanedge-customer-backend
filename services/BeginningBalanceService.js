@@ -43,6 +43,11 @@ const beginningBalanceService = {
     return beginningBalance
   },
   delete: async (id) => {
+    var data = await BeginningBalanceModel.getById(id)
+    var hasData = await CashJournalModel.getByClientIdTypeId(data.client_id,data.type_id)
+    if(hasData){
+      throw new Errors.BEGINNING_BALANCE_DELETE_ERROR_DATA()
+    }
 
     await CashJournalModel.permanentDeleteByRefId(id)
     return await BeginningBalanceModel.delete(id)

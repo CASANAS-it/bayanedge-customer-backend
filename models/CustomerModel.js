@@ -65,6 +65,7 @@ const customModel = {
     const customer = await customModel.model
       .findOne({
         client_id: id,
+        is_active : true
       })
       .lean()
     return customer
