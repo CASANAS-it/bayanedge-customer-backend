@@ -23,7 +23,7 @@ const customControllers = {
         router.post(baseUrl + '/save', authorize(), customControllers.save)
         router.post(baseUrl + '/', authorize(), customControllers.getById)
         router.post(baseUrl + '/pay', authorize(), customControllers.pay)
-        // router.post(baseUrl + '/delete', authorize(), customControllers.delete)
+        router.post(baseUrl + '/delete', authorize(), customControllers.delete)
     },
 
 
@@ -82,13 +82,9 @@ const customControllers = {
     },
     delete: async (req, res) => {
         try {
-            var data = await loansProceedService.delete(req.body)
+            await loansProceedService.delete(req.body)
 
-            res.send(
-                new CommonMessage({
-                    data: data
-                })
-            )
+            res.send(new CommonMessage({}))
         } catch (err) {
             const safeErr = ErrorManager.getSafeError(err)
             res.status(safeErr.status).json(safeErr)

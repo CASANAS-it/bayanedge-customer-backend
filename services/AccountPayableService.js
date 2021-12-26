@@ -55,6 +55,16 @@ const accountPayableService = {
     await CashJournalModel.create(cashJournal)
     return ap
   },
+
+  delete: async (params) => {
+    var transaction = await AccountPayableModel.getById(params.transaction_id)
+  
+    if(transaction.total > transaction.balance) {
+      throw new Errors.TRANSACTION_DELETE_ERROR()
+    }
+
+    await AccountPayableModel.delete(params)
+  },
 }
 
 export {

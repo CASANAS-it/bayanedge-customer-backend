@@ -23,7 +23,7 @@ const customControllers = {
         router.post(baseUrl + '/save', authorize(), customControllers.save)
         router.post(baseUrl + '/', authorize(), customControllers.getById)
         router.post(baseUrl + '/pay', authorize(), customControllers.pay)
-        // router.post(baseUrl + '/delete', authorize(), customControllers.delete)
+        router.post(baseUrl + '/delete', authorize(), customControllers.delete)
     },
 
 
