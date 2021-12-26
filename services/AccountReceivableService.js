@@ -9,6 +9,11 @@ const accountReceivableService = {
   getAll: async (limit, offset, client_id) => {
     return await AccountReceivableModel.getPaginatedItems(limit, offset, client_id)
   },
+
+  hasDataByClient: async (id) => {
+    var items = await AccountReceivableModel.getByClientId(id)
+    return items !== null ? true : false
+  },
   getById: async (id) => {
     var accountReceivable = await AccountReceivableModel.getById(id)
     if (!accountReceivable) {
@@ -28,10 +33,10 @@ const accountReceivableService = {
 
     return ap
   },
-  
+
   pay: async (params) => {
     var current = await AccountReceivableModel.getById(params.transaction_id)
-  
+
     var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
     var date = moment(current.next_payment_date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;

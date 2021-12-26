@@ -9,6 +9,11 @@ const accountPayableService = {
   getAll: async (limit, offset, client_id) => {
     return await AccountPayableModel.getPaginatedItems(limit, offset, client_id)
   },
+  
+  hasDataByClient: async (id) => {
+    var items = await AccountPayableModel.getByClientId(id)
+    return items !== null ? true : false
+  },
   getById: async (id) => {
     var accountPayable = await AccountPayableModel.getById(id)
     if (!accountPayable) {

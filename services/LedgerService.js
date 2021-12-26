@@ -10,6 +10,10 @@ const ledgerService = {
   getAll: async (limit, offset, client_id) => {
     return await LedgerModel.getPaginatedItems(limit, offset, client_id)
   },
+  hasDataByClient: async (id) => {
+    var items = await LedgerModel.getByClientId(id)
+    return items !== null ? true : false
+  },
   getById: async (id) => {
     var ledger = await LedgerModel.getById(id)
     if (!ledger) {

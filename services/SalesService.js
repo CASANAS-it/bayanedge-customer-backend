@@ -12,6 +12,10 @@ const salesService = {
   getAll: async (limit, offset, client_id) => {
     return await SalesModel.getPaginatedItems(limit, offset, client_id)
   },
+  hasDataByClient: async (id) => {
+    var items = await SalesModel.getByClientId(id)
+    return items !== null ? true  : false
+  },
   getById: async (id) => {
     var sales = await SalesModel.getById(id)
     if (!sales) {

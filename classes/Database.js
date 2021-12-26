@@ -32,6 +32,7 @@ import AccountReceivableModel from '../models/AccountReceivableModel'
 import LoansPayableItemModel from '../models/LoansPayableItemModel'
 import LoansPayableModel from '../models/LoansPayableModel'
 import LoansProceedModel from '../models/LoansProceedModel'
+import BeginningBalanceModel from '../models/BeginningBalanceModel'
 /**
  * Connection to DB
  */
@@ -73,6 +74,7 @@ class Database {
     LoansPayableItemModel.init()
     LoansPayableModel.init()
     LoansProceedModel.init()
+    BeginningBalanceModel.init()
     // End Init Models
   }
 

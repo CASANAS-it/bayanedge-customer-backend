@@ -90,6 +90,7 @@ const customModel = {
     const items = await customModel.model
       .findOne({
         client_id: id,
+        is_active : true
       })
       .lean()
     return items

@@ -45,6 +45,7 @@ import LoansPayableItemController from '../controllers/LoansPayableItemControlle
 import CashInflowController from '../controllers/CashInflowController'
 import CashOutflowController from '../controllers/CashOutflowController'
 import LoansProceedController from '../controllers/LoansProceedController'
+import BeginningBalanceController from '../controllers/BeginningBalanceController'
 
 const cron = require('node-cron')
 // End Import Controllers
@@ -121,6 +122,7 @@ class Server {
     CashInflowController.init(router)
     CashOutflowController.init(router)
     LoansProceedController.init(router)
+    BeginningBalanceController.init(router)
     // End Init Controllers
 
     this.app.use('/', router)
