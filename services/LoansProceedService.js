@@ -47,8 +47,10 @@ const loansProceedService = {
 
     return loansProceed
   },
-  delete: async (params) => {
-    return await LoansProceedModel.delete(params)
+  delete: async (params) => {    
+    
+    await LoansProceedModel.delete(params)
+    await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
   },
   create: async (params) => {
     params.interest = parseFloat(params.total) * (1 + (parseFloat(params.interest_percentage) / 100))
