@@ -111,7 +111,7 @@ const customModel = {
     const items = await customModel.model
       .findOne({
         client_id: id,
-        is_active : true
+        is_active: true
       })
       .lean()
     return items
@@ -140,6 +140,25 @@ const customModel = {
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
+
+  getPaginatedItemsByTypeId: async (limit, offset, client_id, type_id) => {
+
+    var options = {
+      populate: ['item'],
+      lean: true,
+      offset: offset, limit: limit,
+      sort: { created_date: -1 }
+    }
+
+    var condition = {
+      type_id: type_id, $or: [
+        { is_beginning: false },
+        { is_beginning: { $exists: false } }]
+    };
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, options)
+
+    // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
+  },
   getById: async (id) => {
     const item = await customModel.model
       .findOne({
@@ -149,13 +168,13 @@ const customModel = {
       .lean()
     return item
   },
-  getByClientIdTypeId: async (id,type_id) => {
+  getByClientIdTypeId: async (id, type_id) => {
     const items = await customModel.model
       .findOne({
         client_id: id,
-        type_id : type_id,
-        is_active : true,
-        is_beginning : false
+        type_id: type_id,
+        is_active: true,
+        is_beginning: false
       })
       .lean()
     return items
@@ -217,7 +236,7 @@ const customModel = {
       flow_type_id: params.flow_type_id,
       date: params.date,
       is_active: true,
-      is_beginning : params.is_beginning,
+      is_beginning: params.is_beginning,
       created_by: params.admin_id,
       created_date: new Date(),
       modified_by: params.admin_id,

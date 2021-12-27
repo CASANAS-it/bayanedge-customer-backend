@@ -46,6 +46,9 @@ import CashInflowController from '../controllers/CashInflowController'
 import CashOutflowController from '../controllers/CashOutflowController'
 import LoansProceedController from '../controllers/LoansProceedController'
 import BeginningBalanceController from '../controllers/BeginningBalanceController'
+import LoansRepaymentController from '../controllers/LoansRepaymentController'
+import { loansProceedService } from '../services/LoansProceedService'
+import JobsService from '../services/JobsService'
 
 const cron = require('node-cron')
 // End Import Controllers
@@ -123,15 +126,17 @@ class Server {
     CashOutflowController.init(router)
     LoansProceedController.init(router)
     BeginningBalanceController.init(router)
+    LoansRepaymentController.init(router  )
     // End Init Controllers
 
     this.app.use('/', router)
 
     console.log('Started running Batch Job Process')
-    // cron.schedule('*/5 * * * *', async () => {
-    //   console.log('Running validating jobs')
-    //   await JobsService.updateJobs()
-    // })
+    cron.schedule('0 1 * * *', async () => {
+      console.log('Running validating jobs')
+
+      await JobsService.run()
+    })
   }
 }
 

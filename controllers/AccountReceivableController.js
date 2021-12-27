@@ -20,6 +20,7 @@ const customControllers = {
     init: router => {
         const baseUrl = `${Properties.api}/account_receivable`
         router.post(baseUrl + '/get', authorize(), customControllers.get)
+        router.post(baseUrl + '/get_paid', authorize(), customControllers.getPaid)
         router.post(baseUrl + '/save', authorize(), customControllers.save)
         router.post(baseUrl + '/', authorize(), customControllers.getById)
         router.post(baseUrl + '/pay', authorize(), customControllers.pay)
@@ -27,6 +28,26 @@ const customControllers = {
     },
 
 
+    getPaid: async (req, res) => {
+        try {
+
+            const { pageIndex, pageSize, client_id } = req.body;
+
+            const { limit, offset } = getPagination(pageIndex, pageSize);
+            accountReceivableService.getAllCompleted(limit, offset, client_id).then(data => {
+                const response = getPagingData(data, pageIndex, limit);
+                res.send(
+                    new CommonMessage({
+                        data: response
+                    })
+                )
+            })
+
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
     get: async (req, res) => {
         try {
 

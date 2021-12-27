@@ -3,6 +3,7 @@ import { FlowType, TransType } from '../classes/Constants'
 import Errors from '../classes/Errors'
 import AccountReceivableModel from '../models/AccountReceivableModel'
 import CashJournalModel from '../models/CashJournalModel'
+import InventoryModel from '../models/InventoryModel'
 import { generateId } from '../utils/Crypto'
 import { beginningBalanceService } from './BeginningBalanceService'
 
@@ -11,6 +12,9 @@ const accountReceivableService = {
     return await AccountReceivableModel.getPaginatedItems(limit, offset, client_id)
   },
 
+  getAllCompleted: async (limit, offset, client_id) => {
+    return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.ACCOUNTS_RECEIVABLE)
+  },
   hasDataByClient: async (id) => {
     var items = await AccountReceivableModel.getByClientId(id)
     return items !== null ? true : false
