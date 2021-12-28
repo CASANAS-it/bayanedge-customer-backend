@@ -87,7 +87,7 @@ const accountReceivableService = {
 
 
   delete: async (params) => {
-    await CashJournalModel.permanentDeleteByRefId(params.id)
+    await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
     return await AccountReceivableModel.delete(params)
   },
 }

@@ -84,7 +84,7 @@ const accountPayableService = {
   },
 
   delete: async (params) => {
-    await CashJournalModel.permanentDeleteByRefId(params.id)
+    await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
     await AccountPayableModel.delete(params)
   },
 }

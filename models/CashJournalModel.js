@@ -221,6 +221,7 @@ const customModel = {
   },
 
   permanentDeleteByRefId: async (id) => {
+    console.log(id)
     const user = await customModel.model.deleteMany(
       { reference_id: id })
     return user

@@ -50,7 +50,7 @@ const salesService = {
     return sales
   },
   delete: async (params) => {
-    await CashJournalModel.permanentDeleteByRefId(params.id)
+    await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
     return await SalesModel.delete(params)
   },
   create: async (params) => {
