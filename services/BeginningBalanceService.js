@@ -85,13 +85,13 @@ const beginningBalanceService = {
     var hasLedger = await beginningBalanceService.hasDataByClient({ client_id: client_id, type_id: TransType.LEDGER })
     var ledgerData = await ledgerService.hasDataByClient(client_id)
     if (!hasLedger && !ledgerData) {
-      data.push({ name: TransType.LEDGER, value: TransType.LEDGER, flow_type: FlowType.OUTFLOW, display_id: "SA000000" })
+      data.push({ name: TransType.LEDGER, value: TransType.LEDGER, flow_type: FlowType.OUTFLOW, display_id: "IN000000" })
     }
     // accounts payable
     var hasAP = await beginningBalanceService.hasDataByClient({ client_id: client_id, type_id: TransType.ACCOUNTS_PAYABLE })
     var apData = await accountPayableService.hasDataByClient(client_id)
     if (!hasAP && !apData) {
-      data.push({ name: TransType.ACCOUNTS_PAYABLE, value: TransType.ACCOUNTS_PAYABLE, flow_type: FlowType.OUTFLOW, display_id: "IN000000" })
+      data.push({ name: TransType.ACCOUNTS_PAYABLE, value: TransType.ACCOUNTS_PAYABLE, flow_type: FlowType.OUTFLOW, display_id: "AP000000" })
     }
     return data
   },

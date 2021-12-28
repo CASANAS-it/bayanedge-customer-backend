@@ -27,6 +27,9 @@ const customModel = {
       unit_of_measurement: {
         type: 'String'
       },
+      beginning_quantity: {
+        type: 'Number'
+      },
       quantity: {
         type: 'Number'
       },
@@ -99,6 +102,7 @@ const customModel = {
       unit_selling_price: parseFloat(params.unit_selling_price),
       unit_of_measurement: params.unit_of_measurement,
       quantity: params.quantity,
+      beginning_quantity : params.beginning_quantity,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -142,6 +146,7 @@ const customModel = {
       unit_selling_price: parseFloat(params.unit_selling_price),
       unit_of_measurement: params.unit_of_measurement,
       quantity: params.quantity,
+      beginning_quantity : params.beginning_quantity,
       is_active: true,
       created_by: params.admin_id,
       created_date: new Date(),
