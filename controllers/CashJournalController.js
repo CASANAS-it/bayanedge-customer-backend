@@ -63,10 +63,9 @@ const customControllers = {
 
     getSummary: async (req, res) => {
         try {
-            const { id } = req.body;
             res.send(
                 new CommonMessage({
-                    data: await cashJournalService.getSummary()
+                    data: await cashJournalService.getSummary(req.body)
                 })
             )
         } catch (err) {

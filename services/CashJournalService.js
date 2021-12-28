@@ -16,8 +16,8 @@ const cashJournalService = {
     }
     return sales
   },
-  getSummary: async () => {
-    var cj = await CashJournalModel.getAll()
+  getSummary: async (params) => {
+    var cj = await CashJournalModel.getAllByClientId(params.client_id)
     var total = 0;
     var inflowTotal = 0;
     var outflowTotal = 0;
