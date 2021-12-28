@@ -174,7 +174,9 @@ const customModel = {
         client_id: id,
         type_id: type_id,
         is_active: true,
-        is_beginning: false
+        $or: [
+          { is_beginning: false },
+          { is_beginning: { $exists: false } }]
       })
       .lean()
     return items
