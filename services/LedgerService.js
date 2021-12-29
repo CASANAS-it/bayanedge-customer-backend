@@ -43,7 +43,7 @@ const ledgerService = {
     return ledger
   },
   delete: async (params) => {
-    await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
+    await CashJournalModel.permanentDeleteByRefId(params.id)
     return await LedgerModel.delete(params)
   },
   create: async (params) => {
