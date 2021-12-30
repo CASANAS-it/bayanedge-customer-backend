@@ -71,6 +71,7 @@ const customModel = {
     const items = await customModel.model
       .find({
         client_id: id,
+        is_active : true
       })
       .lean()
     return items
@@ -145,7 +146,7 @@ const customModel = {
       unit_cost: parseFloat(params.unit_cost),
       unit_selling_price: parseFloat(params.unit_selling_price),
       unit_of_measurement: params.unit_of_measurement,
-      quantity: params.quantity,
+      quantity: params.beginning_quantity,
       beginning_quantity : params.beginning_quantity,
       is_active: true,
       created_by: params.admin_id,

@@ -103,6 +103,7 @@ const customModel = {
     const items = await customModel.model
       .find({
         client_id: id,
+        is_active : true
       })
       .lean()
     return items

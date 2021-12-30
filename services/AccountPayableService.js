@@ -59,7 +59,7 @@ const accountPayableService = {
     var current = await AccountPayableModel.getById(params.transaction_id)
 
     var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
-    var date = moment(current.next_payment_date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
+    var date = moment().add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
     params.balance = newBalance
 
