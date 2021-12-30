@@ -87,6 +87,9 @@ const accountReceivableService = {
 
 
   delete: async (params) => {
+    var oldData = await AccountReceivableModel.getById(params.transaction_id);
+    var revertInventory = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: oldData.item_id, quantity: oldData.quantity })
+   
     await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
     return await AccountReceivableModel.delete(params)
   },

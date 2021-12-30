@@ -43,6 +43,10 @@ const ledgerService = {
     return ledger
   },
   delete: async (params) => {
+    
+    var oldLedger = await LedgerModel.getById(params.id);
+    var revertInventory = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: oldLedger.item_id, quantity: oldLedger.quantity })
+   
     await CashJournalModel.permanentDeleteByRefId(params.id)
     return await LedgerModel.delete(params)
   },

@@ -50,7 +50,10 @@ const salesService = {
     return sales
   },
   delete: async (params) => {
-    await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
+    var oldSales = await SalesModel.getById(params.id);
+    var revertInventory = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: oldSales.item_id, quantity: oldSales.quantity })
+  
+    await CashJournalModel.permanentDeleteByRefId(params.id)
     return await SalesModel.delete(params)
   },
   create: async (params) => {
