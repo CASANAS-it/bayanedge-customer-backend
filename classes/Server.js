@@ -49,12 +49,13 @@ import BeginningBalanceController from '../controllers/BeginningBalanceControlle
 import LoansRepaymentController from '../controllers/LoansRepaymentController'
 import { loansProceedService } from '../services/LoansProceedService'
 import JobsService from '../services/JobsService'
+import ReportsController from '../controllers/ReportsController'
 
 const cron = require('node-cron')
 // End Import Controllers
 
 class Server {
-  constructor () {
+  constructor() {
     this.app = express()
   }
 
@@ -62,7 +63,7 @@ class Server {
    * Start the server
    * @returns {Promise<void>}
    */
-  async init () {
+  async init() {
     // Start Init Database
     Database.init()
     // End Init Database
@@ -126,7 +127,8 @@ class Server {
     CashOutflowController.init(router)
     LoansProceedController.init(router)
     BeginningBalanceController.init(router)
-    LoansRepaymentController.init(router  )
+    LoansRepaymentController.init(router)
+    ReportsController.init(router)
     // End Init Controllers
 
     this.app.use('/', router)

@@ -105,7 +105,7 @@ const customModel = {
       .find({
         client_id: id,
         is_active : true
-      })
+      }).populate('item')
       .lean()
     return items
   },

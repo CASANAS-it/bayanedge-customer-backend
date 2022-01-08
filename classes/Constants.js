@@ -19,7 +19,9 @@ const TransType = Object.freeze({
   ACCOUNTS_PAYABLE : "Accounts Payable",
   ACCOUNTS_RECEIVABLE : "Accounts Receivable",
   MICROSAVINGS : "Microsavings",
-  LOANS_PROCEED : "Loans Proceed"
+  LOANS_PROCEED : "Loans Proceed",
+  OTHER_CASH_INCOME: "Other Cash Income",
+  OPERATING_EXPENSE : "Operating Expense",
 })
 
 const AssetType = Object.freeze({
