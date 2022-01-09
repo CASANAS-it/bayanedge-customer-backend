@@ -264,13 +264,13 @@ const reportService = {
 
       {
         label: "Fresh Infusion from Bayan Edge",
-        detail: retLoansPayable
+        detail: 0
       },
 
 
       {
         label: "Cash Balance, End",
-        detail: retLoansPayable
+        detail: retAfterDebt - 0
       },
 
     ]
