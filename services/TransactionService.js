@@ -197,7 +197,7 @@ const reportService = {
     var retLoansPayable = (loansProceed - loansRepayment) + (loansProceedInterest - loansProceedInterestPaid) + microsavingDeposit;
     var retPrincipal = (loansProceed - loansRepayment);
     var retInterest = (loansProceedInterest - loansProceedInterestPaid);
-    var retAfterDebt = retCashBalanceEnd - retPrincipal
+    var retAfterDebt = retCashBalanceEnd - retLoansPayable
     return [
       {
         label: "Sales (On Cash)",
