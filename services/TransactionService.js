@@ -194,7 +194,7 @@ const reportService = {
     var retCashOutflow = ledger + apPaid + operatingExpense
     var retCashFlow = retCashInflow - retCashOutflow
     var retCashBalanceEnd = retCashFlow + beginningBalance
-    var retLoansPayable = (loansProceed - loansRepayment) + (loansProceedInterest - loansRepayment) + microsavingDeposit;
+    var retLoansPayable = (loansProceed - loansRepayment) + (loansProceedInterest - loansProceedInterestPaid) + microsavingDeposit;
     var retPrincipal = (loansProceed - loansRepayment);
     var retInterest = (loansProceedInterest - loansProceedInterestPaid);
     var retAfterDebt = retCashBalanceEnd - retPrincipal
@@ -241,7 +241,7 @@ const reportService = {
       },
 
       {
-        label: "Cash Balance, END (Before Debt Servicing Fresh Fund Infusion",
+        label: "Cash Balance, END (Before Debt Servicing Fresh Fund Infusion)",
         detail: retCashBalanceEnd
       },
       {
@@ -261,7 +261,7 @@ const reportService = {
         detail: microsavingDeposit
       },
       {
-        label: "Cash Balance, End (After Debt Servicing…)",
+        label: "Cash Balance, End (After Debt Servicing)",
         detail: retAfterDebt
       },
 
