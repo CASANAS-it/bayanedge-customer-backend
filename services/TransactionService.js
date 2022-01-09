@@ -105,6 +105,7 @@ const reportService = {
     var otherCashIncome = 0;
     var loansRepayment = 0;
     var loansProceed = 0;
+    var loansProceedInterestPaid = 0;
     var loansProceedInterest = 0;
     var operatingExpense = 0;
     var ledger = 0;
@@ -166,7 +167,9 @@ const reportService = {
 
     allLoansProceeds.forEach(element => {
       loansProceed += parseFloat(element.total)
-      loansProceedInterest += parseFloat(element.interest)
+      if (element.is_completed)
+        loansProceedInterestPaid += parseFloat(element.total) * (parseFloat(element.interest_percentage) / 100)
+      loansProceedInterest += parseFloat(element.total) * (parseFloat(element.interest_percentage) / 100)
     });
 
     allOtherCI.forEach(element => {
@@ -193,7 +196,7 @@ const reportService = {
     var retCashBalanceEnd = retCashFlow + beginningBalance
     var retLoansPayable = (loansProceed - loansRepayment) + (loansProceedInterest - loansRepayment) + microsavingDeposit;
     var retPrincipal = (loansProceed - loansRepayment);
-    var retInterest = (loansProceedInterest - loansRepayment);
+    var retInterest = (loansProceedInterest - loansProceedInterestPaid);
     var retAfterDebt = retCashBalanceEnd - retPrincipal
     return [
       {
