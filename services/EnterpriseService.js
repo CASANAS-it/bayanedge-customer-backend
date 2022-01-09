@@ -7,9 +7,6 @@ const enterpriseService = {
   },
   getById: async (id) => {
     var enterprise = await EnterpriseModel.getByEnterpriseId(id)
-    if (!enterprise) {
-      throw new Errors.NO_RECORDS_FOUND()
-    }
     return enterprise
   },
   hasEnterpriseByClient: async (id) => {
