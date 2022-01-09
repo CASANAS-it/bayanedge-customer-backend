@@ -103,7 +103,7 @@ const customModel = {
     const items = await customModel.model
       .find({
         client_id: id,
-        is_active : true
+        is_active: true
       }).populate('item')
       .lean()
     return items
@@ -127,7 +127,7 @@ const customModel = {
       .lean()
     return items
   },
-  getPaginatedItems: async (limit, offset, client_id, type_id) => {
+  getPaginatedItems: async (limit, offset, client_id, flow_id, search = "", type_id = "") => {
 
     var options = {
       populate: ['item'],
@@ -136,7 +136,11 @@ const customModel = {
       sort: { created_date: -1 }
     }
 
-    var condition = { flow_type_id: type_id };
+    var condition = { flow_type_id: flow_id };
+    if (search)
+      condition.$or = [{display_id :{ $regex: search }},{'details.display_id' :{ $regex: search }}]
+    if (type_id)
+      condition.type_id = type_id
     return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, options)
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()

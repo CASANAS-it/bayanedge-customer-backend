@@ -6,8 +6,8 @@ import InventoryModel from '../models/InventoryModel'
 import { FlowType, TransType } from '../classes/Constants'
 
 const cashJournalService = {
-  getAll: async (limit, offset, client_id, type) => {
-    return await CashJournalModel.getPaginatedItems(limit, offset, client_id, type)
+  getAll: async (limit, offset, client_id, type, search,type_id ) => {
+    return await CashJournalModel.getPaginatedItems(limit, offset, client_id, type, search,type_id )
   },
   getById: async (id) => {
     var sales = await CashJournalModel.getById(id)
