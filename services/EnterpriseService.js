@@ -18,9 +18,6 @@ const enterpriseService = {
   },
   getByClientId: async (id) => {
     var enterprise = await EnterpriseModel.getByClientId(id)
-    if (!enterprise) {
-      throw new Errors.NO_RECORDS_FOUND()
-    }
     return enterprise
   },
   update: async (params) => {

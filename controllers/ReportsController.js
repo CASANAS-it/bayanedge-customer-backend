@@ -21,6 +21,7 @@ const customControllers = {
     init: router => {
         const baseUrl = `${Properties.api}/reports`
         router.post(baseUrl + '/income_statement', authorize(), customControllers.incomeStatement)
+        router.post(baseUrl + '/cash_flow_statement', authorize(), customControllers.cashFlowStatement)
     },
 
 
@@ -28,6 +29,22 @@ const customControllers = {
         try {
 
             reportService.getIncomeStatement(req.body).then(data => {
+                res.send(
+                    new CommonMessage({
+                        data: data
+                    })
+                )
+            })
+
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
+    cashFlowStatement: async (req, res) => {
+        try {
+
+            reportService.getCashFlowStatement(req.body).then(data => {
                 res.send(
                     new CommonMessage({
                         data: data

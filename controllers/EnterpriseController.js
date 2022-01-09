@@ -47,10 +47,10 @@ const customControllers = {
     getById: async (req, res) => {
         try {
 
-            const { id } = req.body;
+            const { client_id } = req.body;
             res.send(
                 new CommonMessage({
-                    data: await enterpriseService.getById(id)
+                    data: await enterpriseService.getByClientId(client_id)
                 })
             )
         } catch (err) {
