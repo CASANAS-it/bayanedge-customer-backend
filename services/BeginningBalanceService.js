@@ -9,10 +9,14 @@ import { salesService } from './SalesService'
 import { accountReceivableService } from './AccountReceivableService'
 import { ledgerService } from './LedgerService'
 import { accountPayableService } from './AccountPayableService'
+import moment from 'moment'
 
 const beginningBalanceService = {
   getAll: async (limit, offset, client_id) => {
     return await BeginningBalanceModel.getPaginatedItems(limit, offset, client_id)
+  },
+  getAllByClientId: async (client_id) => {
+    return await BeginningBalanceModel.getAllByClientId(client_id)
   },
   hasDataByClient: async (params) => {
     const { client_id, type_id } = params
@@ -27,25 +31,35 @@ const beginningBalanceService = {
     return beginningBalance
   },
 
+  getByTypeId: async (clientId, typeId) => {
+    var beginningBalance = await BeginningBalanceModel.getByTypeIdClientId(clientId, typeId)
+    if (!beginningBalance) {
+      throw new Errors.NO_RECORDS_FOUND()
+    }
+    return beginningBalance
+  },
+
   update: async (params) => {
     var beginningBalance = await BeginningBalanceModel.update(params)
     await CashJournalModel.permanentDeleteByRefId(beginningBalance.transaction_id)
 
-    var transaction = JSON.parse(JSON.stringify(params));
-    transaction.reference_id = params.transaction_id;
-    transaction.type_id = beginningBalance.type_id;
-    transaction.details = params;
-    transaction.display_id = beginningBalance.display_id
-    transaction.flow_type_id = beginningBalance.flow_type_id
-    transaction.is_beginning = true;
-    await CashJournalModel.create(transaction)
+    if (params.flow_type_id) {
+      var transaction = JSON.parse(JSON.stringify(params));
+      transaction.reference_id = params.transaction_id;
+      transaction.type_id = beginningBalance.type_id;
+      transaction.details = params;
+      transaction.display_id = beginningBalance.display_id
+      transaction.flow_type_id = beginningBalance.flow_type_id
+      transaction.is_beginning = true;
+      await CashJournalModel.create(transaction)
+    }
 
     return beginningBalance
   },
   delete: async (id) => {
     var data = await BeginningBalanceModel.getById(id)
-    var hasData = await CashJournalModel.getByClientIdTypeId(data.client_id,data.type_id)
-    if(hasData){
+    var hasData = await CashJournalModel.getByClientIdTypeId(data.client_id, data.type_id)
+    if (hasData) {
       throw new Errors.BEGINNING_BALANCE_DELETE_ERROR_DATA()
     }
 
@@ -54,16 +68,28 @@ const beginningBalanceService = {
   },
   create: async (params) => {
 
-    var beginningBalance = await BeginningBalanceModel.create(params)
-    var transaction = JSON.parse(JSON.stringify(params));
-    transaction.reference_id = beginningBalance.transaction_id;
-    transaction.type_id = params.type_id;
-    transaction.details = beginningBalance;
-    transaction.display_id = params.display_id
-    transaction.flow_type_id = params.flow_type_id
-    transaction.is_beginning = true;
-    await CashJournalModel.create(transaction)
+    if (params.type_id == TransType.ACCOUNTS_PAYABLE || params.type_id == TransType.ACCOUNTS_RECEIVABLE) {
+      var date = moment(params.date, "YYYY-MM-DD").add(params.details.payment_terms, 'days').format("YYYY-MM-DD")
+      params.details.next_payment_date = date;
+      params.details.is_completed = false;
+      params.details.balance = params.total
+    } else if (params.type_id == TransType.MICROSAVINGS) {
+      params.total = params.details.beginning_amount
+    }
 
+    var beginningBalance = await BeginningBalanceModel.create(params)
+
+    if (params.flow_type_id) {
+      var transaction = JSON.parse(JSON.stringify(params));
+      transaction.reference_id = beginningBalance.transaction_id;
+      transaction.type_id = params.type_id;
+      transaction.details = beginningBalance;
+      transaction.display_id = params.display_id
+      transaction.flow_type_id = params.flow_type_id
+      transaction.is_beginning = true;
+      await CashJournalModel.create(transaction)
+
+    }
     return beginningBalance
   },
   getAvailableBeginningBalance: async (props) => {

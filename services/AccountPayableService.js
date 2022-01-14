@@ -2,6 +2,7 @@ import moment from 'moment'
 import { FlowType, TransType } from '../classes/Constants'
 import Errors from '../classes/Errors'
 import AccountPayableModel from '../models/AccountPayableModel'
+import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import CashJournalModel from '../models/CashJournalModel'
 import InventoryModel from '../models/InventoryModel'
 import { generateId } from '../utils/Crypto'
@@ -77,6 +78,31 @@ const accountPayableService = {
     cashJournal.total = params.amount_paid;
     cashJournal.display_id = params.display_id;
     cashJournal.details = current;
+    cashJournal.type_id = TransType.ACCOUNTS_PAYABLE;
+    cashJournal.flow_type_id = FlowType.OUTFLOW
+    await CashJournalModel.create(cashJournal)
+    return ap
+  },
+
+  beginningPay: async (params) => {
+    var current = await BeginningBalanceModel.getById(params.transaction_id)
+
+    var newBalance = parseFloat(current.details.balance) - parseFloat(params.amount_paid);
+    var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
+
+    current.details.next_payment_date = date;
+    current.details.balance = newBalance
+    if (newBalance === 0) {
+      current.details.is_completed = true
+    }
+
+    var ap = await BeginningBalanceModel.pay(current);
+
+    var cashJournal = JSON.parse(JSON.stringify(current));
+    cashJournal.reference_id = current.transaction_id;
+    cashJournal.total = params.amount_paid;
+    cashJournal.details = current;
+    cashJournal.display_id = params.display_id;
     cashJournal.type_id = TransType.ACCOUNTS_PAYABLE;
     cashJournal.flow_type_id = FlowType.OUTFLOW
     await CashJournalModel.create(cashJournal)

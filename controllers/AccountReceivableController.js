@@ -24,6 +24,7 @@ const customControllers = {
         router.post(baseUrl + '/save', authorize(), customControllers.save)
         router.post(baseUrl + '/', authorize(), customControllers.getById)
         router.post(baseUrl + '/pay', authorize(), customControllers.pay)
+        router.post(baseUrl + '/beginning_pay', authorize(), customControllers.beginningPay)
         router.post(baseUrl + '/delete', authorize(), customControllers.delete)
     },
 
@@ -118,6 +119,21 @@ const customControllers = {
     pay: async (req, res) => {
         try {
             var data = await accountReceivableService.pay(req.body)
+
+            res.send(
+                new CommonMessage({
+                    data: data
+                })
+            )
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
+    
+    beginningPay: async (req, res) => {
+        try {
+            var data = await accountReceivableService.beginningPay(req.body)
 
             res.send(
                 new CommonMessage({

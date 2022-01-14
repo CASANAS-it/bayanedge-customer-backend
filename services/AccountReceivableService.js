@@ -2,6 +2,7 @@ import moment from 'moment'
 import { FlowType, TransType } from '../classes/Constants'
 import Errors from '../classes/Errors'
 import AccountReceivableModel from '../models/AccountReceivableModel'
+import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import CashJournalModel from '../models/CashJournalModel'
 import InventoryModel from '../models/InventoryModel'
 import { generateId } from '../utils/Crypto'
@@ -32,7 +33,7 @@ const accountReceivableService = {
     if (oldData.total > oldData.balance) {
       throw new Errors.EDIT_ERROR_WITH_EXISTING_DATA()
     }
-    
+
     var revertInventory = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: oldData.item_id, quantity: oldData.quantity })
     var inventor = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
 
@@ -84,12 +85,34 @@ const accountReceivableService = {
     return ap
   },
 
+  beginningPay: async (params) => {
+    var current = await BeginningBalanceModel.getById(params.transaction_id)
 
+    var newBalance = parseFloat(current.details.balance) - parseFloat(params.amount_paid);
+    var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
 
+    current.details.next_payment_date = date;
+    current.details.balance = newBalance
+    if (newBalance === 0) {
+      current.details.is_completed = true
+    }
+
+    var ap = await BeginningBalanceModel.pay(current);
+
+    var cashJournal = JSON.parse(JSON.stringify(current));
+    cashJournal.reference_id = current.transaction_id;
+    cashJournal.total = params.amount_paid;
+    cashJournal.details = current;
+    cashJournal.display_id = params.display_id;
+    cashJournal.type_id = TransType.ACCOUNTS_RECEIVABLE;
+    cashJournal.flow_type_id = FlowType.INFLOW
+    await CashJournalModel.create(cashJournal)
+    return ap
+  },
   delete: async (params) => {
     var oldData = await AccountReceivableModel.getById(params.transaction_id);
     var revertInventory = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: oldData.item_id, quantity: oldData.quantity })
-   
+
     await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
     return await AccountReceivableModel.delete(params)
   },

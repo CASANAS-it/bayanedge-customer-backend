@@ -41,7 +41,9 @@ const customModel = {
       total: {
         type: "Number"
       },
-
+      details: {
+        type: "Object"
+      },
       has_record: {
         type: 'Boolean'
       },
@@ -91,6 +93,17 @@ const customModel = {
       .lean()
     return items
   },
+  
+  getByTypeIdClientId: async (id,typeId) => {
+    const items = await customModel.model
+      .findOne({
+        client_id: id,
+        type_id : typeId,
+        is_active : true
+      })
+      .lean()
+    return items
+  },
   getByClientId: async (id) => {
     const items = await customModel.model
       .findOne({
@@ -131,6 +144,15 @@ const customModel = {
     return item
   },
 
+  pay: async (params) => {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
+      details : params.details,
+      modified_by: params.admin_id,
+      modified_date: new Date(),
+    })
+    return user
+  },
+  
   markHasRecord: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
       has_record: true,
@@ -166,6 +188,7 @@ const customModel = {
       name: params.name,
       description: params.description,
       flow_type_id : params.flow_type_id,
+      details : params.details,
       total: params.total,
       date: params.date,
       type_id : params.type_id,

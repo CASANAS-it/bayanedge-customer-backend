@@ -20,6 +20,7 @@ const customControllers = {
     init: router => {
         const baseUrl = `${Properties.api}/beginning_balance`
         router.post(baseUrl + '/get', authorize(), customControllers.get)
+        router.post(baseUrl + '/all', authorize(), customControllers.getAll)
         router.post(baseUrl + '/save', authorize(), customControllers.save)
         router.post(baseUrl + '/', authorize(), customControllers.getById)
         router.post(baseUrl + '/pay', authorize(), customControllers.pay)
@@ -48,6 +49,23 @@ const customControllers = {
             res.status(safeErr.status).json(safeErr)
         }
     },
+
+    
+    getAll: async (req, res) => {
+        try {
+            const {  client_id } = req.body;
+            res.send(
+                new CommonMessage({
+                    data: await beginningBalanceService.getAllByClientId(client_id)
+                })
+            )
+
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
+    
     getById: async (req, res) => {
         try {
 
@@ -55,6 +73,21 @@ const customControllers = {
             res.send(
                 new CommonMessage({
                     data: await beginningBalanceService.getById(id)
+                })
+            )
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
+    
+    getByTypeId: async (req, res) => {
+        try {
+
+            const {client_id, id } = req.body;
+            res.send(
+                new CommonMessage({
+                    data: await beginningBalanceService.getByTypeId(client_id,id)
                 })
             )
         } catch (err) {
