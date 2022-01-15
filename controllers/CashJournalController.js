@@ -46,6 +46,27 @@ const customControllers = {
             res.status(safeErr.status).json(safeErr)
         }
     },
+    
+    getByRefId: async (req, res) => {
+        try {
+
+            const { pageIndex, pageSize, client_id, type, search, reference_id } = req.body;
+
+            const { limit, offset } = getPagination(pageIndex, pageSize);
+            cashJournalService.getAllByRefId(limit, offset, client_id, type, search, reference_id).then(data => {
+                const response = getPagingData(data, pageIndex, limit);
+                res.send(
+                    new CommonMessage({
+                        data: response
+                    })
+                )
+            })
+
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
     getById: async (req, res) => {
         try {
 

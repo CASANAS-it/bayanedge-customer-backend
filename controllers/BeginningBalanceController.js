@@ -26,6 +26,8 @@ const customControllers = {
         router.post(baseUrl + '/pay', authorize(), customControllers.pay)
         router.post(baseUrl + '/types', authorize(), customControllers.setup)
         router.post(baseUrl + '/delete', authorize(), customControllers.delete)
+        router.post(baseUrl + '/get_inventory_total', authorize(), customControllers.getInventoryTotal)
+        
     },
 
 
@@ -88,6 +90,21 @@ const customControllers = {
             res.send(
                 new CommonMessage({
                     data: await beginningBalanceService.getByTypeId(client_id,id)
+                })
+            )
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
+    
+    getInventoryTotal: async (req, res) => {
+        try {
+
+            const {client_id, id } = req.body;
+            res.send(
+                new CommonMessage({
+                    data: await beginningBalanceService.getInventoryTotal(client_id)
                 })
             )
         } catch (err) {

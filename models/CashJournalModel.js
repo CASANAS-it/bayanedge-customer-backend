@@ -164,6 +164,25 @@ const customModel = {
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
+  
+  getPaginatedItemsByRefId: async (limit, offset, client_id,search, refId) => {
+
+    var options = {
+      populate: ['item'],
+      lean: true,
+      offset: offset, limit: limit,
+      sort: { created_date: -1 }
+    }
+
+    var condition = {
+      reference_id: refId, $or: [
+        { is_beginning: false },
+        { is_beginning: { $exists: false } }]
+    };
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, options)
+
+    // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
+  },
   getById: async (id) => {
     const item = await customModel.model
       .findOne({
