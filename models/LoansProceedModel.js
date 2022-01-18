@@ -35,7 +35,7 @@ const customModel = {
       next_payment_date: {
         type: 'String'
       },
-      interest_percentage: {
+      interest_fixed_amount: {
         type: 'String'
       },
       interest: {
@@ -170,7 +170,7 @@ const customModel = {
       total: params.total,
       next_payment_date: params.next_payment_date,
       date: params.date,
-      interest_percentage: params.interest_percentage,
+      interest_fixed_amount: params.interest_fixed_amount,
       payment_terms: params.payment_terms,
       balance: params.interest,
       interest: params.interest,
@@ -206,7 +206,7 @@ const customModel = {
       total: params.total,
       next_payment_date: params.next_payment_date,
       date: params.date,
-      interest_percentage: params.interest_percentage,
+      interest_fixed_amount: params.interest_fixed_amount,
       balance: params.interest,
       interest: params.interest,
       payment_terms: params.payment_terms,

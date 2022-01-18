@@ -173,8 +173,8 @@ const reportService = {
     allLoansProceeds.forEach(element => {
       loansProceed += parseFloat(element.total)
       if (element.is_completed)
-        loansProceedInterestPaid += parseFloat(element.total) * (parseFloat(element.interest_percentage) / 100)
-      loansProceedInterest += parseFloat(element.total) * (parseFloat(element.interest_percentage) / 100)
+        loansProceedInterestPaid += parseFloat(element.interest_fixed_amount)
+      loansProceedInterest += parseFloat(element.interest_fixed_amount)
     });
 
     allOtherCI.forEach(element => {

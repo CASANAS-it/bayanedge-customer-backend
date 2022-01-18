@@ -34,7 +34,7 @@ const loansProceedService = {
       throw new Errors.EDIT_ERROR_WITH_EXISTING_DATA()
     }
 
-    params.interest = parseFloat(params.total) * (1 + (parseFloat(params.interest_percentage) / 100))
+    params.interest = parseFloat(params.total) + parseFloat(params.interest_fixed_amount)
     var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
 
@@ -119,7 +119,7 @@ const loansProceedService = {
     await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
   },
   create: async (params) => {
-    params.interest = parseFloat(params.total) * (1 + (parseFloat(params.interest_percentage) / 100))
+    params.interest = parseFloat(params.total) + parseFloat(params.interest_fixed_amount)
     var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
 
