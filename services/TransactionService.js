@@ -26,6 +26,7 @@ const reportService = {
     var allOtherCI = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME && !x.is_beginning)
     var allLoansProceedInterest = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && !x.is_beginning && x.flow_type_id === FlowType.OUTFLOW)
 
+    
     var allArHistory = await AccountReceivableModel.getAllByClientId(params.client_id)
     if (params.isMonthly) {
       allArHistory = allArHistory.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
@@ -52,7 +53,7 @@ const reportService = {
     });
 
     var retSales = sales + arTotal;
-    var retCostOfGoods = salesUnitCost + arTotal;
+    var retCostOfGoods = salesUnitCost + arTotalUnitCost;
     var retGrosProfit = (retSales) - (retCostOfGoods);
     var retOperatingProfit = retGrosProfit - operatingExpense
     var retNetProfit = retOperatingProfit + otherCashIncome;
