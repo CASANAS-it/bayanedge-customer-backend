@@ -60,7 +60,7 @@ const reportService = {
       {
         label: "Sales",
         detail: retSales,
-        className : 'large-font'
+        className : 'large-font text-right'
       },
       {
         label: "Less: Cost of Goods Sold",
@@ -69,7 +69,7 @@ const reportService = {
       {
         label: "Gross Profit",
         detail: retGrosProfit,
-        className : 'large-font'
+        className : 'large-font text-right'
       },
       {
         label: "Less: Operating Expense",
@@ -78,7 +78,7 @@ const reportService = {
       {
         label: "Operating Profit",
         detail: retOperatingProfit,
-        className : 'large-font'
+        className : 'large-font text-right'
       },
       {
         label: "Other Cash Income",
@@ -87,7 +87,7 @@ const reportService = {
       {
         label: "Net Profit before Interest Expense",
         detail: retNetProfit,
-        className : 'large-font'
+        className : 'large-font text-right'
       },
       {
         label: "Less: Interest Expense",
@@ -96,7 +96,7 @@ const reportService = {
       {
         label: "Net Profit after Interest Expense",
         detail: retNetProfit - loansRepayment,
-        className : 'large-font'
+        className : 'large-font text-right'
       }
     ]
   },
