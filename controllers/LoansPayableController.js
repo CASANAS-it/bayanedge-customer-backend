@@ -14,15 +14,17 @@ import Errors from '../classes/Errors'
 import ErrorManager from '../classes/ErrorManager'
 import { UserType } from '../classes/Constants'
 import { getPagination, getPagingData } from '../utils/CommonUtil'
-import { loanPayableService } from '../services/LoansPayableService'
+import { loansPayableService } from '../services/LoansPayableService'
 
 const customControllers = {
     init: router => {
         const baseUrl = `${Properties.api}/loans_payable`
         router.post(baseUrl + '/get', authorize(), customControllers.get)
+        router.post(baseUrl + '/item/get', authorize(), customControllers.getItems)
         router.post(baseUrl + '/save', authorize(), customControllers.save)
         router.post(baseUrl + '/', authorize(), customControllers.getById)
-        // router.post(baseUrl + '/delete', authorize(), customControllers.delete)
+        router.post(baseUrl + '/pay', authorize(), customControllers.pay)
+        router.post(baseUrl + '/delete', authorize(), customControllers.delete)
     },
 
 
@@ -32,7 +34,28 @@ const customControllers = {
             const { pageIndex, pageSize, client_id } = req.body;
 
             const { limit, offset } = getPagination(pageIndex, pageSize);
-            loanPayableService.getAll(limit, offset,client_id).then(data => {
+            loansPayableService.getAll(limit, offset, client_id).then(data => {
+                const response = getPagingData(data, pageIndex, limit);
+                res.send(
+                    new CommonMessage({
+                        data: response
+                    })
+                )
+            })
+
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
+    
+    getItems: async (req, res) => {
+        try {
+
+            const { pageIndex, pageSize, client_id } = req.body;
+
+            const { limit, offset } = getPagination(pageIndex, pageSize);
+            loansPayableService.getAllItems(limit, offset, client_id).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
                 res.send(
                     new CommonMessage({
@@ -52,7 +75,7 @@ const customControllers = {
             const { id } = req.body;
             res.send(
                 new CommonMessage({
-                    data: await loanPayableService.getById(id)
+                    data: await loansPayableService.getById(id)
                 })
             )
         } catch (err) {
@@ -61,12 +84,13 @@ const customControllers = {
         }
     },
     save: async (req, res) => {
-        try { 
+        try {
+
             var data;
-            if (!req.body.loan_payable_id) {
-                data = await loanPayableService.create(req.body)
+            if (!req.body.transaction_id) {
+                data = await loansPayableService.create(req.body)
             } else {
-                data = await loanPayableService.update(req.body)
+                data = await loansPayableService.update(req.body)
             }
             res.send(
                 new CommonMessage({
@@ -80,7 +104,17 @@ const customControllers = {
     },
     delete: async (req, res) => {
         try {
-            var data = await loanPayableService.delete(req.body)
+            await loansPayableService.delete(req.body)
+
+            res.send(new CommonMessage({}))
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
+    pay: async (req, res) => {
+        try {
+            var data = await loansPayableService.pay(req.body)
 
             res.send(
                 new CommonMessage({

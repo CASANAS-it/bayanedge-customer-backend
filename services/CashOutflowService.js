@@ -55,6 +55,9 @@ const cashOutflowService = {
       case "Drawings":
         initial = "DW"
         break;
+      case "Non-financial Charges":
+        initial = "NF"
+        break;
       default:
         break;
     }

@@ -1,73 +1,119 @@
-import { application } from 'express'
-import moment from 'moment'
-import { Config, TransType } from '../classes/Constants'
 import Errors from '../classes/Errors'
-import LoansPayableItemModel from '../models/LoansPayableItemModel'
+import VendorModel from '../models/VendorModel'
 import LoansPayableModel from '../models/LoansPayableModel'
+import LoansRepaymentModel from '../models/LoansRepaymentModel'
+import InventoryModel from '../models/InventoryModel'
 import CashJournalModel from '../models/CashJournalModel'
-import { generateId } from '../utils/Crypto'
-
-const loanPayableService = {
+import { FlowType, TransactionType, TransType } from '../classes/Constants'
+import moment from 'moment'
+const loansPayableService = {
   getAll: async (limit, offset, client_id) => {
     return await LoansPayableModel.getPaginatedItems(limit, offset, client_id)
   },
+  getAllItems: async (limit, offset, client_id) => {
+    return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.LOANS_PAYABLE)
+  },
+  getAllRepayment: async (limit, offset, client_id) => {
+    return await LoansRepaymentModel.getPaginatedItems(limit, offset, client_id)
+  },
   getById: async (id) => {
-    var loanPayable = await LoansPayableModel.getById(id)
-    if (!loanPayable) {
+    var loansPayable = await LoansPayableModel.getById(id)
+    if (!loansPayable) {
       throw new Errors.NO_RECORDS_FOUND()
     }
-    return loanPayable
-  },
-  // update: async (params) => {
-  //   var newBalance = params.balance - params.amount_to_be_paid_per_term;
-
-  //   var ap = await LoansPayableModel.updateBalance(params);
-  //   if (newBalance === 0) {
-  //     await LoansPayableModel.markAsComplete(params.sales_id)
-  //   }
-
-  //   var item = {
-  //     parent_id: params.sales_id,
-  //     client_id: params.client_id,
-  //     transaction_date: new moment().format("YYYY-MM-DD"),
-  //     amount_to_be_paid_per_term: params.amount_to_be_paid_per_term,
-  //     admin_id: params.admin_id,
-  //   }
-  //   const arItem = await LoansPayableItemModel.create(item)
-  //   var cashJournal = JSON.parse(JSON.stringify(ap));
-  //   cashJournal.reference_id = arItem.child_id;
-  //   cashJournal.total = params.amount_to_be_paid_per_term;
-  //   cashJournal.type_id = TransType.SALES;
-  //   await CashJournalModel.create(cashJournal)
-
-  //   return ap
-  // },
-  create: async (params) => {
-    var loansPayable = await LoansPayableModel.create(params)
-    
-    var date = moment(params.date, "YYYY-MM-DD").add(Config.PAYMENT_TERMS, 'days').format("YYYY-MM-DD")
-
-    var item = {
-      parent_id: loansPayable.loan_payable_id,
-      client_id: params.client_id,
-      balance  : params.total,
-      transaction_date: date,
-      admin_id: params.admin_id,
-    }
-    const arItem = await LoansPayableItemModel.create(item)
-
-
-    // insert into cash journal
-    var transaction = JSON.parse(JSON.stringify(params));
-    transaction.reference_id = loansPayable.loan_payable_id;
-    transaction.total = transaction.total;
-    transaction.type_id = TransType.LOANS_PAYABLE;
-    await CashJournalModel.create(transaction)
     return loansPayable
-  }
+  },
+  getRepaymentById: async (id) => {
+    var loansPayable = await LoansRepaymentModel.getById(id)
+    if (!loansPayable) {
+      throw new Errors.NO_RECORDS_FOUND()
+    }
+    return loansPayable
+  },
+  update: async (params) => {
+    var hasData = await LoansRepaymentModel.getByParentId(params.transaction_id)
 
+    if (hasData) {
+      throw new Errors.EDIT_ERROR_WITH_EXISTING_DATA()
+    }
+
+    params.interest = parseFloat(params.total) + parseFloat(params.interest_fixed_amount)
+    var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
+    params.next_payment_date = date;
+
+    var loansPayable = await LoansPayableModel.update(params)
+    // await CashJournalModel.permanentDeleteByRefId(loansPayable.transaction_id)
+
+    return loansPayable
+  },
+  pay: async (params) => {
+    var current = await LoansPayableModel.getById(params.transaction_id)
+
+    var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
+    var currentDate = moment().format("YYYY-MM-DD")
+    var date = moment().add(params.payment_terms, 'days').format("YYYY-MM-DD")
+    params.next_payment_date = date;
+    params.balance = newBalance
+
+    current.next_payment_date = date;
+    current.balance = newBalance
+    await LoansPayableModel.pay(params)
+    if (newBalance === 0) {
+      await LoansPayableModel.markAsCompleted(params.transaction_id, params.admin_id)
+    }
+    // var postToCashJournal = moment(params.date).isSameOrBefore(currentDate)
+
+    // if (postToCashJournal) {
+    var cashJournal = JSON.parse(JSON.stringify(params));
+
+    cashJournal.reference_id = current.transaction_id;
+    cashJournal.total = params.amount_paid;
+    cashJournal.display_id = params.display_id;
+    cashJournal.details = current;
+    cashJournal.type_id = TransType.LOANS_PAYABLE;
+    cashJournal.flow_type_id = FlowType.OUTFLOW
+    await CashJournalModel.create(cashJournal)
+    // }
+
+  },
+  delete: async (params) => {
+
+    await LoansPayableModel.delete(params)
+    await LoansRepaymentModel.permanentDeleteByParentId(params.transaction_id)
+    await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
+  },
+  updateRepayment: async (params) => {
+
+    var current = await LoansRepaymentModel.getById(params.transaction_id)
+
+    var loansPayable = await LoansPayableModel.update(params)
+    await CashJournalModel.permanentDeleteByRefId(loansPayable.transaction_id)
+
+    var transaction = JSON.parse(JSON.stringify(params));
+    transaction.reference_id = loansPayable.transaction_id;
+    transaction.type_id = TransType.LOANS_PAYABLE;
+    transaction.details = loansPayable;
+    transaction.display_id = loansPayable.display_id
+    transaction.flow_type_id = FlowType.OUTFLOW
+    await CashJournalModel.create(transaction)
+
+    return loansPayable
+  },
+  deleteRepayment: async (params) => {
+
+    await LoansRepaymentModel.delete(params)
+    await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
+  },
+  create: async (params) => {
+    params.interest = parseFloat(params.total) + parseFloat(params.interest_fixed_amount)
+    var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
+    params.next_payment_date = date;
+
+    var loansPayable = await LoansPayableModel.create(params)
+    return loansPayable
+  },
 }
 
 export {
-  loanPayableService
+  loansPayableService
 }
