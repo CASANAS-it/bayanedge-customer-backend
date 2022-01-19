@@ -57,46 +57,47 @@ const reportService = {
     var retGrosProfit = (retSales) - (retCostOfGoods);
     var retOperatingProfit = retGrosProfit - operatingExpense
     var retNetProfit = retOperatingProfit + otherCashIncome;
+    var retNetProfitInterest = retNetProfit - loansRepayment;
     return [
       {
         label: "Sales",
-        detail: retSales,
+        detail: Number.isNaN(retSales) ? 0 : retSales,
         className : 'large-font'
       },
       {
         label: "Less: Cost of Goods Sold",
-        detail: retCostOfGoods
+        detail: Number.isNaN(retCostOfGoods) ? 0 : retCostOfGoods,
       },
       {
         label: "Gross Profit",
-        detail: retGrosProfit,
+        detail: Number.isNaN(retGrosProfit) ? 0 : retGrosProfit,
         className : 'large-font'
       },
       {
         label: "Less: Operating Expense",
-        detail: operatingExpense
+        detail: Number.isNaN(operatingExpense)? 0 : operatingExpense
       },
       {
         label: "Operating Profit",
-        detail: retOperatingProfit,
+        detail: Number.isNaN(retOperatingProfit) ? 0 : retOperatingProfit,
         className : 'large-font'
       },
       {
         label: "Other Cash Income",
-        detail: otherCashIncome
+        detail: Number.isNaN(otherCashIncome) ? 0 : otherCashIncome,
       },
       {
         label: "Net Profit before Interest Expense",
-        detail: retNetProfit,
+        detail: Number.isNaN(retNetProfit) ? 0 : retNetProfit,
         className : 'large-font'
       },
       {
         label: "Less: Interest Expense",
-        detail: loansRepayment
+        detail: Number.isNaN(loansRepayment) ? 0 : loansRepayment
       },
       {
         label: "Net Profit after Interest Expense",
-        detail: retNetProfit - loansRepayment,
+        detail: Number.isNaN(retNetProfitInterest) ? 0 : retNetProfitInterest,
         className : 'large-font'
       }
     ]
