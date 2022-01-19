@@ -51,8 +51,8 @@ const reportService = {
       operatingExpense += parseFloat(element.total)
     });
 
-    var retSales = sales + arPaid;
-    var retCostOfGoods = sales + arTotal;
+    var retSales = sales + arTotal;
+    var retCostOfGoods = salesUnitCost + arTotal;
     var retGrosProfit = (retSales) - (retCostOfGoods);
     var retOperatingProfit = retGrosProfit - operatingExpense
     var retNetProfit = retOperatingProfit + otherCashIncome;

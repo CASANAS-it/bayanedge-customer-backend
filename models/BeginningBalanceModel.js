@@ -166,6 +166,7 @@ const customModel = {
       client_id: params.client_id,
       name: params.name,
       description: params.description,
+      details : params.details,
       total: params.total,
       date: params.date,
       modified_by: params.admin_id,

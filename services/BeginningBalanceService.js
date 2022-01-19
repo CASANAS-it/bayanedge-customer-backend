@@ -52,6 +52,18 @@ const beginningBalanceService = {
       transaction.flow_type_id = beginningBalance.flow_type_id
       transaction.is_beginning = true;
       await CashJournalModel.create(transaction)
+    }else if (params.type_id == TransType.SALES) {
+
+      var transaction = JSON.parse(JSON.stringify(params));
+      transaction.reference_id = beginningBalance.transaction_id;
+      transaction.type_id = params.type_id;
+      transaction.details = beginningBalance;
+      transaction.display_id = params.display_id
+      transaction.flow_type_id = FlowType.INFLOW
+      transaction.is_beginning = true;
+      transaction.total = parseFloat(params.details.selling_price) - parseFloat(params.details.cost_of_goods_sold)
+      await CashJournalModel.create(transaction)
+
     }
 
     return beginningBalance
