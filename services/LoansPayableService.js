@@ -6,12 +6,17 @@ import InventoryModel from '../models/InventoryModel'
 import CashJournalModel from '../models/CashJournalModel'
 import { FlowType, TransactionType, TransType } from '../classes/Constants'
 import moment from 'moment'
+import BeginningBalanceModel from '../models/BeginningBalanceModel'
 const loansPayableService = {
   getAll: async (limit, offset, client_id) => {
     return await LoansPayableModel.getPaginatedItems(limit, offset, client_id)
   },
   getAllItems: async (limit, offset, client_id) => {
     return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.LOANS_PAYABLE)
+  },
+  
+  getAllNewLoansItems: async (limit, offset, client_id) => {
+    return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.NEW_LOANS)
   },
   getAllRepayment: async (limit, offset, client_id) => {
     return await LoansRepaymentModel.getPaginatedItems(limit, offset, client_id)
@@ -57,6 +62,8 @@ const loansPayableService = {
 
     current.next_payment_date = date;
     current.balance = newBalance
+    current.interest_fixed_amount = params.interest_fixed_amount;
+    current.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
     await LoansPayableModel.pay(params)
     if (newBalance === 0) {
       await LoansPayableModel.markAsCompleted(params.transaction_id, params.admin_id)
@@ -67,15 +74,42 @@ const loansPayableService = {
     var cashJournal = JSON.parse(JSON.stringify(params));
 
     cashJournal.reference_id = current.transaction_id;
-    cashJournal.total = params.amount_paid;
+    cashJournal.total = current.interest;
     cashJournal.display_id = params.display_id;
     cashJournal.details = current;
-    cashJournal.type_id = TransType.LOANS_PAYABLE;
+    cashJournal.type_id = TransType.NEW_LOANS;
     cashJournal.flow_type_id = FlowType.OUTFLOW
     await CashJournalModel.create(cashJournal)
     // }
 
   },
+
+  
+  beginningPay: async (params) => {
+    var current = await BeginningBalanceModel.getById(params.transaction_id)
+
+    var newBalance = parseFloat(current.details.balance) - parseFloat(params.amount_paid);
+    var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
+
+    current.details.next_payment_date = date;
+    current.details.balance = newBalance
+    if (newBalance === 0) {
+      current.details.is_completed = true
+    }
+
+    var ap = await BeginningBalanceModel.pay(current);
+
+    var cashJournal = JSON.parse(JSON.stringify(current));
+    cashJournal.reference_id = current.transaction_id;
+    cashJournal.total = params.amount_paid;
+    cashJournal.details = current;
+    cashJournal.display_id = params.display_id;
+    cashJournal.type_id = TransType.LOANS_PAYABLE;
+    cashJournal.flow_type_id = FlowType.OUTFLOW
+    await CashJournalModel.create(cashJournal)
+    return ap
+  },
+
   delete: async (params) => {
 
     await LoansPayableModel.delete(params)
@@ -91,7 +125,7 @@ const loansPayableService = {
 
     var transaction = JSON.parse(JSON.stringify(params));
     transaction.reference_id = loansPayable.transaction_id;
-    transaction.type_id = TransType.LOANS_PAYABLE;
+    transaction.type_id = TransType.NEW_LOANS;
     transaction.details = loansPayable;
     transaction.display_id = loansPayable.display_id
     transaction.flow_type_id = FlowType.OUTFLOW
@@ -105,7 +139,7 @@ const loansPayableService = {
     await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
   },
   create: async (params) => {
-    params.interest = parseFloat(params.total) + parseFloat(params.interest_fixed_amount)
+    // params.interest = parseFloat(params.total) + parseFloat(params.interest_fixed_amount)
     var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
 

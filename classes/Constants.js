@@ -21,6 +21,7 @@ const TransType = Object.freeze({
   MICROSAVINGS : "Microsavings",
   LOANS_PROCEED : "Loans Proceed",
   LOANS_PAYABLE : "Loans Payable",
+  NEW_LOANS : "New Loans",
   OTHER_CASH_INCOME: "Other Cash Income",
   OPERATING_EXPENSE : "Operating Expense",
   OTHER_INCOME : "Other Income",

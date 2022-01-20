@@ -7,8 +7,8 @@ import CashJournalModel from '../models/CashJournalModel'
 import { generateId } from '../utils/Crypto'
 
 const loanPayableItemService = {
-  getAll: async (limit, offset, client_id, is_paid) => {
-    return await LoansPayableItemModel.getPaginatedItems(limit, offset, client_id, is_paid)
+  getAll: async (limit, offset, client_id) => {
+    return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.NEW_LOANS)
   },
   getById: async (id) => {
     var loansPayable = await LoansPayableItemModel.getById(id)

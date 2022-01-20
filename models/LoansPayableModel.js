@@ -188,12 +188,12 @@ const customModel = {
     return user
   },
   create: async (params) => {
-    var displayId = "LB000001"
-    const previousId = await customModel.model.findOne({ client_id: params.client_id }).sort({ display_id: -1 });
+    var displayId = "NL000001"
+    const previousId = await customModel.model.findOne({ client_id: params.client_id, is_active : true }).sort({ display_id: -1 });
     if (previousId) {
       var disId = previousId.display_id
       disId = parseInt(disId.substring(2)) + 1;
-      displayId = "LB" + padZeroes(disId)
+      displayId = "NL" + padZeroes(disId)
     }
 
     const id = generateId()
@@ -206,9 +206,9 @@ const customModel = {
       total: params.total,
       next_payment_date: params.next_payment_date,
       date: params.date,
-      interest_fixed_amount: params.interest_fixed_amount,
-      balance: params.interest,
-      interest: params.interest,
+      // interest_fixed_amount: params.interest_fixed_amount,
+      balance: params.total,
+      // interest: parseFloat(params.total) + parseFloat(params.interest_fixed_amount),
       payment_terms: params.payment_terms,
       is_active: true,
       is_completed: false,

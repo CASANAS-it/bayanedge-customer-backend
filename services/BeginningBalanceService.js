@@ -52,7 +52,7 @@ const beginningBalanceService = {
       transaction.flow_type_id = beginningBalance.flow_type_id
       transaction.is_beginning = true;
       await CashJournalModel.create(transaction)
-    }else if (params.type_id == TransType.SALES) {
+    } else if (params.type_id == TransType.SALES) {
 
       var transaction = JSON.parse(JSON.stringify(params));
       transaction.reference_id = beginningBalance.transaction_id;
@@ -87,6 +87,12 @@ const beginningBalanceService = {
       params.details.balance = params.total
     } else if (params.type_id == TransType.MICROSAVINGS) {
       params.total = params.details.beginning_amount
+    } else if (params.type_id == TransType.LOANS_PAYABLE) {
+      var date = moment(params.date, "YYYY-MM-DD").add(params.details.payment_terms, 'days').format("YYYY-MM-DD")
+      params.details.next_payment_date = date;
+      params.details.interest = parseFloat(params.total) + parseFloat(params.details.interest_fixed_amount)
+      params.details.balance = params.details.interest
+      params.details.is_completed = false;
     }
 
     var beginningBalance = await BeginningBalanceModel.create(params)
@@ -150,7 +156,7 @@ const beginningBalanceService = {
 
     items.forEach(element => {
       total += parseFloat(element.unit_cost) * parseFloat(element.beginning_quantity)
-    }); 
+    });
     return total;
   }
 }

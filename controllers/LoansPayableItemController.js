@@ -32,7 +32,7 @@ const customControllers = {
             const { pageIndex, pageSize, client_id,is_paid } = req.body;
 
             const { limit, offset } = getPagination(pageIndex, pageSize);
-            loanPayableItemService.getAll(limit, offset,client_id,is_paid).then(data => {
+            loanPayableItemService.getAll(limit, offset,client_id).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
                 res.send(
                     new CommonMessage({
