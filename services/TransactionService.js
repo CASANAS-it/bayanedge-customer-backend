@@ -208,11 +208,12 @@ const reportService = {
       allLoansProceeds = allLoansProceeds.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
     }
 
-
     allLoansProceedCash.forEach(element => {
       loansProceedsInterest += parseFloat(element.details.interest_fixed_amount)
       loansProceedsPrincipal += parseFloat(element.details.interest) - parseFloat(element.details.interest_fixed_amount)
     });
+
+    console.log(loansProceedsInterest,'---------------')
 
     allSales.forEach(element => {
       sales += parseFloat(element.total)

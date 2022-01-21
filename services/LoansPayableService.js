@@ -107,6 +107,7 @@ const loansPayableService = {
     cashJournal.total = params.amount_paid;
     cashJournal.details = current;
     cashJournal.display_id = params.display_id;
+    cashJournal.is_beginning = true
     cashJournal.type_id = TransType.LOANS_PROCEED;
     cashJournal.flow_type_id = FlowType.OUTFLOW
     await CashJournalModel.create(cashJournal)

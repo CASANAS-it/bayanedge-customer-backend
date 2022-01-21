@@ -54,9 +54,9 @@ const ledgerService = {
     
     var hasBeginining = await beginningBalanceService.hasDataByClient({ client_id: params.client_id, type_id: TransType.LEDGER })
    
-    if (!hasBeginining) {
-      throw new Errors.NO_BEGINNING_BALANCE()
-    }
+    // if (!hasBeginining) {
+    //   throw new Errors.NO_BEGINNING_BALANCE()
+    // }
     var ledger = await LedgerModel.create(params)
     var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
 
