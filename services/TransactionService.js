@@ -20,6 +20,7 @@ const reportService = {
     var operatingExpense = 0;
     var loansProceedsInterest = 0;
     var loansProceedsPrincipal = 0;
+    var nonFinancial = 0;
 
     var salesBeginning = 0, salesBeginningSelling = 0;
     var opexBeginning = 0, nopexBeginning = 0;
@@ -52,46 +53,72 @@ const reportService = {
     var allOpex = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE && !x.is_beginning)
     var allOtherCI = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME && !x.is_beginning)
     var allLoansProceed = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && !x.is_beginning && x.flow_type_id === FlowType.OUTFLOW)
-
+    var allLoansProceedCash = cj.filter(x => x.type_id === TransType.LOANS_PROCEED)
+    var allNonFinancial = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES && !x.is_beginning)
+   
+    allNonFinancial.forEach(element => {
+      nonFinancial += parseFloat(element.total)
+    });
     var allArHistory = await AccountReceivableModel.getAllByClientId(params.client_id)
     if (params.isMonthly) {
       allArHistory = allArHistory.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
     }
     allSales.forEach(element => {
       sales += parseFloat(element.total)
-      salesUnitCost += parseFloat(element.item.unit_cost) * parseFloat(element.quantity)
+      if (element.item.unit_cost && element.details.quantity)
+        salesUnitCost += parseFloat(element.item.unit_cost) * parseFloat(element.details.quantity)
     });
     allAr.forEach(element => {
       arPaid += parseFloat(element.total)
     });
     allArHistory.forEach(element => {
       arTotal += parseFloat(element.total)
-      arTotalUnitCost += parseFloat(element.item.unit_cost) * parseFloat(element.quantity)
+      if (element.item.unit_cost && element.quantity)
+        arTotalUnitCost += parseFloat(element.item.unit_cost) * parseFloat(element.quantity)
     });
     allOtherCI.forEach(element => {
       otherCashIncome += parseFloat(element.total)
     });
-    allLoansProceed.forEach(element => {
-      loansProceedsInterest += parseFloat(element.details.interest_fixed_amount)
-      loansProceedsPrincipal += parseFloat(element.details.interest) - parseFloat(element.details.interest_fixed_amount)
+  
+    allLoansProceedCash.forEach(element => {
+      if (element.is_beginning) {
+        if (element.details.details) {
+
+          if (element.details.details.interest_fixed_amount)
+            loansProceedsInterest += parseFloat(element.details.details.interest_fixed_amount)
+          if (element.details.details.interest && element.details.details.interest_fixed_amount)
+            loansProceedsPrincipal += parseFloat(element.details.details.interest) - parseFloat(element.details.details.interest_fixed_amount)
+        }
+
+      } else {
+        if (element.details) {
+          if (element.details.interest_fixed_amount)
+            loansProceedsInterest += parseFloat(element.details.interest_fixed_amount)
+          if (element.details.interest && element.details.interest_fixed_amount)
+            loansProceedsPrincipal += parseFloat(element.details.interest) - parseFloat(element.details.interest_fixed_amount)
+        }
+      }
     });
+
     allOpex.forEach(element => {
       operatingExpense += parseFloat(element.total)
     });
 
-    var retSales = (sales - salesBeginningSelling) + sales + arTotal;
-    var retCostOfGoods = (sales - salesBeginningSelling) + salesUnitCost + arTotalUnitCost;
+
+
+    var retSales = (salesBeginningSelling) + sales + arTotal;
+    var retCostOfGoods = (salesBeginningSelling) + salesUnitCost + arTotalUnitCost;
     var retGrosProfit = (retSales) - (retCostOfGoods);
-    var retOperatingExpense = (opexBeginning - operatingExpense)
+    var retOperatingExpense = (opexBeginning + operatingExpense)
     var retOperatingProfit = retGrosProfit - retOperatingExpense
 
-    var retOtherCashIncome = (otherCashIncome - otherBeginning)
-    var retNetProfit = Number.isNaN(retOperatingProfit + retOtherCashIncome) ? 0 : retOperatingProfit + retOtherCashIncome;
+    var retOtherCashIncome = (otherCashIncome + otherBeginning)
+    var retNetProfit = retOperatingProfit + retOtherCashIncome;
     var retNetProfitInterest = retNetProfit - loansRepayment;
     var retNonOperatingExpenseInterest = nopexBeginning + loansProceedsInterest
 
     var retNonOperatingExpenseInterest = nopexBeginning + loansProceedsInterest
-    var retNonOperatingExpenseNonFinancial = nonFinancialBeginning + nopexBeginning
+    var retNonOperatingExpenseNonFinancial = nonFinancialBeginning + nonFinancial
     var retNonOperatingExpense = retNonOperatingExpenseInterest + retNonOperatingExpenseNonFinancial
 
     var retNetProfitAfterNopex = retNetProfit - retNonOperatingExpense
