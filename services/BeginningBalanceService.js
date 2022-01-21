@@ -40,6 +40,23 @@ const beginningBalanceService = {
   },
 
   update: async (params) => {
+    if (params.type_id == TransType.ACCOUNTS_PAYABLE || params.type_id == TransType.ACCOUNTS_RECEIVABLE) {
+      var date = moment(params.date, "YYYY-MM-DD").add(params.details.payment_terms, 'days').format("YYYY-MM-DD")
+      params.details.next_payment_date = date;
+      params.details.is_completed = false;
+      params.details.balance = params.total
+    } else if (params.type_id == TransType.MICROSAVINGS) {
+      params.total = params.details.beginning_amount
+    } else if (params.type_id == TransType.LOANS_PAYABLE) {
+      var date = moment(params.date, "YYYY-MM-DD").add(params.details.payment_terms, 'days').format("YYYY-MM-DD")
+      params.details.next_payment_date = date;
+      params.details.interest = parseFloat(params.total) + parseFloat(params.details.interest_fixed_amount)
+      params.details.balance = params.details.interest
+      params.details.is_completed = false;
+    } else if (params.type_id == TransType.NON_OPERATING_EXPENSE) {
+      params.total = parseFloat(params.details.interest_fixed_amount) + parseFloat(params.details.non_financial_charges)
+    }
+
     var beginningBalance = await BeginningBalanceModel.update(params)
     await CashJournalModel.permanentDeleteByRefId(beginningBalance.transaction_id)
 
@@ -52,19 +69,18 @@ const beginningBalanceService = {
       transaction.flow_type_id = beginningBalance.flow_type_id
       transaction.is_beginning = true;
       await CashJournalModel.create(transaction)
-    } else if (params.type_id == TransType.SALES) {
-
-      var transaction = JSON.parse(JSON.stringify(params));
-      transaction.reference_id = beginningBalance.transaction_id;
-      transaction.type_id = params.type_id;
-      transaction.details = beginningBalance;
-      transaction.display_id = params.display_id
-      transaction.flow_type_id = FlowType.INFLOW
-      transaction.is_beginning = true;
-      transaction.total = parseFloat(params.details.selling_price) - parseFloat(params.details.cost_of_goods_sold)
-      await CashJournalModel.create(transaction)
-
-    }
+    } 
+    // else if (params.type_id == TransType.SALES) {
+    //   var transaction = JSON.parse(JSON.stringify(params));
+    //   transaction.reference_id = beginningBalance.transaction_id;
+    //   transaction.type_id = params.type_id;
+    //   transaction.details = beginningBalance;
+    //   transaction.display_id = params.display_id
+    //   transaction.flow_type_id = FlowType.INFLOW
+    //   transaction.is_beginning = true;
+    //   transaction.total = parseFloat(params.details.selling_price) - parseFloat(params.details.cost_of_goods_sold)
+    //   await CashJournalModel.create(transaction)
+    // }
 
     return beginningBalance
   },
@@ -93,6 +109,8 @@ const beginningBalanceService = {
       params.details.interest = parseFloat(params.total) + parseFloat(params.details.interest_fixed_amount)
       params.details.balance = params.details.interest
       params.details.is_completed = false;
+    } else if (params.type_id == TransType.NON_OPERATING_EXPENSE) {
+      params.total = parseFloat(params.details.interest_fixed_amount) + parseFloat(params.details.non_financial_charges)
     }
 
     var beginningBalance = await BeginningBalanceModel.create(params)
@@ -106,19 +124,20 @@ const beginningBalanceService = {
       transaction.flow_type_id = params.flow_type_id
       transaction.is_beginning = true;
       await CashJournalModel.create(transaction)
-    } else if (params.type_id == TransType.SALES) {
+    } 
+    // else if (params.type_id == TransType.SALES) {
 
-      var transaction = JSON.parse(JSON.stringify(params));
-      transaction.reference_id = beginningBalance.transaction_id;
-      transaction.type_id = params.type_id;
-      transaction.details = beginningBalance;
-      transaction.display_id = params.display_id
-      transaction.flow_type_id = FlowType.INFLOW
-      transaction.is_beginning = true;
-      transaction.total = parseFloat(params.details.selling_price) - parseFloat(params.details.cost_of_goods_sold)
-      await CashJournalModel.create(transaction)
+    //   var transaction = JSON.parse(JSON.stringify(params));
+    //   transaction.reference_id = beginningBalance.transaction_id;
+    //   transaction.type_id = params.type_id;
+    //   transaction.details = beginningBalance;
+    //   transaction.display_id = params.display_id
+    //   transaction.flow_type_id = FlowType.INFLOW
+    //   transaction.is_beginning = true;
+    //   transaction.total = parseFloat(params.details.selling_price) - parseFloat(params.details.cost_of_goods_sold)
+    //   await CashJournalModel.create(transaction)
 
-    }
+    // }
     return beginningBalance
   },
   getAvailableBeginningBalance: async (props) => {

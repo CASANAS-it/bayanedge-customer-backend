@@ -188,12 +188,12 @@ const customModel = {
     return user
   },
   create: async (params) => {
-    var displayId = "NL000001"
+    var displayId = "LP000001"
     const previousId = await customModel.model.findOne({ client_id: params.client_id, is_active : true }).sort({ display_id: -1 });
     if (previousId) {
       var disId = previousId.display_id
       disId = parseInt(disId.substring(2)) + 1;
-      displayId = "NL" + padZeroes(disId)
+      displayId = "LP" + padZeroes(disId)
     }
 
     const id = generateId()

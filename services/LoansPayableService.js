@@ -16,7 +16,7 @@ const loansPayableService = {
   },
   
   getAllNewLoansItems: async (limit, offset, client_id) => {
-    return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.NEW_LOANS)
+    return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.LOANS_PROCEEDS)
   },
   getAllRepayment: async (limit, offset, client_id) => {
     return await LoansRepaymentModel.getPaginatedItems(limit, offset, client_id)
@@ -77,7 +77,7 @@ const loansPayableService = {
     cashJournal.total = current.interest;
     cashJournal.display_id = params.display_id;
     cashJournal.details = current;
-    cashJournal.type_id = TransType.NEW_LOANS;
+    cashJournal.type_id = TransType.LOANS_PROCEEDS;
     cashJournal.flow_type_id = FlowType.OUTFLOW
     await CashJournalModel.create(cashJournal)
     // }
@@ -125,7 +125,7 @@ const loansPayableService = {
 
     var transaction = JSON.parse(JSON.stringify(params));
     transaction.reference_id = loansPayable.transaction_id;
-    transaction.type_id = TransType.NEW_LOANS;
+    transaction.type_id = TransType.LOANS_PROCEEDS;
     transaction.details = loansPayable;
     transaction.display_id = loansPayable.display_id
     transaction.flow_type_id = FlowType.OUTFLOW
