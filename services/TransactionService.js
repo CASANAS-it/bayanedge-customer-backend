@@ -210,13 +210,17 @@ const reportService = {
 
     allLoansProceedCash.forEach(element => {
       if (element.is_beginning) {
-        loansProceedsInterest += parseFloat(element.details.details.interest_fixed_amount)
-        loansProceedsPrincipal += parseFloat(element.details.details.interest) - parseFloat(element.details.details.interest_fixed_amount)
-     
-      } else {
+        if (element.details.details) {
+          loansProceedsInterest += parseFloat(element.details.details.interest_fixed_amount)
+          loansProceedsPrincipal += parseFloat(element.details.details.interest) - parseFloat(element.details.details.interest_fixed_amount)
+        }
 
-        loansProceedsInterest += parseFloat(element.details.interest_fixed_amount)
-        loansProceedsPrincipal += parseFloat(element.details.interest) - parseFloat(element.details.interest_fixed_amount)
+      } else {
+        if (element.details) {
+          loansProceedsInterest += parseFloat(element.details.interest_fixed_amount)
+          loansProceedsPrincipal += parseFloat(element.details.interest) - parseFloat(element.details.interest_fixed_amount)
+
+        }
       }
     });
 

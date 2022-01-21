@@ -47,8 +47,15 @@ const loansPayableService = {
     params.next_payment_date = date;
 
     var loansPayable = await LoansPayableModel.update(params)
-    // await CashJournalModel.permanentDeleteByRefId(loansPayable.transaction_id)
-
+    await CashJournalModel.permanentDeleteByRefId(loansPayable.transaction_id)
+    
+    var transaction = JSON.parse(JSON.stringify(params));
+    transaction.reference_id = loansPayable.transaction_id;
+    transaction.type_id = TransType.LOANS_PROCEED;
+    transaction.details = loansPayable;
+    transaction.display_id = loansPayable.display_id
+    transaction.flow_type_id = FlowType.INFLOW
+    await CashJournalModel.create(transaction)
     return loansPayable
   },
   pay: async (params) => {
@@ -105,7 +112,7 @@ const loansPayableService = {
 
     var cashJournal = JSON.parse(JSON.stringify(current));
     cashJournal.reference_id = current.transaction_id;
-    cashJournal.total = params.amount_paid;
+    cashJournal.total = current.details.interest;
     cashJournal.details = current;
     cashJournal.display_id = params.display_id;
     cashJournal.is_beginning = true
@@ -149,6 +156,15 @@ const loansPayableService = {
     params.next_payment_date = date;
 
     var loansPayable = await LoansPayableModel.create(params)
+
+    var transaction = JSON.parse(JSON.stringify(params));
+    transaction.reference_id = loansPayable.transaction_id;
+    transaction.type_id = TransType.LOANS_PROCEED;
+    transaction.details = loansPayable;
+    transaction.display_id = loansPayable.display_id
+    transaction.flow_type_id = FlowType.INFLOW
+    await CashJournalModel.create(transaction)
+
     return loansPayable
   },
 }

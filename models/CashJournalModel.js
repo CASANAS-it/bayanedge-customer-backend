@@ -138,9 +138,29 @@ const customModel = {
 
     var condition = { flow_type_id: flow_id };
     if (search)
-      condition.$or = [{display_id :{ $regex: search }},{'details.display_id' :{ $regex: search }}]
+      condition.$or = [{ display_id: { $regex: search } }, { 'details.display_id': { $regex: search } }]
     if (type_id)
       condition.type_id = type_id
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, options)
+
+    // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
+  },
+
+  getPaginatedItemsByTypeIdFlowTypeId: async (limit, offset, client_id, type_id, flow_type_id) => {
+
+    var options = {
+      populate: ['item'],
+      lean: true,
+      offset: offset, limit: limit,
+      sort: { created_date: -1 }
+    }
+
+    var condition = {
+      flow_type_id: flow_type_id,
+      type_id: type_id, $or: [
+        { is_beginning: false },
+        { is_beginning: { $exists: false } }]
+    };
     return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, options)
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
@@ -164,8 +184,8 @@ const customModel = {
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
-  
-  getPaginatedItemsByRefId: async (limit, offset, client_id,search, refId) => {
+
+  getPaginatedItemsByRefId: async (limit, offset, client_id, search, refId) => {
 
     var options = {
       populate: ['item'],

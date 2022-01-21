@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { Config, TransType } from '../classes/Constants'
+import { Config, FlowType, TransType } from '../classes/Constants'
 import Errors from '../classes/Errors'
 import LoansPayableItemModel from '../models/LoansPayableItemModel'
 import LoansPayableModel from '../models/LoansPayableModel'
@@ -7,8 +7,11 @@ import CashJournalModel from '../models/CashJournalModel'
 import { generateId } from '../utils/Crypto'
 
 const loanPayableItemService = {
-  getAll: async (limit, offset, client_id) => {
-    return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.LOANS_PROCEED)
+  getAll: async (limit, offset, client_id,reference_id) => {
+    if(reference_id)
+      return await CashJournalModel.getPaginatedItemsByRefId(limit, offset, client_id, '', reference_id)
+    else
+    return await CashJournalModel.getPaginatedItemsByTypeIdFlowTypeId(limit, offset, client_id, TransType.LOANS_PROCEED,FlowType.OUTFLOW)
   },
   getById: async (id) => {
     var loansPayable = await LoansPayableItemModel.getById(id)
