@@ -21,6 +21,7 @@ const reportService = {
     var loansProceedsInterest = 0;
     var loansProceedsPrincipal = 0;
     var nonFinancial = 0;
+    var cogBeginning = 0;
 
     var salesBeginning = 0, salesBeginningSelling = 0;
     var opexBeginning = 0, nopexBeginning = 0;
@@ -32,8 +33,12 @@ const reportService = {
 
     salesBeginning = begBalance.find(x => x.type_id == TransType.SALES)
     salesBeginning = salesBeginning ? parseFloat(salesBeginning.total) : 0;
+
     salesBeginningSelling = begBalance.find(x => x.type_id == TransType.SALES)
     salesBeginningSelling = salesBeginningSelling ? parseFloat(salesBeginningSelling.details.selling_price) : 0;
+
+    cogBeginning = begBalance.find(x => x.type_id == TransType.SALES)
+    cogBeginning = cogBeginning ? parseFloat(cogBeginning.details.cost_of_goods_sold) : 0;
 
     opexBeginning = begBalance.find(x => x.type_id == TransType.OPERATING_EXPENSE)
     opexBeginning = opexBeginning ? parseFloat(opexBeginning.total) : 0;
@@ -107,7 +112,7 @@ const reportService = {
 
 
     var retSales = (salesBeginningSelling) + sales + arTotal;
-    var retCostOfGoods = (salesBeginningSelling) + salesUnitCost + arTotalUnitCost;
+    var retCostOfGoods = (cogBeginning) + salesUnitCost + arTotalUnitCost;
     var retGrosProfit = (retSales) - (retCostOfGoods);
     var retOperatingExpense = (opexBeginning + operatingExpense)
     var retOperatingProfit = retGrosProfit - retOperatingExpense
