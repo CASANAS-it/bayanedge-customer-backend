@@ -214,16 +214,16 @@ const reportService = {
 
           if (element.details.details.interest_fixed_amount)
             loansProceedsInterest += parseFloat(element.details.details.interest_fixed_amount)
-          if (element.details.details.interest)
-            loansProceedsPrincipal += parseFloat(element.details.details.interest)
+          if (element.details.details.interest && element.details.details.interest_fixed_amount)
+            loansProceedsPrincipal += parseFloat(element.details.details.interest) - parseFloat(element.details.details.interest_fixed_amount)
         }
 
       } else {
         if (element.details) {
           if (element.details.interest_fixed_amount)
             loansProceedsInterest += parseFloat(element.details.interest_fixed_amount)
-          if (element.details.interest)
-            loansProceedsPrincipal += parseFloat(element.details.interest)
+          if (element.details.interest && element.details.interest_fixed_amount)
+            loansProceedsPrincipal += parseFloat(element.details.interest) - parseFloat(element.details.interest_fixed_amount)
         }
       }
     });
