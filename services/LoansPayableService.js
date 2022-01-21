@@ -93,6 +93,9 @@ const loansPayableService = {
 
     current.details.next_payment_date = date;
     current.details.balance = newBalance
+    current.details.interest_fixed_amount = params.interest_fixed_amount;
+    current.details.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
+   
     if (newBalance === 0) {
       current.details.is_completed = true
     }
