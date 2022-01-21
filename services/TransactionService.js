@@ -211,19 +211,22 @@ const reportService = {
     allLoansProceedCash.forEach(element => {
       if (element.is_beginning) {
         if (element.details.details) {
-          loansProceedsInterest += parseFloat(element.details.details.interest_fixed_amount)
-          loansProceedsPrincipal += parseFloat(element.details.details.interest) - parseFloat(element.details.details.interest_fixed_amount)
+
+          if (element.details.details.interest_fixed_amount)
+            loansProceedsInterest += parseFloat(element.details.details.interest_fixed_amount)
+          if (element.details.details.interest)
+            loansProceedsPrincipal += parseFloat(element.details.details.interest)
         }
 
       } else {
         if (element.details) {
-          loansProceedsInterest += parseFloat(element.details.interest_fixed_amount)
-          loansProceedsPrincipal += parseFloat(element.details.interest) - parseFloat(element.details.interest_fixed_amount)
-
+          if (element.details.interest_fixed_amount)
+            loansProceedsInterest += parseFloat(element.details.interest_fixed_amount)
+          if (element.details.interest)
+            loansProceedsPrincipal += parseFloat(element.details.interest)
         }
       }
     });
-
 
     allSales.forEach(element => {
       sales += parseFloat(element.total)
