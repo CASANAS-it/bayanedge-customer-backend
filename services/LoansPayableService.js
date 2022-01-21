@@ -102,6 +102,7 @@ const loansPayableService = {
 
     var ap = await BeginningBalanceModel.pay(current);
 
+
     var cashJournal = JSON.parse(JSON.stringify(current));
     cashJournal.reference_id = current.transaction_id;
     cashJournal.total = params.amount_paid;

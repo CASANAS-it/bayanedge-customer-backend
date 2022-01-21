@@ -196,7 +196,7 @@ const reportService = {
     var allMicrosavingsWithdrawal = cj.filter(x => x.type_id === TransType.MICROSAVINGS && !x.is_beginning && x.flow_type_id === FlowType.INFLOW)
     var allDrawings = cj.filter(x => x.type_id === TransType.DRAWINGS && !x.is_beginning)
     var allNonFinancial = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES && !x.is_beginning)
-    var allLoansProceedCash = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && !x.is_beginning)
+    var allLoansProceedCash = cj.filter(x => x.type_id === TransType.LOANS_PROCEED)
 
     var allArHistory = await AccountReceivableModel.getAllByClientId(params.client_id)
     var allApHistory = await AccountPayableModel.getAllByClientId(params.client_id)
@@ -209,11 +209,17 @@ const reportService = {
     }
 
     allLoansProceedCash.forEach(element => {
-      loansProceedsInterest += parseFloat(element.details.interest_fixed_amount)
-      loansProceedsPrincipal += parseFloat(element.details.interest) - parseFloat(element.details.interest_fixed_amount)
+      if (element.is_beginning) {
+        loansProceedsInterest += parseFloat(element.details.details.interest_fixed_amount)
+        loansProceedsPrincipal += parseFloat(element.details.details.interest) - parseFloat(element.details.details.interest_fixed_amount)
+     
+      } else {
+
+        loansProceedsInterest += parseFloat(element.details.interest_fixed_amount)
+        loansProceedsPrincipal += parseFloat(element.details.interest) - parseFloat(element.details.interest_fixed_amount)
+      }
     });
 
-    console.log(loansProceedsInterest,'---------------')
 
     allSales.forEach(element => {
       sales += parseFloat(element.total)
