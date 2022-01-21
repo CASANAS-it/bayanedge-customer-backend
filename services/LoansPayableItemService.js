@@ -8,7 +8,7 @@ import { generateId } from '../utils/Crypto'
 
 const loanPayableItemService = {
   getAll: async (limit, offset, client_id) => {
-    return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.NEW_LOANS)
+    return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.LOANS_PROCEED)
   },
   getById: async (id) => {
     var loansPayable = await LoansPayableItemModel.getById(id)

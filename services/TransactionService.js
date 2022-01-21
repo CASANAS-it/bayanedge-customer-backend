@@ -3,6 +3,7 @@ import AccountPayableModel from '../models/AccountPayableModel'
 import AccountReceivableModel from '../models/AccountReceivableModel'
 import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import CashJournalModel from '../models/CashJournalModel'
+import LoansPayableModel from '../models/LoansPayableModel'
 import LoansProceedModel from '../models/LoansProceedModel'
 
 const reportService = {
@@ -195,11 +196,11 @@ const reportService = {
     var allMicrosavingsWithdrawal = cj.filter(x => x.type_id === TransType.MICROSAVINGS && !x.is_beginning && x.flow_type_id === FlowType.INFLOW)
     var allDrawings = cj.filter(x => x.type_id === TransType.DRAWINGS && !x.is_beginning)
     var allNonFinancial = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES && !x.is_beginning)
-    var allLoansProceedCash = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && !x.is_beginning && x.flow_type_id === FlowType.OUTFLOW)
+    var allLoansProceedCash = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && !x.is_beginning)
 
     var allArHistory = await AccountReceivableModel.getAllByClientId(params.client_id)
     var allApHistory = await AccountPayableModel.getAllByClientId(params.client_id)
-    var allLoansProceeds = await LoansProceedModel.getAllByClientId(params.client_id)
+    var allLoansProceeds = await LoansPayableModel.getAllByClientId(params.client_id)
 
     if (params.isMonthly) {
       allArHistory = allArHistory.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
@@ -249,9 +250,6 @@ const reportService = {
 
     allLoansProceeds.forEach(element => {
       loansProceed += parseFloat(element.total)
-      if (element.is_completed)
-        loansProceedInterestPaid += parseFloat(element.interest_fixed_amount)
-      loansProceedInterest += parseFloat(element.interest_fixed_amount)
     });
 
     allOtherCI.forEach(element => {
@@ -277,12 +275,10 @@ const reportService = {
 
     var retCashOnHandBeg = cashOnHandBeg
     var retCashInflow = sales + otherCashIncome + arPaid + microsavingWithdrawal
-    var retCashOutflow = salesUnitCost + apPaid + operatingExpense + drawings + nonFinancial
+    var retCashOutflow = ledger + apPaid + operatingExpense + drawings + nonFinancial
     var retCashFlow = retCashInflow - retCashOutflow
     var retCashBalanceEnd = retCashFlow + cashOnHandBeg
     var retDebtServicing = loansProceedsPrincipal + loansProceedsInterest + microsavingDeposit
-    var retPrincipal = (loansProceed - loansRepayment);
-    var retInterest = (loansProceedInterest - loansProceedInterestPaid);
     var retAfterDebt = retCashBalanceEnd - retDebtServicing
     var retFreshIfusion = loansProceed;
     var retCashBalance = retAfterDebt + retFreshIfusion
@@ -321,7 +317,7 @@ const reportService = {
       },
       {
         label: "Cash Purchases",
-        detail: Number.isNaN(salesUnitCost) ? 0 : salesUnitCost
+        detail: Number.isNaN(ledger) ? 0 : ledger
       },
       {
         label: "Payment to Supplier",
