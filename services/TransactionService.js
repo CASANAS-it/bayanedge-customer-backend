@@ -39,7 +39,7 @@ const reportService = {
     nopexBeginning = begBalance.find(x => x.type_id == TransType.NON_OPERATING_EXPENSE)
     nopexBeginning = nopexBeginning ? parseFloat(nopexBeginning.total) : 0;
 
-    otherBeginning = begBalance.find(x => x.type_id == TransType.OTHER_INCOME)
+    otherBeginning = begBalance.find(x => x.type_id == TransType.OTHER_CASH_INCOME)
     otherBeginning = otherBeginning ? parseFloat(otherBeginning.total) : 0;
 
     nonFinancialBeginning = begBalance.find(x => x.type_id == TransType.NON_FINANCIAL_CHARGES)
