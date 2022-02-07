@@ -15,6 +15,7 @@ import ErrorManager from '../classes/ErrorManager'
 import { UserType } from '../classes/Constants'
 import { getPagination, getPagingData } from '../utils/CommonUtil'
 import { accountReceivableService } from '../services/AccountReceivableService'
+import { salesService } from '../services/SalesService'
 
 const customControllers = {
     init: router => {
@@ -24,6 +25,7 @@ const customControllers = {
         router.post(baseUrl + '/save', authorize(), customControllers.save)
         router.post(baseUrl + '/', authorize(), customControllers.getById)
         router.post(baseUrl + '/pay', authorize(), customControllers.pay)
+        router.post(baseUrl + '/beginning', authorize(), customControllers.getBeginning)
         router.post(baseUrl + '/beginning_pay', authorize(), customControllers.beginningPay)
         router.post(baseUrl + '/delete', authorize(), customControllers.delete)
     },
@@ -49,13 +51,36 @@ const customControllers = {
             res.status(safeErr.status).json(safeErr)
         }
     },
+
+    
+
+    getBeginning: async (req, res) => {
+        try {
+
+            const { pageIndex, pageSize, client_id } = req.body;
+
+            const { limit, offset } = getPagination(pageIndex, pageSize);
+            salesService.getAllBeginningAR(limit, offset, client_id).then(data => {
+                const response = getPagingData(data, pageIndex, limit);
+                res.send(
+                    new CommonMessage({
+                        data: response
+                    })
+                )
+            })
+
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
     get: async (req, res) => {
         try {
 
             const { pageIndex, pageSize, client_id } = req.body;
 
             const { limit, offset } = getPagination(pageIndex, pageSize);
-            accountReceivableService.getAll(limit, offset, client_id).then(data => {
+            salesService.getAllAR(limit, offset, client_id).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
                 res.send(
                     new CommonMessage({
@@ -75,7 +100,7 @@ const customControllers = {
             const { id } = req.body;
             res.send(
                 new CommonMessage({
-                    data: await accountReceivableService.getById(id)
+                    data: await salesService.getById(id)
                 })
             )
         } catch (err) {

@@ -28,6 +28,9 @@ const customModel = {
       total: {
         type: "Number"
       },
+      microsavings: {
+        type: "Number"
+      },
       balance: {
         type: "Number"
       },
@@ -163,6 +166,12 @@ const customModel = {
     })
     return user
   },
+
+  
+  deletePosted: async (params) => {
+    const user = await customModel.model.deleteOne({ transaction_id: params.transaction_id })
+    return user
+  },
   
   permanentDeleteByParentId: async (id) => {
     const user = await customModel.model.deleteMany(
@@ -178,6 +187,7 @@ const customModel = {
       display_id: params.display_id,
       total: params.total,
       date: params.date,
+      microsavings : params.microsavings,
       balance: params.balance,
       is_active: true,
       is_posted: params.is_posted,

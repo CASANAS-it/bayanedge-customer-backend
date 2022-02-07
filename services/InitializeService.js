@@ -14,26 +14,35 @@ import {
   UserType,
   EquityType,
   TransactionType,
+  OpexType,
 } from '../classes/Constants'
+import OperatingExpenseTypeModel from '../models/OperatingExpenseTypeModel'
 
 const initializeService = {
 
   init: async () => {
-    Logger.info('CHECKING')
-    const adminCount = await UserModel.getAll()
-    if (adminCount.length === 0) {
-      Logger.info('****************************')
-      Logger.info('****Create Admin Account****')
-      Logger.info('****************************')
-      await UserModel.createAdminUser()
-    }
+    const count = await TransactionTypeModel.getAll()
 
-    const count = await AssetTypeModel.getAll()
-
-    if (count.length === 0) {
-      Logger.info('INITIALIZATION STARTED')
-      await initializeService.initializeData()
+    // if (count.length === 0) {
+    //   Logger.info('INITIALIZATION STARTED')
+    //   await initializeService.initializeData()
+    // }
+    var countType = await OperatingExpenseTypeModel.getAll()
+    if (countType.length === 0) {
+      await initializeService.initializeNopexType()
     }
+  },
+  initializeNopexType: async () => {
+    Logger.info('******************************')
+    Logger.info('****Initializing Nopex Type****')
+    Logger.info('******************************')
+    await OperatingExpenseTypeModel.createType({ name: OpexType.SALARIES_WAGES })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.MONTH_PAY })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.LIGHT_WATER })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.RENTAL })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.COMMUNICATIONS })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.TRANSPORTATION })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.REPRESENTATION })
   },
 
   initializeData: async () => {
@@ -45,7 +54,7 @@ const initializeService = {
 
 
     await initTransactionType()
-    await initAssetType()
+    // await initAssetType()
     await initRevenueType()
     await initLiabilityType()
     await initExpenseType()

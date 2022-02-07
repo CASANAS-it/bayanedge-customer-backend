@@ -24,6 +24,12 @@ const customModel = {
       contact_information: {
         type: 'Object'
       },
+      terms : {
+        type : "Number"
+      },
+      credit_limit : {
+        type : "Number"
+      },
       is_active: {
         type: 'Boolean'
       },
@@ -94,6 +100,8 @@ const customModel = {
       customer_name: params.customer_name,
       address: params.address,
       contact_information: params.contact_information,
+      terms : params.terms,
+      credit_limit : params.credit_limit,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -117,6 +125,8 @@ const customModel = {
       address: params.address,
       contact_information: params.contact_information,
       is_active: true,
+      terms : params.terms,
+      credit_limit : params.credit_limit,
       created_by: params.admin_id,
       created_date: new Date(),
       modified_by: params.admin_id,

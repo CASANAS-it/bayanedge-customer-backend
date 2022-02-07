@@ -20,26 +20,24 @@ const customModel = {
       client_id: {
         type: 'String',
       },
-      item_id: {
+
+      customer_id: {
         type: 'String',
-        ref: "items"
       },
-      unit_selling_price: {
-        type: 'String'
+     
+      details: {
+        type: "Object"
       },
-      quantity: {
+      trans_type: {
         type: 'String'
       },
       date: {
         type: 'String'
       },
-      next_payment_date: {
-        type: 'String'
-      },
-      total: {
+      total_unit_cost: {
         type: "Number"
       },
-      payment_terms: {
+      total_unit_selling: {
         type: "Number"
       },
       balance: {
@@ -69,17 +67,10 @@ const customModel = {
       })
 
 
-    // itemSchema.virtual('vendor', {
-    //   ref: 'vendors',
-    //   localField: 'vendor_id',
-    //   foreignField: 'vendor_id',
-    //   justOne: true // for many-to-1 relationships
-    // });
-
-    itemSchema.virtual('item', {
-      ref: 'items',
-      localField: 'item_id',
-      foreignField: 'item_id',
+    itemSchema.virtual('customer', {
+      ref: 'customers',
+      localField: 'customer_id',
+      foreignField: 'customer_id',
       justOne: true // for many-to-1 relationships
     });
 
@@ -104,7 +95,7 @@ const customModel = {
     const items = await customModel.model
       .find({
         client_id: id,
-        is_active : true
+        is_active: true
       }).populate('item')
       .lean()
     return items
@@ -113,7 +104,7 @@ const customModel = {
     const items = await customModel.model
       .findOne({
         client_id: id,
-        is_active : true
+        is_active: true
       })
       .lean()
     return items
@@ -159,13 +150,13 @@ const customModel = {
   update: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
       client_id: params.client_id,
-      item_id: params.item_id,
-      unit_selling_price: params.unit_selling_price,
-      quantity: params.quantity,
-      total: params.total, payment_terms: params.payment_terms,
-      balance: params.total,
+      customer_id: params.customer_id,
+      details: params.details,
+      total_unit_cost: params.total_unit_cost,
+      total_unit_selling: params.total_unit_selling,
+      balance  : params.total_unit_selling,
+      trans_type : params.trans_type,
       date: params.date,
-      next_payment_date: params.next_payment_date,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -192,15 +183,6 @@ const customModel = {
   pay: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
       balance: params.balance,
-      next_payment_date: params.next_payment_date,
-      modified_by: params.admin_id,
-      modified_date: new Date(),
-    })
-    return user
-  },
-  delete: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
-      is_active: false,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -214,6 +196,15 @@ const customModel = {
     })
     return user
   },
+  delete: async (params) => {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
+      is_active: false,
+      modified_by: params.admin_id,
+      modified_date: new Date(),
+    })
+    return user
+  },
+ 
   permanentDelete: async (id) => {
     const user = await customModel.model.deleteOne(
       { transaction_id: id })
@@ -231,14 +222,12 @@ const customModel = {
       display_id: displayId,
       transaction_id: generateId(),
       client_id: params.client_id,
-      item_id: params.item_id,
-      unit_selling_price: params.unit_selling_price,
-      quantity: params.quantity,
-      total: params.total,
-      balance: params.total,
-      type_id: params.type_id,
-      payment_terms: params.payment_terms,
-      next_payment_date: params.next_payment_date,
+      customer_id : params.customer_id,
+      details: params.details,
+      trans_type : params.trans_type,
+      total_unit_cost: params.total_unit_cost,
+      total_unit_selling: params.total_unit_selling,
+      balance  : params.total_unit_selling,
       date: params.date,
       is_active: true,
       is_completed: false,

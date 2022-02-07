@@ -34,9 +34,8 @@ const securityControllers = {
   },
   getSetUpSummary: async (req, res) => {
     try {
-      await initializeService.init()
+      // await initializeService.init()
       const params = req.body
-      console.log(params,'---params')
       const user = await userService.getSummary(params)
       if (user) {
         res.send(

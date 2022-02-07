@@ -7,6 +7,7 @@ import CashJournalModel from '../models/CashJournalModel'
 import { FlowType, TransactionType, TransType } from '../classes/Constants'
 import moment from 'moment'
 import BeginningBalanceModel from '../models/BeginningBalanceModel'
+import { cashJournalService } from './CashJournalService'
 const loansPayableService = {
   getAll: async (limit, offset, client_id) => {
     return await LoansPayableModel.getPaginatedItems(limit, offset, client_id)
@@ -14,7 +15,7 @@ const loansPayableService = {
   getAllItems: async (limit, offset, client_id) => {
     return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.LOANS_PAYABLE)
   },
-  
+
   getAllNewLoansItems: async (limit, offset, client_id) => {
     return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.LOANS_PROCEEDS)
   },
@@ -48,7 +49,7 @@ const loansPayableService = {
 
     var loansPayable = await LoansPayableModel.update(params)
     await CashJournalModel.permanentDeleteByRefId(loansPayable.transaction_id)
-    
+
     var transaction = JSON.parse(JSON.stringify(params));
     transaction.reference_id = loansPayable.transaction_id;
     transaction.type_id = TransType.LOANS_PROCEED;
@@ -67,17 +68,31 @@ const loansPayableService = {
     params.next_payment_date = date;
     params.balance = newBalance
 
+
+
     current.next_payment_date = date;
     current.balance = newBalance
     current.interest_fixed_amount = params.interest_fixed_amount;
     current.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
-    await LoansPayableModel.pay(params)
+    var summary = await cashJournalService.getSummary(params)
+
+    if (summary) {
+      if (current.interest > summary.total) {
+        throw new SafeError({
+          status: 200,
+          code: 209,
+          message: "Insufficient Cash Balance",
+          name: "Ledger"
+        })
+      }
+    }
+
+    var ap = await LoansPayableModel.pay(params)
     if (newBalance === 0) {
       await LoansPayableModel.markAsCompleted(params.transaction_id, params.admin_id)
     }
-    // var postToCashJournal = moment(params.date).isSameOrBefore(currentDate)
+    var postToCashJournal = moment(params.date).isSameOrBefore(currentDate)
 
-    // if (postToCashJournal) {
     var cashJournal = JSON.parse(JSON.stringify(params));
 
     cashJournal.reference_id = current.transaction_id;
@@ -86,29 +101,56 @@ const loansPayableService = {
     cashJournal.details = current;
     cashJournal.type_id = TransType.LOANS_PROCEED;
     cashJournal.flow_type_id = FlowType.OUTFLOW
+    cashJournal.is_posted = postToCashJournal;
     await CashJournalModel.create(cashJournal)
-    // }
+
+    var ms = JSON.parse(JSON.stringify(params));
+    ms.reference_id = current.transaction_id;
+    ms.total = params.microsavings;
+    ms.display_id = "MS" + ap.display_id.substring(2);
+    ms.details = current;
+    ms.type_id = TransType.MICROSAVINGS;
+    ms.flow_type_id = FlowType.OUTFLOW
+    ms.is_posted = postToCashJournal;
+    await CashJournalModel.create(ms)
+
+
+    return ap
 
   },
 
-  
+
   beginningPay: async (params) => {
     var current = await BeginningBalanceModel.getById(params.transaction_id)
 
     var newBalance = parseFloat(current.details.balance) - parseFloat(params.amount_paid);
     var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
+    var currentDate = moment().format("YYYY-MM-DD")
 
     current.details.next_payment_date = date;
     current.details.balance = newBalance
     current.details.interest_fixed_amount = params.interest_fixed_amount;
     current.details.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
-   
+
+    var summary = await cashJournalService.getSummary(params)
+
+    if (summary) {
+      if (current.details.interest > summary.total) {
+        throw new SafeError({
+          status: 200,
+          code: 209,
+          message: "Insufficient Cash Balance",
+          name: "Ledger"
+        })
+      }
+    }
+
     if (newBalance === 0) {
       current.details.is_completed = true
     }
-
+    var postToCashJournal = moment(params.date).isSameOrBefore(currentDate)
+    current.is_posted = postToCashJournal
     var ap = await BeginningBalanceModel.pay(current);
-
 
     var cashJournal = JSON.parse(JSON.stringify(current));
     cashJournal.reference_id = current.transaction_id;
@@ -118,7 +160,20 @@ const loansPayableService = {
     cashJournal.is_beginning = true
     cashJournal.type_id = TransType.LOANS_PROCEED;
     cashJournal.flow_type_id = FlowType.OUTFLOW
+    cashJournal.is_posted = postToCashJournal
     await CashJournalModel.create(cashJournal)
+
+    var ms = JSON.parse(JSON.stringify(params));
+    ms.reference_id = current.transaction_id;
+    ms.total = params.microsavings;
+    ms.display_id = "MS" + ap.display_id.substring(2);
+    ms.details = current;
+    ms.type_id = TransType.MICROSAVINGS;
+    ms.is_posted = postToCashJournal
+    ms.is_beginning = true
+    ms.flow_type_id = FlowType.OUTFLOW
+    await CashJournalModel.create(ms)
+
     return ap
   },
 

@@ -40,6 +40,9 @@ const customModel = {
       is_beginning: {
         type: 'Boolean'
       },
+      is_posted: {
+        type: 'Boolean'
+      },
       is_active: {
         type: 'Boolean'
       },
@@ -63,14 +66,14 @@ const customModel = {
 
     itemSchema.virtual('customer', {
       ref: 'customers',
-      localField: 'customer_id',
+      localField: 'details.customer_id',
       foreignField: 'customer_id',
       justOne: true // for many-to-1 relationships
     });
 
     itemSchema.virtual('vendor', {
       ref: 'vendors',
-      localField: 'vendor_id',
+      localField: 'details.vendor_id',
       foreignField: 'vendor_id',
       justOne: true // for many-to-1 relationships
     });
@@ -103,7 +106,11 @@ const customModel = {
     const items = await customModel.model
       .find({
         client_id: id,
-        is_active: true
+        is_active: true,
+        $or: [
+          { is_posted: true },
+          { is_posted: { $exists: false } }
+        ]
       }).populate('item')
       .lean()
     return items
@@ -130,7 +137,7 @@ const customModel = {
   getPaginatedItems: async (limit, offset, client_id, flow_id, search = "", type_id = "") => {
 
     var options = {
-      populate: ['item'],
+      populate: ['item', 'customer', 'vendor'],
       lean: true,
       offset: offset, limit: limit,
       sort: { created_date: -1 }
@@ -149,7 +156,7 @@ const customModel = {
   getPaginatedItemsByTypeIdFlowTypeId: async (limit, offset, client_id, type_id, flow_type_id) => {
 
     var options = {
-      populate: ['item'],
+      populate: ['item', 'customer', 'vendor'],
       lean: true,
       offset: offset, limit: limit,
       sort: { created_date: -1 }
@@ -157,9 +164,11 @@ const customModel = {
 
     var condition = {
       flow_type_id: flow_type_id,
-      type_id: type_id, $or: [
-        { is_beginning: false },
-        { is_beginning: { $exists: false } }]
+      type_id: type_id,
+      //  $or: [
+      //   { is_beginning: false },
+      //   { is_beginning: { $exists: false } }
+      // ]
     };
     return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, options)
 
@@ -169,7 +178,7 @@ const customModel = {
   getPaginatedItemsByTypeId: async (limit, offset, client_id, type_id) => {
 
     var options = {
-      populate: ['item'],
+      populate: ['item', 'customer', 'vendor'],
       lean: true,
       offset: offset, limit: limit,
       sort: { created_date: -1 }
@@ -185,20 +194,26 @@ const customModel = {
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
 
-  getPaginatedItemsByRefId: async (limit, offset, client_id, search, refId) => {
+  getPaginatedItemsByRefId: async (limit, offset, client_id, search, refId, type_id) => {
 
     var options = {
-      populate: ['item'],
+      populate: ['item', 'customer', 'vendor'],
       lean: true,
       offset: offset, limit: limit,
       sort: { created_date: -1 }
     }
 
     var condition = {
-      reference_id: refId, $or: [
-        { is_beginning: false },
-        { is_beginning: { $exists: false } }]
+      reference_id: refId,
+      //  $or: [
+      //   { is_beginning: false },
+      //   { is_beginning: { $exists: false } }
+      // ]
     };
+
+    if (type_id) {
+      condition.type_id = type_id
+    }
     return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, options)
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
@@ -211,6 +226,22 @@ const customModel = {
       })
       .lean()
     return item
+  },
+  getAllNonPosted: async (date) => {
+    const items = await customModel.model
+      .find({
+        is_posted: false,
+        date: date
+      })
+      .lean()
+    return items
+  },
+
+  markAsPosted: async (params) => {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
+      is_posted: true
+    })
+    return user
   },
   getByClientIdTypeId: async (id, type_id) => {
     const items = await customModel.model
@@ -282,6 +313,7 @@ const customModel = {
       type_id: params.type_id,
       flow_type_id: params.flow_type_id,
       date: params.date,
+      is_posted: params.hasOwnProperty('is_posted') ? params.is_posted : true,
       is_active: true,
       is_beginning: params.is_beginning,
       created_by: params.admin_id,

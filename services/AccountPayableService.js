@@ -5,8 +5,10 @@ import AccountPayableModel from '../models/AccountPayableModel'
 import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import CashJournalModel from '../models/CashJournalModel'
 import InventoryModel from '../models/InventoryModel'
+import LedgerModel from '../models/LedgerModel'
 import { generateId } from '../utils/Crypto'
 import { beginningBalanceService } from './BeginningBalanceService'
+import { cashJournalService } from './CashJournalService'
 
 const accountPayableService = {
   getAll: async (limit, offset, client_id) => {
@@ -56,21 +58,57 @@ const accountPayableService = {
 
     return ap
   },
+  // pay: async (params) => {
+  //   var current = await AccountPayableModel.getById(params.transaction_id)
+
+  //   var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
+  //   var date = moment().add(params.payment_terms, 'days').format("YYYY-MM-DD")
+  //   params.next_payment_date = date;
+  //   params.balance = newBalance
+
+  //   current.next_payment_date = date;
+  //   current.balance = newBalance
+
+
+  //   var ap = await AccountPayableModel.pay(params);
+  //   if (newBalance === 0) {
+  //     await AccountPayableModel.markAsComplete(params.transaction_id, params.admin_id)
+  //   }
+  //   var cashJournal = JSON.parse(JSON.stringify(params));
+
+  //   cashJournal.reference_id = current.transaction_id;
+  //   cashJournal.total = params.amount_paid;
+  //   cashJournal.display_id = params.display_id;
+  //   cashJournal.details = current;
+  //   cashJournal.type_id = TransType.ACCOUNTS_PAYABLE;
+  //   cashJournal.flow_type_id = FlowType.OUTFLOW
+  //   await CashJournalModel.create(cashJournal)
+  //   return ap
+  // },
   pay: async (params) => {
-    var current = await AccountPayableModel.getById(params.transaction_id)
+    var current = await LedgerModel.getById(params.transaction_id)
 
     var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
-    var date = moment().add(params.payment_terms, 'days').format("YYYY-MM-DD")
-    params.next_payment_date = date;
     params.balance = newBalance
-
-    current.next_payment_date = date;
     current.balance = newBalance
 
+    var summary = await cashJournalService.getSummary(params)
 
-    var ap = await AccountPayableModel.pay(params);
+    if(summary){
+      if(params.amount_paid > summary.total){
+        throw new SafeError({
+          status: 200,
+          code: 209,
+          message: "Insufficient Cash Balance",
+          name: "Ledger"
+        })
+      }
+    }
+
+
+    var ap = await LedgerModel.pay(params);
     if (newBalance === 0) {
-      await AccountPayableModel.markAsComplete(params.transaction_id, params.admin_id)
+      await LedgerModel.markAsComplete(params.transaction_id, params.admin_id)
     }
     var cashJournal = JSON.parse(JSON.stringify(params));
 
@@ -89,6 +127,18 @@ const accountPayableService = {
 
     var newBalance = parseFloat(current.details.balance) - parseFloat(params.amount_paid);
     var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
+    var summary = await cashJournalService.getSummary(params)
+
+    if(summary){
+      if(params.amount_paid > summary.total){
+        throw new SafeError({
+          status: 200,
+          code: 209,
+          message: "Insufficient Cash Balance",
+          name: "Ledger"
+        })
+      }
+    }
 
     current.details.next_payment_date = date;
     current.details.balance = newBalance

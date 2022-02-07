@@ -20,14 +20,22 @@ const cashInflowService = {
     var transaction = JSON.parse(JSON.stringify(params));
     transaction.details = params;
     transaction.flow_type_id = FlowType.INFLOW
-    var updated = await CashJournalModel.update(transaction)
     if (previous.type_id == TransType.MICROSAVINGS) {
       var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(previous.client_id, TransType.MICROSAVINGS)
       if (msBeginning) {
+        if (msBeginning.total > params.total) {
+          throw new SafeError({
+            status: 200,
+            code: 209,
+            message: "Insufficient Cash Balance",
+            name: "Ledger"
+          })
+        }
         msBeginning.total = parseFloat(msBeginning.total) + parseFloat(previous.total) - parseFloat(transaction.total);
         await BeginningBalanceModel.update(msBeginning)
       }
     }
+    var updated = await CashJournalModel.update(transaction)
     return updated
   },
   delete: async (params) => {
@@ -54,6 +62,8 @@ const cashInflowService = {
         break;
     }
 
+
+
     var displayId = initial + "000001";
     var lastDisplay = await CashJournalModel.getLastDisplayId(params.client_id, params.type_id, FlowType.INFLOW)
 
@@ -67,15 +77,25 @@ const cashInflowService = {
     transaction.details = params;
     transaction.flow_type_id = FlowType.INFLOW
     transaction.display_id = displayId;
-    var created = await CashJournalModel.create(transaction)
     if (params.type_id == TransType.MICROSAVINGS) {
       var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(params.client_id, TransType.MICROSAVINGS)
       if (msBeginning) {
+
+        if (msBeginning.total > params.total) {
+          throw new SafeError({
+            status: 200,
+            code: 209,
+            message: "Insufficient Cash Balance",
+            name: "Ledger"
+          })
+        }
+
+
         msBeginning.total = parseFloat(msBeginning.total) - parseFloat(params.total);
         await BeginningBalanceModel.update(msBeginning)
       }
     }
-
+    var created = await CashJournalModel.create(transaction)
 
     return created
   }

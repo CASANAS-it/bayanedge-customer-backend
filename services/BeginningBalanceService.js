@@ -10,6 +10,8 @@ import { accountReceivableService } from './AccountReceivableService'
 import { ledgerService } from './LedgerService'
 import { accountPayableService } from './AccountPayableService'
 import moment from 'moment'
+import LedgerModel from '../models/LedgerModel'
+import SalesModel from '../models/SalesModel'
 
 const beginningBalanceService = {
   getAll: async (limit, offset, client_id) => {
@@ -48,8 +50,8 @@ const beginningBalanceService = {
     } else if (params.type_id == TransType.MICROSAVINGS) {
       params.total = params.details.beginning_amount
     } else if (params.type_id == TransType.LOANS_PAYABLE) {
-      var date = moment(params.date, "YYYY-MM-DD").add(params.details.payment_terms, 'days').format("YYYY-MM-DD")
-      params.details.next_payment_date = date;
+      // var date = moment(params.date, "YYYY-MM-DD").add(params.details.payment_terms, 'days').format("YYYY-MM-DD")
+      // params.details.next_payment_date = date;
       params.details.interest = parseFloat(params.total) + parseFloat(params.details.interest_fixed_amount)
       params.details.balance = params.details.interest
       params.details.is_completed = false;
@@ -58,6 +60,51 @@ const beginningBalanceService = {
     }
 
     var beginningBalance = await BeginningBalanceModel.update(params)
+
+    if (params.type_id == TransType.ACCOUNTS_PAYABLE) {
+      await LedgerModel.deleteBeginning(params)
+    } else if (params.type_id == TransType.ACCOUNTS_RECEIVABLE) {
+      await SalesModel.deleteBeginning(params)
+    }
+
+    if (params.type_id == TransType.ACCOUNTS_PAYABLE) {
+      for (let index = 0; index < params.details.vendors.length; index++) {
+        const element = params.details.vendors[index];
+        var ap = {
+          total: element.amount,
+          client_id: params.client_id,
+          vendor_id: element.vendor_id,
+          trans_type: "On Credit",
+          total_unit_cost: 0,
+          total_unit_selling: 0,
+          balance: element.amount,
+          is_beginning: true,
+          is_completed: false,
+          date: params.date,
+        }
+        await LedgerModel.create(ap)
+      }
+
+    } else if (params.type_id == TransType.ACCOUNTS_RECEIVABLE) {
+
+      for (let index = 0; index < params.details.customers.length; index++) {
+        const element = params.details.customers[index];
+        var ar = {
+          total: element.amount,
+          client_id: params.client_id,
+          customer_id: element.customer_id,
+          trans_type: "On Credit",
+          total_unit_cost: 0,
+          total_unit_selling: 0,
+          balance: element.amount,
+          is_beginning: true,
+          is_completed: false,
+          date: params.date,
+        }
+        await SalesModel.create(ar)
+      }
+    }
+
     await CashJournalModel.permanentDeleteByRefId(beginningBalance.transaction_id)
 
     if (params.flow_type_id) {
@@ -69,7 +116,7 @@ const beginningBalanceService = {
       transaction.flow_type_id = beginningBalance.flow_type_id
       transaction.is_beginning = true;
       await CashJournalModel.create(transaction)
-    } 
+    }
     // else if (params.type_id == TransType.SALES) {
     //   var transaction = JSON.parse(JSON.stringify(params));
     //   transaction.reference_id = beginningBalance.transaction_id;
@@ -86,6 +133,11 @@ const beginningBalanceService = {
   },
   delete: async (id) => {
     var data = await BeginningBalanceModel.getById(id)
+    if (data.type_id == TransType.ACCOUNTS_PAYABLE) {
+      await LedgerModel.deleteBeginning(data)
+    } else if (data.type_id == TransType.ACCOUNTS_RECEIVABLE) {
+      await SalesModel.deleteBeginning(data)
+    }
     var hasData = await CashJournalModel.getByClientIdTypeId(data.client_id, data.type_id)
     if (hasData) {
       throw new Errors.BEGINNING_BALANCE_DELETE_ERROR_DATA()
@@ -97,23 +149,60 @@ const beginningBalanceService = {
   create: async (params) => {
 
     if (params.type_id == TransType.ACCOUNTS_PAYABLE || params.type_id == TransType.ACCOUNTS_RECEIVABLE) {
-      var date = moment(params.date, "YYYY-MM-DD").add(params.details.payment_terms, 'days').format("YYYY-MM-DD")
-      params.details.next_payment_date = date;
       params.details.is_completed = false;
       params.details.balance = params.total
     } else if (params.type_id == TransType.MICROSAVINGS) {
       params.total = params.details.beginning_amount
     } else if (params.type_id == TransType.LOANS_PAYABLE) {
-      var date = moment(params.date, "YYYY-MM-DD").add(params.details.payment_terms, 'days').format("YYYY-MM-DD")
-      params.details.next_payment_date = date;
+      // var date = moment(params.date, "YYYY-MM-DD").add(params.details.payment_terms, 'days').format("YYYY-MM-DD")
+      // params.details.next_payment_date = date;
       // params.details.interest = parseFloat(params.total) + parseFloat(params.details.interest_fixed_amount)
-      params.details.balance = params.total
-      params.details.is_completed = false;
+      params.details = {
+        balance : params.total,
+        is_completed : false
+      }
     } else if (params.type_id == TransType.NON_OPERATING_EXPENSE) {
       params.total = parseFloat(params.details.interest_fixed_amount) + parseFloat(params.details.non_financial_charges)
     }
 
     var beginningBalance = await BeginningBalanceModel.create(params)
+    if (params.type_id == TransType.ACCOUNTS_PAYABLE) {
+      for (let index = 0; index < params.details.vendors.length; index++) {
+        const element = params.details.vendors[index];
+        var ap = {
+          total: element.amount,
+          client_id: params.client_id,
+          vendor_id: element.vendor_id,
+          trans_type: "On Credit",
+          total_unit_cost: 0,
+          total_unit_selling: 0,
+          balance: element.amount,
+          is_beginning: true,
+          is_completed: false,
+          date: params.date,
+        }
+        await LedgerModel.create(ap)
+      }
+
+    } else if (params.type_id == TransType.ACCOUNTS_RECEIVABLE) {
+
+      for (let index = 0; index < params.details.customers.length; index++) {
+        const element = params.details.customers[index];
+        var ar = {
+          total: element.amount,
+          client_id: params.client_id,
+          customer_id: element.customer_id,
+          trans_type: "On Credit",
+          total_unit_cost: 0,
+          total_unit_selling: 0,
+          balance: element.amount,
+          is_beginning: true,
+          is_completed: false,
+          date: params.date,
+        }
+        await SalesModel.create(ar)
+      }
+    }
 
     if (params.flow_type_id) {
       var transaction = JSON.parse(JSON.stringify(params));
@@ -124,7 +213,7 @@ const beginningBalanceService = {
       transaction.flow_type_id = params.flow_type_id
       transaction.is_beginning = true;
       await CashJournalModel.create(transaction)
-    } 
+    }
     // else if (params.type_id == TransType.SALES) {
 
     //   var transaction = JSON.parse(JSON.stringify(params));

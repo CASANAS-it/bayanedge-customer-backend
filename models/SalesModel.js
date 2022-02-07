@@ -13,27 +13,44 @@ const customModel = {
       transaction_id: {
         type: 'String'
       },
-      display_id : {
-        type : 'String'
+      display_id: {
+        type: 'String'
       },
       client_id: {
         type: 'String',
       },
-      item_id: {
+      customer_id: {
         type: 'String',
-        ref: "items"
       },
-      unit_selling_price: {
-        type: 'String'
-      },
-      quantity: {
-        type: 'String'
+      details: {
+        type: "Object"
       },
       date: {
         type: 'String'
       },
-      total : {
-        type : "Number"
+      total: {
+        type: "Number"
+      },
+      total_unit_cost: {
+        type: "Number"
+      },
+      total_unit_selling: {
+        type: "Number"
+      },
+      balance: {
+        type: "Number"
+      },
+      is_completed: {
+        type: 'Boolean',
+      },
+      is_beginning: {
+        type: 'Boolean',
+      },
+      trans_type: {
+        type: 'String'
+      },
+      is_boolean: {
+        type: 'Boolean'
       },
       is_active: {
         type: 'Boolean'
@@ -55,10 +72,10 @@ const customModel = {
         toObject: { virtuals: true },
       })
 
-    itemSchema.virtual('item', {
-      ref: 'items',
-      localField: 'item_id',
-      foreignField: 'item_id',
+    itemSchema.virtual('customer', {
+      ref: 'customers',
+      localField: 'customer_id',
+      foreignField: 'customer_id',
       justOne: true // for many-to-1 relationships
     });
 
@@ -83,7 +100,7 @@ const customModel = {
     const items = await customModel.model
       .find({
         client_id: id,
-        is_active : true
+        is_active: true
       })
       .lean()
     return items
@@ -92,18 +109,36 @@ const customModel = {
     const items = await customModel.model
       .findOne({
         client_id: id,
-        is_active : true
+        is_active: true
       })
       .lean()
     return items
   },
   getPaginatedItems: async (limit, offset, client_id) => {
     var options = {
-      populate: ['item','customer'],
-      lean : true
+      populate: ['item', 'customer'],
+      lean: true
     }
-    return await customModel.getModel().paginate({is_active: true, client_id: client_id }, {...options, offset: offset, limit: limit })
-   
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, { ...options, offset: offset, limit: limit })
+
+    // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
+  },
+  getPaginatedARItems: async (limit, offset, client_id) => {
+    var options = {
+      populate: ['item', 'customer'],
+      lean: true
+    }
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id, trans_type: "On Credit" }, { ...options, offset: offset, limit: limit })
+
+    // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
+  },
+  getPaginatedBeginningItems: async (limit, offset, client_id,type) => {
+    var options = {
+      populate: ['item', 'customer'],
+      lean: true
+    }
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id, trans_type: type, is_beginning : true }, { ...options, offset: offset, limit: limit })
+
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
   getById: async (id) => {
@@ -118,10 +153,13 @@ const customModel = {
   update: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
       client_id: params.client_id,
-      item_id: params.item_id,
-      unit_selling_price: params.unit_selling_price,
-      quantity: params.quantity,
+      customer_id: params.customer_id,
+      details: params.details,
+      total_unit_cost: params.total_unit_cost,
+      total_unit_selling: params.total_unit_selling,
+      balance: params.balance,
       total: params.total,
+      is_completed: params.is_completed,
       date: params.date,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -136,34 +174,78 @@ const customModel = {
     })
     return user
   },
+  deleteBeginning: async (params) => {
+    const user = await customModel.model.deleteMany(
+      { is_beginning: true, client_id: params.client_id })
+    return user
+  },
+  pay: async (params) => {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
+      balance: params.balance,
+      modified_by: params.admin_id,
+      modified_date: new Date(),
+    })
+    return user
+  },
+  markAsComplete: async (id, admin_id) => {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: id }, {
+      is_completed: true,
+      modified_by: admin_id,
+      modified_date: new Date(),
+    })
+    return user
+  },
   create: async (params) => {
 
     var displayId = "SA000001"
-    const previousId = await customModel.model.findOne({ client_id: params.client_id }).sort({ display_id: -1 });
-    if (previousId) {
-      var disId = previousId.display_id
-      disId = parseInt(disId.substring(2)) + 1;
-      displayId = "SA" + padZeroes(disId)
+    if (params.trans_type == "On Cash") {
+      if (params.is_beginning) {
+        displayId = "SA000000"
+      } else {
+        const previousId = await customModel.model.findOne({ client_id: params.client_id, display_id: { $regex: 'SA' } }).sort({ display_id: -1 });
+        if (previousId) {
+          var disId = previousId.display_id
+          disId = parseInt(disId.substring(2)) + 1;
+          displayId = "SA" + padZeroes(disId)
+        }
+      }
+    } else {
+      if (params.is_beginning) {
+        displayId = "AR000000"
+      } else {
+        displayId = "AR000001"
+        const previousId = await customModel.model.findOne({ client_id: params.client_id, display_id: { $regex: 'AR' } }).sort({ display_id: -1 });
+        if (previousId) {
+          var disId = previousId.display_id
+          disId = parseInt(disId.substring(2)) + 1;
+          displayId = "AR" + padZeroes(disId)
+        }
+      }
     }
+
     const id = generateId()
     const item = new customModel.model({
       transaction_id: id,
-      display_id : displayId,
+      display_id: displayId,
       client_id: params.client_id,
-      item_id: params.item_id,
-      unit_selling_price: params.unit_selling_price,
-      quantity: params.quantity,
-      total: params.total,
+      customer_id: params.customer_id,
+      trans_type: params.trans_type,
+      details: params.details,
+      total_unit_cost: params.total_unit_cost,
+      total_unit_selling: params.total_unit_selling,
+      balance: params.balance,
+      is_beginning: params.is_beginning,
+      is_completed: params.is_completed,
       date: params.date,
-      is_active : true,
+      is_active: true,
+      total: params.total,
       created_by: params.admin_id,
       created_date: new Date(),
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
     return await item.save()
-
-  }
+  },
 }
 
 export default {

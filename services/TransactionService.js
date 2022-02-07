@@ -3,8 +3,10 @@ import AccountPayableModel from '../models/AccountPayableModel'
 import AccountReceivableModel from '../models/AccountReceivableModel'
 import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import CashJournalModel from '../models/CashJournalModel'
+import LedgerModel from '../models/LedgerModel'
 import LoansPayableModel from '../models/LoansPayableModel'
 import LoansProceedModel from '../models/LoansProceedModel'
+import SalesModel from '../models/SalesModel'
 
 const reportService = {
   getIncomeStatement: async (params) => {
@@ -53,39 +55,45 @@ const reportService = {
     nonFinancialBeginning = nonFinancialBeginning ? parseFloat(nonFinancialBeginning.total) : 0;
 
 
-    var allSales = cj.filter(x => x.type_id === TransType.SALES && !x.is_beginning)
-    var allAr = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE && !x.is_beginning)
-    var allOpex = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE && !x.is_beginning)
-    var allOtherCI = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME && !x.is_beginning)
-    var allLoansProceed = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && !x.is_beginning && x.flow_type_id === FlowType.OUTFLOW)
-    var allLoansProceedCash = cj.filter(x => x.type_id === TransType.LOANS_PROCEED)
-    var allNonFinancial = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES && !x.is_beginning)
-   
-    allNonFinancial.forEach(element => {
+    var allSalesCJ = cj.filter(x => x.type_id === TransType.SALES && !x.is_beginning)
+    var allArCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE && !x.is_beginning)
+    var allOpexCJ = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE && !x.is_beginning)
+    var allOtherCICJ = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME && !x.is_beginning)
+    var allLoansProceedCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && !x.is_beginning && x.flow_type_id === FlowType.OUTFLOW)
+    var allLoansProceedCashCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED)
+    var allNonFinancialCJ = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES && !x.is_beginning)
+    var allSales = await SalesModel.getAllByClientId(params.client_id)
+    var allLedger = await LedgerModel.getAllByClientId(params.client_id)
+
+
+    allNonFinancialCJ.forEach(element => {
       nonFinancial += parseFloat(element.total)
     });
+
     var allArHistory = await AccountReceivableModel.getAllByClientId(params.client_id)
     if (params.isMonthly) {
       allArHistory = allArHistory.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
+      allSales = allSales.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
     }
-    allSales.forEach(element => {
-      sales += parseFloat(element.total)
-      if (element.item.unit_cost && element.details.quantity)
-        salesUnitCost += parseFloat(element.item.unit_cost) * parseFloat(element.details.quantity)
+
+    allSalesCJ.forEach(element => {
+      sales += parseFloat(element.details.total_unit_selling)
+      salesUnitCost += parseFloat(element.details.total_unit_cost)
     });
-    allAr.forEach(element => {
+    allArCJ.forEach(element => {
       arPaid += parseFloat(element.total)
     });
-    allArHistory.forEach(element => {
-      arTotal += parseFloat(element.total)
-      if (element.item.unit_cost && element.quantity)
-        arTotalUnitCost += parseFloat(element.item.unit_cost) * parseFloat(element.quantity)
+    allSales.forEach(element => {
+      if (element.trans_type == "On Credit") {
+        arTotal += parseFloat(element.total_unit_selling)
+        arTotalUnitCost += parseFloat(element.total_unit_cost)
+      }
     });
-    allOtherCI.forEach(element => {
+    allOtherCICJ.forEach(element => {
       otherCashIncome += parseFloat(element.total)
     });
-  
-    allLoansProceedCash.forEach(element => {
+
+    allLoansProceedCashCJ.forEach(element => {
       if (element.is_beginning) {
         if (element.details.details) {
 
@@ -105,7 +113,7 @@ const reportService = {
       }
     });
 
-    allOpex.forEach(element => {
+    allOpexCJ.forEach(element => {
       operatingExpense += parseFloat(element.total)
     });
 
@@ -217,22 +225,24 @@ const reportService = {
     if (params.isMonthly) {
       cj = cj.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
     }
-    var allSales = cj.filter(x => x.type_id === TransType.SALES && !x.is_beginning)
-    var allAr = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE && !x.is_beginning)
-    var allInventoryLedger = cj.filter(x => x.type_id === TransType.LEDGER && !x.is_beginning)
-    var allAp = cj.filter(x => x.type_id === TransType.ACCOUNTS_PAYABLE && !x.is_beginning)
-    var allOpex = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE && !x.is_beginning)
-    var allOtherCI = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME && !x.is_beginning)
-    var allLoansProceedInterest = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && !x.is_beginning && x.flow_type_id === FlowType.OUTFLOW)
-    var allMicrosavingsDeposit = cj.filter(x => x.type_id === TransType.MICROSAVINGS && !x.is_beginning && x.flow_type_id === FlowType.OUTFLOW)
-    var allMicrosavingsWithdrawal = cj.filter(x => x.type_id === TransType.MICROSAVINGS && !x.is_beginning && x.flow_type_id === FlowType.INFLOW)
-    var allDrawings = cj.filter(x => x.type_id === TransType.DRAWINGS && !x.is_beginning)
-    var allNonFinancial = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES && !x.is_beginning)
-    var allLoansProceedCash = cj.filter(x => x.type_id === TransType.LOANS_PROCEED)
+    var allSalesCJ = cj.filter(x => x.type_id === TransType.SALES && !x.is_beginning)
+    var allArCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE && !x.is_beginning)
+    var allInventoryLedgerCJ = cj.filter(x => x.type_id === TransType.LEDGER && !x.is_beginning)
+    var allApCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_PAYABLE && !x.is_beginning)
+    var allOpexCJ = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE && !x.is_beginning)
+    var allOtherCICJ = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME && !x.is_beginning)
+    var allLoansProceedInterestCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && !x.is_beginning && x.flow_type_id === FlowType.OUTFLOW)
+    var allMicrosavingsDepositCJ = cj.filter(x => x.type_id === TransType.MICROSAVINGS && !x.is_beginning && x.flow_type_id === FlowType.OUTFLOW)
+    var allMicrosavingsWithdrawalCJ = cj.filter(x => x.type_id === TransType.MICROSAVINGS && !x.is_beginning && x.flow_type_id === FlowType.INFLOW)
+    var allDrawingsCJ = cj.filter(x => x.type_id === TransType.DRAWINGS && !x.is_beginning)
+    var allNonFinancialCJ = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES && !x.is_beginning)
+    var allLoansProceedCashCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED)
 
     var allArHistory = await AccountReceivableModel.getAllByClientId(params.client_id)
     var allApHistory = await AccountPayableModel.getAllByClientId(params.client_id)
     var allLoansProceeds = await LoansPayableModel.getAllByClientId(params.client_id)
+    var allSales = await SalesModel.getAllByClientId(params.client_id)
+    var allLedger = await LedgerModel.getAllByClientId(params.client_id)
 
     if (params.isMonthly) {
       allArHistory = allArHistory.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
@@ -240,7 +250,7 @@ const reportService = {
       allLoansProceeds = allLoansProceeds.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
     }
 
-    allLoansProceedCash.forEach(element => {
+    allLoansProceedCashCJ.forEach(element => {
       if (element.is_beginning) {
         if (element.details.details) {
 
@@ -260,36 +270,39 @@ const reportService = {
       }
     });
 
-    allSales.forEach(element => {
-      sales += parseFloat(element.total)
-      salesUnitCost += parseFloat(element.item.unit_cost) * parseFloat(element.quantity)
+    allSalesCJ.forEach(element => {
+      sales += parseFloat(element.details.total_unit_selling)
+      salesUnitCost += parseFloat(element.details.total_unit_cost)
     });
-    allAr.forEach(element => {
+    allArCJ.forEach(element => {
       arPaid += parseFloat(element.total)
     });
-    allAp.forEach(element => {
+    allApCJ.forEach(element => {
       apPaid += parseFloat(element.total)
     });
-    allInventoryLedger.forEach(element => {
-      ledger += parseFloat(element.total)
+    allInventoryLedgerCJ.forEach(element => {
+      ledger += parseFloat(element.details.total_unit_cost)
     });
 
-    allMicrosavingsDeposit.forEach(element => {
+    allMicrosavingsDepositCJ.forEach(element => {
       microsavingDeposit += parseFloat(element.total)
     });
-    allMicrosavingsWithdrawal.forEach(element => {
+    allMicrosavingsWithdrawalCJ.forEach(element => {
       microsavingWithdrawal += parseFloat(element.total)
     });
-    allArHistory.forEach(element => {
-      arTotal += parseFloat(element.total)
-      arTotalUnitCost += parseFloat(element.item.unit_cost) * parseFloat(element.quantity)
+    allSales.forEach(element => {
+      if (element.trans_type == "On Credit") {
+        arTotal += parseFloat(element.total_unit_selling)
+        arTotalUnitCost += parseFloat(element.total_unit_cost)
+      }
     });
 
-    allApHistory.forEach(element => {
-      apTotal += parseFloat(element.total)
+    allLedger.forEach(element => {
+      if (element.trans_type == "On Credit")
+        apTotal += parseFloat(element.total_unit_cost)
     });
 
-    allDrawings.forEach(element => {
+    allDrawingsCJ.forEach(element => {
       drawings += parseFloat(element.total)
     });
 
@@ -298,17 +311,17 @@ const reportService = {
       loansProceed += parseFloat(element.total)
     });
 
-    allOtherCI.forEach(element => {
+    allOtherCICJ.forEach(element => {
       otherCashIncome += parseFloat(element.total)
     });
-    allLoansProceedInterest.forEach(element => {
+    allLoansProceedInterestCJ.forEach(element => {
       loansRepayment += parseFloat(element.total)
     });
-    allOpex.forEach(element => {
+    allOpexCJ.forEach(element => {
       operatingExpense += parseFloat(element.total)
     });
 
-    allNonFinancial.forEach(element => {
+    allNonFinancialCJ.forEach(element => {
       nonFinancial += parseFloat(element.total)
     });
 

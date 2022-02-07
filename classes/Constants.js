@@ -45,6 +45,17 @@ const AssetType = Object.freeze({
   OTHER_ASSETS : "Other Assets"
 })
 
+
+const OpexType = Object.freeze({
+  SALARIES_WAGES : "Salaries & Wages",
+  MONTH_PAY : "13th Month Pay",
+  LIGHT_WATER : "Light & Water",
+  RENTAL  : "Rental",
+  COMMUNICATIONS : "Communications",
+  TRANSPORTATION : "Transportation",
+  REPRESENTATION : "Representation"
+})
+
 const LiabilityType = Object.freeze({
   ACCOUNTS_PAYABLE: 'Accounts Payable',
   LOANS_PAYABLE: 'Loans Payable',
@@ -92,5 +103,5 @@ export {
   TransactionType,
   TransType,
   Config,
-  FlowType
+  FlowType,OpexType
 }

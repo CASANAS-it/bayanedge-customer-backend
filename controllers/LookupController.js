@@ -27,6 +27,7 @@ const customControllers = {
     router.get(baseUrl + '/customer', authorize(), customControllers.getCustomers)
     router.get(baseUrl + '/vendor', authorize(), customControllers.getVendors)
     router.get(baseUrl + '/inventory', authorize(), customControllers.getInventory)
+    router.get(baseUrl + '/opex_type', authorize(), customControllers.getOpexType)
     
   },
 
@@ -46,6 +47,19 @@ const customControllers = {
   getEquityType: async (req, res) => {
     try {
       const data = await lookupService.getAllEquityType()
+      res.send(
+        new CommonMessage({
+          data: data
+        })
+      )
+    } catch (err) {
+      const safeErr = ErrorManager.getSafeError(err)
+      res.status(safeErr.status).json(safeErr)
+    }
+  },
+  getOpexType: async (req, res) => {
+    try {
+      const data = await lookupService.getAllOpexType()
       res.send(
         new CommonMessage({
           data: data

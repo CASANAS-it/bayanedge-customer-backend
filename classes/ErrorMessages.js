@@ -28,6 +28,7 @@ const ErrorMessages = Object.freeze({
   NO_BEGINNING_BALANCE: { status: 200, message: 'Please set beginning balance first.',code : 206 },
   BEGINNING_BALANCE_DELETE_ERROR_DATA: { status: 200, message: 'Can not delete beginning balance. Transaction already exists.',code : 207 },
   EDIT_ERROR_WITH_EXISTING_DATA: { status: 200, message: 'Can not update data. Transaction already exists.',code : 208 },
+  INSUFFICIENT_QUANTITY: { status: 200, message: 'Insufficient Quantity.',code : 209 },
   // 300 series
   API_RESPONSE: { status: 200, message: '{}', code: 300 },
 

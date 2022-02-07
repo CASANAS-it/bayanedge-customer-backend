@@ -3,6 +3,7 @@ import Errors from '../classes/Errors'
 import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import CashJournalModel from '../models/CashJournalModel'
 import { padZeroes } from '../utils/CommonUtil'
+import { cashJournalService } from './CashJournalService'
 
 const cashOutflowService = {
   getAll: async (limit, offset, client_id) => {
@@ -20,14 +21,28 @@ const cashOutflowService = {
     var transaction = JSON.parse(JSON.stringify(params));;
     transaction.details = params;
     transaction.flow_type_id = FlowType.OUTFLOW
-    var updated = await CashJournalModel.update(transaction)
     if (previous.type_id == TransType.MICROSAVINGS) {
       var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(previous.client_id, TransType.MICROSAVINGS)
       if (msBeginning) {
         msBeginning.total = parseFloat(msBeginning.total) - parseFloat(previous.total) + parseFloat(transaction.total);
         await BeginningBalanceModel.update(msBeginning)
       }
+    } else {
+      var summary = await cashJournalService.getSummary(params)
+
+      if (summary) {
+        if (transaction.total > summary.total) {
+          throw new SafeError({
+            status: 200,
+            code: 209,
+            message: "Insufficient Cash Balance",
+            name: "Ledger"
+          })
+        }
+      }
+
     }
+    var updated = await CashJournalModel.update(transaction)
     return updated
   },
   delete: async (params) => {
@@ -76,15 +91,30 @@ const cashOutflowService = {
     transaction.details = params;
     transaction.display_id = displayId
     transaction.flow_type_id = FlowType.OUTFLOW
-    var created = await CashJournalModel.create(transaction)
 
     if (params.type_id == TransType.MICROSAVINGS) {
       var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(params.client_id, TransType.MICROSAVINGS)
       if (msBeginning) {
+
         msBeginning.total = parseFloat(msBeginning.total) + parseFloat(params.total);
         await BeginningBalanceModel.update(msBeginning)
       }
+    } else {
+      var summary = await cashJournalService.getSummary(params)
+
+      if (summary) {
+        if (params.total > summary.total) {
+          throw new SafeError({
+            status: 200,
+            code: 209,
+            message: "Insufficient Cash Balance",
+            name: "Ledger"
+          })
+        }
+      }
+
     }
+    var created = await CashJournalModel.create(transaction)
     return created
 
   }

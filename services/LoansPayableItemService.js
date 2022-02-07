@@ -9,7 +9,7 @@ import { generateId } from '../utils/Crypto'
 const loanPayableItemService = {
   getAll: async (limit, offset, client_id,reference_id) => {
     if(reference_id)
-      return await CashJournalModel.getPaginatedItemsByRefId(limit, offset, client_id, '', reference_id)
+      return await CashJournalModel.getPaginatedItemsByRefId(limit, offset, client_id, '', reference_id,TransType.LOANS_PROCEED)
     else
     return await CashJournalModel.getPaginatedItemsByTypeIdFlowTypeId(limit, offset, client_id, TransType.LOANS_PROCEED,FlowType.OUTFLOW)
   },

@@ -8,6 +8,7 @@ import CustomerModel from '../models/CustomerModel';
 import VendorModel from '../models/VendorModel'
 import { AssetType } from '../classes/Constants';
 import InventoryModel from '../models/InventoryModel';
+import NonOperatingExpenseTypeModel from '../models/OperatingExpenseTypeModel';
 
 
 const lookupService = {
@@ -37,6 +38,10 @@ const lookupService = {
   },
   getAllItem : async (clientId) => {
     return await InventoryModel.getAllByClientId(clientId)
+  },
+  
+  getAllOpexType : async (clientId) => {
+    return await NonOperatingExpenseTypeModel.getAll(clientId)
   },
 
 }

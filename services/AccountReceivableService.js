@@ -5,6 +5,7 @@ import AccountReceivableModel from '../models/AccountReceivableModel'
 import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import CashJournalModel from '../models/CashJournalModel'
 import InventoryModel from '../models/InventoryModel'
+import SalesModel from '../models/SalesModel'
 import { generateId } from '../utils/Crypto'
 import { beginningBalanceService } from './BeginningBalanceService'
 
@@ -43,35 +44,60 @@ const accountReceivableService = {
   },
   create: async (params) => {
 
-    var hasBeginining = await beginningBalanceService.hasDataByClient({ client_id: params.client_id, type_id: TransType.ACCOUNTS_RECEIVABLE })
 
-    if (!hasBeginining) {
-      throw new Errors.NO_BEGINNING_BALANCE()
+    // var hasSales = await beginningBalanceService.hasDataByClient({ client_id: params.client_id, type_id: TransType.SALES })
+
+    // if (!hasSales) {
+    //   throw new Errors.NO_BEGINNING_BALANCE()
+    // }
+
+    var ap = await AccountReceivableModel.create(params)
+    for (let index = 0; index < params.details.length; index++) {
+      const item = params.details[index];
+
+      var inventor = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: item.item_id, quantity: item.quantity })
     }
-
-    var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
-    params.next_payment_date = date;
-    var ap = await AccountReceivableModel.create(params);
-    var inventor = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
 
     return ap
   },
 
+  // pay: async (params) => {
+  //   var current = await AccountReceivableModel.getById(params.transaction_id)
+
+  //   var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
+  //   var date = moment().add(params.payment_terms, 'days').format("YYYY-MM-DD")
+  //   params.next_payment_date = date;
+  //   params.balance = newBalance
+
+  //   current.next_payment_date = date;
+  //   current.balance = newBalance
+
+
+  //   var ap = await AccountReceivableModel.pay(params);
+  //   if (newBalance === 0) {
+  //     await AccountReceivableModel.markAsComplete(params.transaction_id, params.admin_id)
+  //   }
+  //   var cashJournal = JSON.parse(JSON.stringify(params));
+
+  //   cashJournal.reference_id = current.transaction_id;
+  //   cashJournal.total = params.amount_paid;
+  //   cashJournal.details = current;
+  //   cashJournal.display_id = params.display_id;
+  //   cashJournal.type_id = TransType.ACCOUNTS_RECEIVABLE;
+  //   cashJournal.flow_type_id = FlowType.INFLOW
+  //   await CashJournalModel.create(cashJournal)
+  //   return ap
+  // },
   pay: async (params) => {
-    var current = await AccountReceivableModel.getById(params.transaction_id)
+    var current = await SalesModel.getById(params.transaction_id)
 
     var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
-    var date = moment().add(params.payment_terms, 'days').format("YYYY-MM-DD")
-    params.next_payment_date = date;
     params.balance = newBalance
-
-    current.next_payment_date = date;
     current.balance = newBalance
 
-
-    var ap = await AccountReceivableModel.pay(params);
+    var ap = await SalesModel.pay(params);
     if (newBalance === 0) {
-      await AccountReceivableModel.markAsComplete(params.transaction_id, params.admin_id)
+      await SalesModel.markAsComplete(params.transaction_id, params.admin_id)
     }
     var cashJournal = JSON.parse(JSON.stringify(params));
 

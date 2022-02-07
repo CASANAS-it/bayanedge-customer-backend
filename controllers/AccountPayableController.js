@@ -15,6 +15,7 @@ import ErrorManager from '../classes/ErrorManager'
 import { UserType } from '../classes/Constants'
 import { getPagination, getPagingData } from '../utils/CommonUtil'
 import { accountPayableService } from '../services/AccountPayableService'
+import { ledgerService } from '../services/LedgerService'
 
 const customControllers = {
     init: router => {
@@ -24,6 +25,7 @@ const customControllers = {
         router.post(baseUrl + '/save', authorize(), customControllers.save)
         router.post(baseUrl + '/', authorize(), customControllers.getById)
         router.post(baseUrl + '/pay', authorize(), customControllers.pay)
+        router.post(baseUrl + '/beginning', authorize(), customControllers.getBeginning)
         router.post(baseUrl + '/beginning_pay', authorize(), customControllers.beginningPay)
         router.post(baseUrl + '/delete', authorize(), customControllers.delete)
     },
@@ -54,7 +56,7 @@ const customControllers = {
             const { pageIndex, pageSize, client_id } = req.body;
 
             const { limit, offset } = getPagination(pageIndex, pageSize);
-            accountPayableService.getAll(limit, offset, client_id).then(data => {
+            ledgerService.getAllAP(limit, offset, client_id).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
                 res.send(
                     new CommonMessage({
@@ -63,7 +65,27 @@ const customControllers = {
                 )
             })
 
-        } catch (err) {
+        } catch (err) { 
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
+    getBeginning: async (req, res) => {
+        try {
+
+            const { pageIndex, pageSize, client_id } = req.body;
+
+            const { limit, offset } = getPagination(pageIndex, pageSize);
+            ledgerService.getAllBeginningAP(limit, offset, client_id).then(data => {
+                const response = getPagingData(data, pageIndex, limit);
+                res.send(
+                    new CommonMessage({
+                        data: response
+                    })
+                )
+            })
+
+        } catch (err) { 
             const safeErr = ErrorManager.getSafeError(err)
             res.status(safeErr.status).json(safeErr)
         }
@@ -74,7 +96,7 @@ const customControllers = {
             const { id } = req.body;
             res.send(
                 new CommonMessage({
-                    data: await accountPayableService.getById(id)
+                    data: await ledgerService.getById(id)
                 })
             )
         } catch (err) {
