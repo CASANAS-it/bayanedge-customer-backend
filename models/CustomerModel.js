@@ -30,6 +30,10 @@ const customModel = {
       credit_limit : {
         type : "Number"
       },
+      
+      available_credit : {
+        type : "Number"
+      },
       is_active: {
         type: 'Boolean'
       },
@@ -95,12 +99,24 @@ const customModel = {
       .lean()
     return customer
   },
+
+
+  updateCredit: async (params) => {
+    const user = await customModel.model.findOneAndUpdate({ customer_id: params.customer_id }, {
+      available_credit : params.available_credit,
+      modified_by: params.admin_id,
+      modified_date: new Date(),
+    })
+    return user
+  },
+
   update: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ id: params.id }, {
+    const user = await customModel.model.findOneAndUpdate({ customer_id: params.customer_id }, {
       customer_name: params.customer_name,
       address: params.address,
       contact_information: params.contact_information,
       terms : params.terms,
+      available_credit : params.credit_limit,
       credit_limit : params.credit_limit,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -108,7 +124,7 @@ const customModel = {
     return user
   },
   delete: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ id: params.id }, {
+    const user = await customModel.model.findOneAndUpdate({ customer_id: params.customer_id }, {
       is_active: false,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -123,6 +139,7 @@ const customModel = {
       customer_name: params.customer_name,
       client_id: params.client_id,
       address: params.address,
+      available_credit : params.credit_limit,
       contact_information: params.contact_information,
       is_active: true,
       terms : params.terms,

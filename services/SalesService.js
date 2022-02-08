@@ -10,7 +10,7 @@ import AccountReceivableModel from '../models/AccountReceivableModel'
 import { beginningBalanceService } from './BeginningBalanceService'
 import ErrorManager from '../classes/ErrorManager'
 import SafeError from '../classes/SafeError'
-import { parseTwoDigitYear } from 'moment'
+import moment, { parseTwoDigitYear } from 'moment'
 
 const salesService = {
   getAll: async (limit, offset, client_id, filter) => {
@@ -47,9 +47,24 @@ const salesService = {
     var oldSales = await SalesModel.getById(params.transaction_id);
 
     // -----------------------------
+    var customer = await CustomerModel.getByCustomerId(params.customer_id)
     if (params.trans_type == "On Credit") {
+      var date = moment().add(customer.terms, 'days').format("YYYY-MM-DD")
+      params.next_payment_date = date;
+
       params.balance = params.total_unit_selling
       params.is_completed = false
+
+
+      if (customer.credit_limit > 0 && (parseFloat(customer.available_credit) + parseFloat(oldSales.total_unit_selling)) < parseFloat(params.total_unit_selling)) {
+        var error = new SafeError({
+          status: 200,
+          code: 209,
+          message: "Insufficient Credit",
+          name: "Sales"
+        })
+        throw error
+      }
     }
 
     for (let index = 0; index < params.details.length; index++) {
@@ -82,6 +97,8 @@ const salesService = {
       var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: item.item_id, quantity: item.quantity })
     }
     var sales = await SalesModel.update(params)
+    customer.available_credit = (parseFloat(customer.available_credit) + parseFloat(oldSales.total_unit_selling)) - parseFloat(params.total_unit_selling)
+    await CustomerModel.updateCredit(customer)
 
     if (params.trans_type == "On Cash") {
 
@@ -115,7 +132,7 @@ const salesService = {
       if (!hasSales) {
         throw new Errors.NO_BEGINNING_BALANCE()
       }
-    }else{
+    } else {
       var hasSales = await beginningBalanceService.hasDataByClient({ client_id: params.client_id, type_id: TransType.ACCOUNTS_RECEIVABLE })
 
       if (!hasSales) {
@@ -127,9 +144,22 @@ const salesService = {
       var customer = await CustomerModel.create(params)
       params.customer_id = customer.customer_id
     }
+    var customer = await CustomerModel.getByCustomerId(params.customer_id)
     if (params.trans_type == "On Credit") {
+      var date = moment().add(customer.terms, 'days').format("YYYY-MM-DD")
+      params.next_payment_date = date;
+
       params.balance = params.total_unit_selling
       params.is_completed = false
+      if (customer.credit_limit > 0 && customer.available_credit < params.total_unit_selling) {
+        var error = new SafeError({
+          status: 200,
+          code: 209,
+          message: "Insufficient Credit",
+          name: "Sales"
+        })
+        throw error
+      }
     }
 
     // checking of quantity
@@ -153,6 +183,8 @@ const salesService = {
     }
 
     var sales = await SalesModel.create(params)
+    customer.available_credit = parseFloat(customer.available_credit) - parseFloat(params.total_unit_selling)
+    await CustomerModel.updateCredit(customer)
 
     if (params.trans_type == "On Cash") {
       var transaction = params;

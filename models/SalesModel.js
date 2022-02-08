@@ -37,6 +37,9 @@ const customModel = {
       total_unit_selling: {
         type: "Number"
       },
+      next_payment_date: {
+        type: 'String'
+      },
       balance: {
         type: "Number"
       },
@@ -208,6 +211,7 @@ const customModel = {
   },
   pay: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
+      next_payment_date : params.next_payment_date,
       balance: params.balance,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -263,6 +267,7 @@ const customModel = {
       balance: params.balance,
       is_beginning: params.is_beginning,
       is_completed: params.is_completed,
+      next_payment_date : params.next_payment_date,
       date: params.date,
       is_active: true,
       total: params.total,

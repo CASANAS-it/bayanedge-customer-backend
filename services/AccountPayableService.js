@@ -6,6 +6,7 @@ import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import CashJournalModel from '../models/CashJournalModel'
 import InventoryModel from '../models/InventoryModel'
 import LedgerModel from '../models/LedgerModel'
+import VendorModel from '../models/VendorModel'
 import { generateId } from '../utils/Crypto'
 import { beginningBalanceService } from './BeginningBalanceService'
 import { cashJournalService } from './CashJournalService'
@@ -16,7 +17,7 @@ const accountPayableService = {
   },
   getAllCompleted: async (limit, offset, client_id) => {
     return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.ACCOUNTS_PAYABLE)
-  },  
+  },
   hasDataByClient: async (id) => {
     var items = await AccountPayableModel.getByClientId(id)
     return items !== null ? true : false
@@ -87,15 +88,18 @@ const accountPayableService = {
   // },
   pay: async (params) => {
     var current = await LedgerModel.getById(params.transaction_id)
-
+    var vendor = await VendorModel.getByVendorId(current.vendor_id)
+    var date = moment().add(vendor.terms, 'days').format("YYYY-MM-DD")
+    params.next_payment_date = date;
+    current.next_payment_date = date
     var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
     params.balance = newBalance
     current.balance = newBalance
 
     var summary = await cashJournalService.getSummary(params)
 
-    if(summary){
-      if(params.amount_paid > summary.total){
+    if (summary) {
+      if (params.amount_paid > summary.total) {
         throw new SafeError({
           status: 200,
           code: 209,
@@ -119,6 +123,9 @@ const accountPayableService = {
     cashJournal.type_id = TransType.ACCOUNTS_PAYABLE;
     cashJournal.flow_type_id = FlowType.OUTFLOW
     await CashJournalModel.create(cashJournal)
+    vendor.available_credit = parseFloat(vendor.available_credit) + parseFloat(params.amount_paid)
+    await VendorModel.updateCredit(vendor)
+
     return ap
   },
 
@@ -129,8 +136,8 @@ const accountPayableService = {
     var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
     var summary = await cashJournalService.getSummary(params)
 
-    if(summary){
-      if(params.amount_paid > summary.total){
+    if (summary) {
+      if (params.amount_paid > summary.total) {
         throw new SafeError({
           status: 200,
           code: 209,
@@ -162,7 +169,7 @@ const accountPayableService = {
   delete: async (params) => {
     var oldData = await AccountPayableModel.getById(params.transaction_id);
     var revertInventory = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: oldData.item_id, quantity: oldData.quantity })
-   
+
     await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
     await AccountPayableModel.delete(params)
   },

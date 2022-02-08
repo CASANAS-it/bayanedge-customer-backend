@@ -69,7 +69,6 @@ const loansPayableService = {
     params.balance = newBalance
 
 
-
     current.next_payment_date = date;
     current.balance = newBalance
     current.interest_fixed_amount = params.interest_fixed_amount;

@@ -10,13 +10,14 @@ import AccountReceivableModel from '../models/AccountReceivableModel'
 import { beginningBalanceService } from './BeginningBalanceService'
 import { cashJournalService } from './CashJournalService'
 import SafeError from '../classes/SafeError'
+import moment from 'moment'
 
 const ledgerService = {
   getAll: async (limit, offset, client_id, filter) => {
     return await LedgerModel.getPaginatedItems(limit, offset, client_id, filter)
   },
-  getAllAP: async (limit, offset, client_id,filter) => {
-    return await LedgerModel.getPaginatedAPItems(limit, offset, client_id,filter)
+  getAllAP: async (limit, offset, client_id, filter) => {
+    return await LedgerModel.getPaginatedAPItems(limit, offset, client_id, filter)
   },
   getAllBeginningAP: async (limit, offset, client_id) => {
     return await LedgerModel.getPaginatedBeginningItems(limit, offset, client_id, "On Credit")
@@ -64,9 +65,23 @@ const ledgerService = {
     }
 
     // -----------------------------
+    var vendor = await VendorModel.getByVendorId(params.vendor_id)
     if (params.trans_type == "On Credit") {
+      var date = moment().add(vendor.terms, 'days').format("YYYY-MM-DD")
+      params.next_payment_date = date;
+
       params.balance = params.total_unit_cost
       params.is_completed = false
+
+      if (vendor.credit_limit > 0 && (parseFloat(vendor.available_credit) + parseFloat(oldSales.total_unit_cost)) < parseFloat(params.total_unit_cost)) {
+        var error = new SafeError({
+          status: 200,
+          code: 209,
+          message: "Insufficient Credit",
+          name: "Ledger"
+        })
+        throw error
+      }
     }
 
     var ledger = await LedgerModel.update(params)
@@ -87,6 +102,9 @@ const ledgerService = {
       transaction.display_id = ledger.display_id
       await CashJournalModel.create(transaction)
     }
+    vendor.available_credit = (parseFloat(vendor.available_credit) + parseFloat(oldSales.total_unit_cost)) - parseFloat(params.total_unit_cost)
+    await VendorModel.updateCredit(vendor)
+
     return ledger
   },
   delete: async (params) => {
@@ -131,9 +149,22 @@ const ledgerService = {
       }
     }
 
+    var vendor = await VendorModel.getByVendorId(params.vendor_id)
     if (params.trans_type == "On Credit") {
+      var date = moment().add(vendor.terms, 'days').format("YYYY-MM-DD")
+      params.next_payment_date = date;
+
       params.balance = params.total_unit_cost
       params.is_completed = false
+      if (vendor.credit_limit > 0 && parseFloat(vendor.available_credit) < parseFloat(params.total_unit_cost)) {
+        var error = new SafeError({
+          status: 200,
+          code: 209,
+          message: "Insufficient Credit",
+          name: "Ledger"
+        })
+        throw error
+      }
     }
 
     var ledger = await LedgerModel.create(params)
@@ -153,6 +184,8 @@ const ledgerService = {
       transaction.display_id = ledger.display_id
       await CashJournalModel.create(transaction)
     }
+    vendor.available_credit = parseFloat(vendor.available_credit)  - parseFloat(params.total_unit_cost)
+    await VendorModel.updateCredit(vendor)
 
     return ledger
   }

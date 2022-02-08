@@ -29,6 +29,9 @@ const customModel = {
       credit_limit : {
         type : "Number"
       },
+      available_credit : {
+        type : "Number"
+      },
       account_number: {
         type: 'String'
       },
@@ -96,6 +99,14 @@ const customModel = {
       .lean()
     return vendor
   },
+  updateCredit: async (params) => {
+    const item = await customModel.model.findOneAndUpdate({ vendor_id: params.vendor_id }, {
+      available_credit : params.available_credit,
+      modified_by: params.admin_id,
+      modified_date: new Date(),
+    })
+    return item
+  },
   update: async (params) => {
     const item = await customModel.model.findOneAndUpdate({ vendor_id: params.vendor_id }, {
       vendor_name: params.vendor_name,
@@ -104,6 +115,7 @@ const customModel = {
       account_number: params.account_number,
       terms : params.terms,
       credit_limit : params.credit_limit,
+      available_credit : params.credit_limit,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -131,6 +143,7 @@ const customModel = {
       created_by: params.admin_id,
       created_date: new Date(),
       terms : params.terms,
+      available_credit : params.credit_limit,
       credit_limit : params.credit_limit,
       modified_by: params.admin_id,
       modified_date: new Date(),

@@ -4,6 +4,7 @@ import Errors from '../classes/Errors'
 import AccountReceivableModel from '../models/AccountReceivableModel'
 import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import CashJournalModel from '../models/CashJournalModel'
+import CustomerModel from '../models/CustomerModel'
 import InventoryModel from '../models/InventoryModel'
 import SalesModel from '../models/SalesModel'
 import { generateId } from '../utils/Crypto'
@@ -91,8 +92,12 @@ const accountReceivableService = {
   pay: async (params) => {
     var current = await SalesModel.getById(params.transaction_id)
 
+    var customer = await CustomerModel.getByCustomerId(current.customer_id)
+    var date = moment().add(customer.terms, 'days').format("YYYY-MM-DD")
     var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
+    params.next_payment_date = date;
     params.balance = newBalance
+    current.next_payment_date = date;
     current.balance = newBalance
 
     var ap = await SalesModel.pay(params);
@@ -108,6 +113,9 @@ const accountReceivableService = {
     cashJournal.type_id = TransType.ACCOUNTS_RECEIVABLE;
     cashJournal.flow_type_id = FlowType.INFLOW
     await CashJournalModel.create(cashJournal)
+    customer.available_credit = parseFloat(customer.available_credit) + parseFloat(params.amount_paid)
+    await CustomerModel.updateCredit(customer)
+
     return ap
   },
 
