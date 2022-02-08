@@ -12,8 +12,8 @@ import { cashJournalService } from './CashJournalService'
 import SafeError from '../classes/SafeError'
 
 const ledgerService = {
-  getAll: async (limit, offset, client_id) => {
-    return await LedgerModel.getPaginatedItems(limit, offset, client_id)
+  getAll: async (limit, offset, client_id, filter) => {
+    return await LedgerModel.getPaginatedItems(limit, offset, client_id, filter)
   },
   getAllAP: async (limit, offset, client_id) => {
     return await LedgerModel.getPaginatedAPItems(limit, offset, client_id)
@@ -37,7 +37,6 @@ const ledgerService = {
     return ledger
   },
   update: async (params) => {
-
     var summary = await cashJournalService.getSummary(params)
 
     if (summary) {
@@ -52,8 +51,8 @@ const ledgerService = {
     }
 
 
-    if (!params.vendor) {
-      var vendor = await CustomerModel.create(params)
+    if (!params.vendor_id) {
+      var vendor = await VendorModel.create(params)
       params.vendor_id = vendor.vendor_id
     }
 
@@ -101,6 +100,11 @@ const ledgerService = {
     return await LedgerModel.delete(params)
   },
   create: async (params) => {
+
+    if (!params.vendor_id) {
+      var vendor = await VendorModel.create(params)
+      params.vendor_id = vendor.vendor_id
+    }
     if (params.trans_type == "On Cash") {
       var hasSales = await beginningBalanceService.hasDataByClient({ client_id: params.client_id, type_id: TransType.INVENTORY })
 

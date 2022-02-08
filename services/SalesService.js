@@ -13,11 +13,11 @@ import SafeError from '../classes/SafeError'
 import { parseTwoDigitYear } from 'moment'
 
 const salesService = {
-  getAll: async (limit, offset, client_id) => {
-    return await SalesModel.getPaginatedItems(limit, offset, client_id)
+  getAll: async (limit, offset, client_id, filter) => {
+    return await SalesModel.getPaginatedItems(limit, offset, client_id, filter)
   },
-  getAllAR: async (limit, offset, client_id) => {
-    return await SalesModel.getPaginatedARItems(limit, offset, client_id)
+  getAllAR: async (limit, offset, client_id, filter) => {
+    return await SalesModel.getPaginatedARItems(limit, offset, client_id, filter)
   },
 
   getAllBeginningAR: async (limit, offset, client_id) => {
@@ -57,7 +57,7 @@ const salesService = {
       var inv = await InventoryModel.getByItemId(item.item_id)
       var oldInv = oldSales.details.find(x => x.item_id == inv.item_id)
       var quantity = parseFloat(inv.quantity) + parseFloat(oldInv ? oldInv.quantity : 0)
-     
+
       if (quantity < item.quantity) {
         var error = new SafeError({
           status: 200,
@@ -109,11 +109,19 @@ const salesService = {
   },
   create: async (params) => {
 
-    // var hasSales = await beginningBalanceService.hasDataByClient({ client_id: params.client_id, type_id: TransType.SALES })
+    if (!params.trans_type == "On Cash") {
+      var hasSales = await beginningBalanceService.hasDataByClient({ client_id: params.client_id, type_id: TransType.SALES })
 
-    // if (!hasSales) {
-    //   throw new Errors.NO_BEGINNING_BALANCE()
-    // }
+      if (!hasSales) {
+        throw new Errors.NO_BEGINNING_BALANCE()
+      }
+    }else{
+      var hasSales = await beginningBalanceService.hasDataByClient({ client_id: params.client_id, type_id: TransType.ACCOUNTS_RECEIVABLE })
+
+      if (!hasSales) {
+        throw new Errors.NO_BEGINNING_BALANCE()
+      }
+    }
 
     if (!params.customer_id) {
       var customer = await CustomerModel.create(params)

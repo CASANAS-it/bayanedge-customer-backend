@@ -29,10 +29,10 @@ const customControllers = {
     get: async (req, res) => {
         try {
 
-            const { pageIndex,pageSize, client_id } = req.body;
+            const { pageIndex,pageSize, client_id,filter } = req.body;
 
             const { limit, offset } = getPagination(pageIndex, pageSize);
-            ledgerService.getAll(limit, offset,client_id).then(data => {
+            ledgerService.getAll(limit, offset,client_id,filter).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
                 res.send(
                     new CommonMessage({

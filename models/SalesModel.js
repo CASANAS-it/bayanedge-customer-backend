@@ -114,12 +114,21 @@ const customModel = {
       .lean()
     return items
   },
-  getPaginatedItems: async (limit, offset, client_id) => {
+  getPaginatedItems: async (limit, offset, client_id, filter) => {
     var options = {
       populate: ['item', 'customer'],
       lean: true
     }
-    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, { ...options, offset: offset, limit: limit })
+    var condition = {}
+    if (filter) {
+      if (filter.search) {
+        condition.$or = [{ display_id: { $regex: filter.search } }, { 'details.display_id': { $regex: filter.search } }]
+      }
+      if (filter.customer_id) {
+        condition.customer_id = filter.customer_id
+      }
+    }
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, { ...options, offset: offset, limit: limit })
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
@@ -132,12 +141,14 @@ const customModel = {
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
-  getPaginatedBeginningItems: async (limit, offset, client_id,type) => {
+  getPaginatedBeginningItems: async (limit, offset, client_id, type) => {
     var options = {
       populate: ['item', 'customer'],
       lean: true
     }
-    return await customModel.getModel().paginate({ is_active: true, client_id: client_id, trans_type: type, is_beginning : true }, { ...options, offset: offset, limit: limit })
+
+
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id, trans_type: type, is_beginning: true }, { ...options, offset: offset, limit: limit })
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },

@@ -111,12 +111,21 @@ const customModel = {
       .lean()
     return items
   },
-  getPaginatedItems: async (limit, offset, client_id) => {
+  getPaginatedItems: async (limit, offset, client_id,filter) => {
     var options = {
       populate: ['item', 'vendor'],
       lean: true
     }
-    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, { ...options, offset: offset, limit: limit })
+    var condition = {}
+    if (filter) {
+      if (filter.search) {
+        condition.$or = [{ display_id: { $regex: filter.search } }, { 'details.display_id': { $regex: filter.search } }]
+      }
+      if (filter.vendor_id) {
+        condition.vendor_id = filter.vendor_id
+      }
+    }
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition}, { ...options, offset: offset, limit: limit })
 
     // return await customModel.getModel().find().select().populate('item').populate('vendor').lean()
   },
