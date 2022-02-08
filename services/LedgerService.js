@@ -15,8 +15,8 @@ const ledgerService = {
   getAll: async (limit, offset, client_id, filter) => {
     return await LedgerModel.getPaginatedItems(limit, offset, client_id, filter)
   },
-  getAllAP: async (limit, offset, client_id) => {
-    return await LedgerModel.getPaginatedAPItems(limit, offset, client_id)
+  getAllAP: async (limit, offset, client_id,filter) => {
+    return await LedgerModel.getPaginatedAPItems(limit, offset, client_id,filter)
   },
   getAllBeginningAP: async (limit, offset, client_id) => {
     return await LedgerModel.getPaginatedBeginningItems(limit, offset, client_id, "On Credit")
@@ -129,12 +129,6 @@ const ledgerService = {
           name: "Ledger"
         })
       }
-    }
-
-
-    if (!params.vendor) {
-      var vendor = await CustomerModel.create(params)
-      params.vendor_id = vendor.vendor_id
     }
 
     if (params.trans_type == "On Credit") {

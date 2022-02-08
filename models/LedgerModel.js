@@ -111,7 +111,7 @@ const customModel = {
       .lean()
     return items
   },
-  getPaginatedItems: async (limit, offset, client_id,filter) => {
+  getPaginatedItems: async (limit, offset, client_id, filter) => {
     var options = {
       populate: ['item', 'vendor'],
       lean: true
@@ -124,17 +124,32 @@ const customModel = {
       if (filter.vendor_id) {
         condition.vendor_id = filter.vendor_id
       }
+      if (filter.item_id) {
+        condition['details.item_id'] = filter.item_id
+      }
     }
-    return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition}, { ...options, offset: offset, limit: limit })
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, { ...options, offset: offset, limit: limit })
 
     // return await customModel.getModel().find().select().populate('item').populate('vendor').lean()
   },
-  getPaginatedAPItems: async (limit, offset, client_id) => {
+  getPaginatedAPItems: async (limit, offset, client_id, filter) => {
     var options = {
       populate: ['item', 'vendor'],
       lean: true
     }
-    return await customModel.getModel().paginate({ is_active: true, client_id: client_id, trans_type: "On Credit" }, { ...options, offset: offset, limit: limit })
+    var condition = {}
+    if (filter) {
+      if (filter.search) {
+        condition.$or = [{ display_id: { $regex: filter.search } }, { 'details.display_id': { $regex: filter.search } }]
+      }
+      if (filter.vendor_id) {
+        condition.vendor_id = filter.vendor_id
+      }
+      if (filter.item_id) {
+        condition['details.item_id'] = filter.item_id
+      }
+    }
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id, trans_type: "On Credit", ...condition }, { ...options, offset: offset, limit: limit })
 
     // return await customModel.getModel().find().select().populate('item').populate('vendor').lean()
   },

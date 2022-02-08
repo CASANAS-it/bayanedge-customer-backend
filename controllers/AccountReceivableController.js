@@ -57,10 +57,10 @@ const customControllers = {
     getBeginning: async (req, res) => {
         try {
 
-            const { pageIndex, pageSize, client_id,filter } = req.body;
+            const { pageIndex, pageSize, client_id } = req.body;
 
             const { limit, offset } = getPagination(pageIndex, pageSize);
-            salesService.getAllBeginningAR(limit, offset, client_id,filter).then(data => {
+            salesService.getAllBeginningAR(limit, offset, client_id).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
                 res.send(
                     new CommonMessage({
