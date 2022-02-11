@@ -163,12 +163,13 @@ const loansPayableService = {
     await CashJournalModel.create(cashJournal)
 
     var ms = JSON.parse(JSON.stringify(params));
+    var details = JSON.parse(JSON.stringify(current))
+    details.details.name= "Microsavings"
+    details.details.description= "Microsavings"
     ms.reference_id = current.transaction_id;
     ms.total = params.microsavings;
     ms.display_id = "MS" + ap.display_id.substring(2);
-    ms.details = current;
-    ms.details.name= "Microsavings"
-    ms.details.description= "Microsavings"
+    ms.details = details;
     ms.type_id = TransType.MICROSAVINGS;
     ms.is_posted = postToCashJournal
     ms.is_beginning = true
