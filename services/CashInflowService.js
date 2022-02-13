@@ -1,5 +1,6 @@
 import { FlowType, TransType } from '../classes/Constants'
 import Errors from '../classes/Errors'
+import SafeError from '../classes/SafeError'
 import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import CashJournalModel from '../models/CashJournalModel'
 import { padZeroes } from '../utils/CommonUtil'
@@ -81,7 +82,7 @@ const cashInflowService = {
       var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(params.client_id, TransType.MICROSAVINGS)
       if (msBeginning) {
 
-        if (msBeginning.total > params.total) {
+        if (msBeginning.total < params.total) {
           throw new SafeError({
             status: 200,
             code: 209,

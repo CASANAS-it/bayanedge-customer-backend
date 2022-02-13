@@ -146,6 +146,17 @@ const loansPayableService = {
       }
     }
 
+    
+    var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(params.client_id, TransType.MICROSAVINGS)
+    if (msBeginning) {
+
+      msBeginning.total = parseFloat(msBeginning.total) + parseFloat(params.microsavings);
+      await BeginningBalanceModel.update(msBeginning)
+    }else{
+      throw new Errors.NO_BEGINNING_BALANCE()
+    
+    }
+
     if (newBalance === 0) {
       current.details.is_completed = true
     }
@@ -177,6 +188,8 @@ const loansPayableService = {
     ms.is_beginning = true
     ms.flow_type_id = FlowType.OUTFLOW
     await CashJournalModel.create(ms)
+
+
 
     return ap
   },
