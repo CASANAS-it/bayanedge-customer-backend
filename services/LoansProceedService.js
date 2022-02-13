@@ -96,6 +96,7 @@ const loansProceedService = {
     await LoansRepaymentModel.permanentDeleteByParentId(params.transaction_id)
     await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
   },
+  
   updateRepayment: async (params) => {
 
     var current = await LoansRepaymentModel.getById(params.transaction_id)
