@@ -97,8 +97,10 @@ const salesService = {
       var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: item.item_id, quantity: item.quantity })
     }
     var sales = await SalesModel.update(params)
-    customer.available_credit = (parseFloat(customer.available_credit) + parseFloat(oldSales.total_unit_selling)) - parseFloat(params.total_unit_selling)
-    await CustomerModel.updateCredit(customer)
+    if (customer.available_credit && customer.credit_limit) {
+      customer.available_credit = (parseFloat(customer.available_credit) + parseFloat(oldSales.total_unit_selling)) - parseFloat(params.total_unit_selling)
+      await CustomerModel.updateCredit(customer)
+    }
 
     if (params.trans_type == "On Cash") {
 
@@ -183,8 +185,10 @@ const salesService = {
     }
 
     var sales = await SalesModel.create(params)
-    customer.available_credit = parseFloat(customer.available_credit) - parseFloat(params.total_unit_selling)
-    await CustomerModel.updateCredit(customer)
+    if (customer.available_credit && customer.credit_limit) {
+      customer.available_credit = parseFloat(customer.available_credit) - parseFloat(params.total_unit_selling)
+      await CustomerModel.updateCredit(customer)
+    }
 
     if (params.trans_type == "On Cash") {
       var transaction = params;

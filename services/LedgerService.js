@@ -102,8 +102,11 @@ const ledgerService = {
       transaction.display_id = ledger.display_id
       await CashJournalModel.create(transaction)
     }
-    vendor.available_credit = (parseFloat(vendor.available_credit) + parseFloat(oldSales.total_unit_cost)) - parseFloat(params.total_unit_cost)
-    await VendorModel.updateCredit(vendor)
+    if (vendor.available_credit && vendor.credit_limit) {
+
+      vendor.available_credit = (parseFloat(vendor.available_credit) + parseFloat(oldSales.total_unit_cost)) - parseFloat(params.total_unit_cost)
+      await VendorModel.updateCredit(vendor)
+    }
 
     return ledger
   },
@@ -184,9 +187,11 @@ const ledgerService = {
       transaction.display_id = ledger.display_id
       await CashJournalModel.create(transaction)
     }
-    vendor.available_credit = parseFloat(vendor.available_credit)  - parseFloat(params.total_unit_cost)
-    await VendorModel.updateCredit(vendor)
+    if (vendor.available_credit && vendor.credit_limit) {
 
+      vendor.available_credit = parseFloat(vendor.available_credit) - parseFloat(params.total_unit_cost)
+      await VendorModel.updateCredit(vendor)
+    }
     return ledger
   }
 }
