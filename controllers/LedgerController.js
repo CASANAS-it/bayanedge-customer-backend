@@ -23,16 +23,35 @@ const customControllers = {
         router.post(baseUrl + '/save', authorize(), customControllers.save)
         router.post(baseUrl + '/', authorize(), customControllers.getById)
         router.post(baseUrl + '/delete', authorize(), customControllers.delete)
+        router.post(baseUrl + '/summary', authorize(), customControllers.getSummary)
     },
 
 
+
+    getSummary: async (req, res) => {
+        try {
+
+            const { client_id } = req.body;
+
+            res.send(
+                new CommonMessage({
+                    data: await ledgerService.getSummary(client_id)
+                })
+            )
+
+
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
     get: async (req, res) => {
         try {
 
-            const { pageIndex,pageSize, client_id,filter } = req.body;
+            const { pageIndex, pageSize, client_id, filter } = req.body;
 
             const { limit, offset } = getPagination(pageIndex, pageSize);
-            ledgerService.getAll(limit, offset,client_id,filter).then(data => {
+            ledgerService.getAll(limit, offset, client_id, filter).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
                 res.send(
                     new CommonMessage({

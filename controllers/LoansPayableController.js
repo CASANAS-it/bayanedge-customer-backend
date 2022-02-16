@@ -26,9 +26,23 @@ const customControllers = {
         router.post(baseUrl + '/pay', authorize(), customControllers.pay)
         router.post(baseUrl + '/beginning_pay', authorize(), customControllers.beginningPay)
         router.post(baseUrl + '/delete', authorize(), customControllers.delete)
+        router.post(baseUrl + '/summary', authorize(), customControllers.getSummary)
     },
 
+    getSummary: async (req, res) => {
+        try {
 
+            const { client_id } = req.body;
+            res.send(
+                new CommonMessage({
+                    data: await loansPayableService.getSummary(client_id)
+                })
+            )
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
     get: async (req, res) => {
         try {
 

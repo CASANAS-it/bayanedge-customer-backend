@@ -59,6 +59,21 @@ const loansPayableService = {
     await CashJournalModel.create(transaction)
     return loansPayable
   },
+
+  getSummary: async (client_id) => {
+    var lp = await LoansPayableModel.getAllByClientId(client_id)
+    var msBalance = await BeginningBalanceModel.getByClientIdTypeId(client_id, TransType.MICROSAVINGS)
+    var balance = 0, microsavings = 0;
+    microsavings = msBalance ? msBalance.total : 0
+    lp.forEach(element => {
+      balance += element.balance
+    });
+    var result = {
+      balance,
+      microsavings
+    }
+    return result
+  },
   pay: async (params) => {
     var current = await LoansPayableModel.getById(params.transaction_id)
 
@@ -84,6 +99,16 @@ const loansPayableService = {
           name: "Ledger"
         })
       }
+    }
+
+    var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(params.client_id, TransType.MICROSAVINGS)
+    if (msBeginning) {
+
+      msBeginning.total = parseFloat(msBeginning.total) + parseFloat(params.microsavings);
+      await BeginningBalanceModel.update(msBeginning)
+    } else {
+      throw new Errors.NO_BEGINNING_BALANCE()
+
     }
 
     var ap = await LoansPayableModel.pay(params)
@@ -146,15 +171,15 @@ const loansPayableService = {
       }
     }
 
-    
+
     var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(params.client_id, TransType.MICROSAVINGS)
     if (msBeginning) {
 
       msBeginning.total = parseFloat(msBeginning.total) + parseFloat(params.microsavings);
       await BeginningBalanceModel.update(msBeginning)
-    }else{
+    } else {
       throw new Errors.NO_BEGINNING_BALANCE()
-    
+
     }
 
     if (newBalance === 0) {

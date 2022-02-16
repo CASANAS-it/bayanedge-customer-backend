@@ -53,7 +53,8 @@ const OpexType = Object.freeze({
   RENTAL  : "Rental",
   COMMUNICATIONS : "Communications",
   TRANSPORTATION : "Transportation",
-  REPRESENTATION : "Representation"
+  REPRESENTATION : "Representation",
+  EXPENSE_ACCOUNT : "Expense Account",
 })
 
 const LiabilityType = Object.freeze({

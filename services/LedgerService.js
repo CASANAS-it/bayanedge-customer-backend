@@ -37,6 +37,22 @@ const ledgerService = {
     }
     return ledger
   },
+  getSummary: async (client_id) => {
+    var ledger = await LedgerModel.getAllByClientId(client_id)
+    var buyTotal = 0;
+    var apTotal = 0;
+    ledger.forEach(element => {
+      if (element.trans_type === "On Cash")
+        buyTotal += element.total_unit_cost
+      else
+        apTotal += element.total_unit_cost
+    });
+    var result = {
+      buyTotal,
+      apTotal
+    }
+    return result
+  },
   update: async (params) => {
     var summary = await cashJournalService.getSummary(params)
 

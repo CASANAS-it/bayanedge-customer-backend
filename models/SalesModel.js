@@ -37,6 +37,9 @@ const customModel = {
       total_unit_selling: {
         type: "Number"
       },
+      reference_no: {
+        type: 'String'
+      },
       next_payment_date: {
         type: 'String'
       },
@@ -187,6 +190,7 @@ const customModel = {
       details: params.details,
       total_unit_cost: params.total_unit_cost,
       total_unit_selling: params.total_unit_selling,
+      reference_no : params.reference_no,
       balance: params.balance,
       total: params.total,
       is_completed: params.is_completed,
@@ -260,6 +264,7 @@ const customModel = {
       display_id: displayId,
       client_id: params.client_id,
       customer_id: params.customer_id,
+      reference_no : params.reference_no,
       trans_type: params.trans_type,
       details: params.details,
       total_unit_cost: params.total_unit_cost,

@@ -38,6 +38,23 @@ const salesService = {
     }
     return sales
   },
+
+  getSummary: async (client_id) => {
+    var sales = await SalesModel.getAllByClientId(client_id)
+    var saleTotal = 0;
+    var arTotal = 0;
+    sales.forEach(element => {
+      if (element.trans_type === "On Cash")
+        saleTotal += element.total_unit_selling
+      else
+        arTotal += element.total_unit_selling
+    });
+    var result = {
+      saleTotal,
+      arTotal
+    }
+    return result
+  },
   update: async (params) => {
     if (!params.customer_id) {
       var customer = await CustomerModel.create(params)
