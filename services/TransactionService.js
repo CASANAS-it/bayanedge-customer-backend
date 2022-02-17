@@ -140,7 +140,7 @@ const reportService = {
         label: "Sales (Benta)",
         detail1 : "",
         detail2: Number.isNaN(retSales) ? 0 : retSales,
-        className: 'large-font'
+        className:'large-font report-highlight'
       },
       {
         label: "Less: Cost of Sales/Service (Puhunan)",
@@ -151,7 +151,7 @@ const reportService = {
         label: "Gross Profit (Tubo)",
         detail1 : "",
         detail2: Number.isNaN(retGrosProfit) ? 0 : retGrosProfit,
-        className: 'large-font'
+        className: 'large-font report-highlight'
       },
       {
         label: "Less: Operating Expense (Gastos)",
@@ -162,7 +162,7 @@ const reportService = {
         label: "Operating Profit (Kita)",
         detail1 : "",
         detail2: Number.isNaN(retOperatingProfit) ? 0 : retOperatingProfit,
-        className: 'large-font'
+        className: 'large-font report-highlight'
       },
       {
         label: "Other Income",
@@ -196,7 +196,7 @@ const reportService = {
         label: "Net Profit",
         detail1 : '',
         detail2: Number.isNaN(retNetProfitAfterNopex) ? 0 : retNetProfitAfterNopex,
-        className: 'large-font'
+        className: 'large-font report-highlight'
       }
 
     ]
@@ -356,7 +356,7 @@ const reportService = {
       {
         label: "Cash Balance, Beginning",
         detail: Number.isNaN(retCashOnHandBeg) ? 0 : retCashOnHandBeg,
-        className : "large-font"
+        className : "large-font report-highlight"
       },
       {
         label: "Cash Inflows (Perang Pumasok)",
@@ -386,7 +386,7 @@ const reportService = {
       {
         label: "Total Cash Inflow",
         detail: Number.isNaN(retCashInflow) ? 0 : retCashInflow,
-        className : "large-font"
+        className : "large-font report-highlight"
       },
       {
         label: "Cash Outflows",
@@ -419,15 +419,17 @@ const reportService = {
       {
         label: "Total Cash Outflow",
         detail: Number.isNaN(retCashOutflow) ? 0 : retCashOutflow,
-        className : "large-font"
+        className : "large-font report-highlight"
       },
       {
         label: (params.isMonthly ? "Monthly Net" : "Net") + " Cashflows",
-        detail: Number.isNaN(retCashFlow) ? 0 : retCashFlow
+        detail: Number.isNaN(retCashFlow) ? 0 : retCashFlow,
+        className : "large-font report-highlight"
       },
       {
         label: "Cash Balance, END",
-        detail: Number.isNaN(retCashBalanceEnd) ? 0 : retCashBalanceEnd
+        detail: Number.isNaN(retCashBalanceEnd) ? 0 : retCashBalanceEnd,
+        className : "large-font report-highlight"
       }
       // ,
       // {
