@@ -124,7 +124,6 @@ const customModel = {
     return items
   },
   getPaginatedItems: async (limit, offset, client_id) => {
-    console.log(limit, offset)
     var options = {
       populate: ['item'],
       lean: true,

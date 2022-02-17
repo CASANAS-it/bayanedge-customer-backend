@@ -117,7 +117,6 @@ const customModel = {
     return items
   },
   getPaginatedItems: async (limit, offset, client_id) => {
-    console.log(limit, offset)
     var options = {
       lean: true,
       offset: offset, limit: limit
@@ -148,6 +147,15 @@ const customModel = {
   markAsCompleted: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
       is_completed: true,
+      modified_by: params.admin_id,
+      modified_date: new Date(),
+    })
+    return user
+  },
+  
+  markAsInCompleted: async (params) => {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
+      is_completed: false,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })

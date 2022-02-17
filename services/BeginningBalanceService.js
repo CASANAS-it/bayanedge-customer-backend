@@ -137,6 +137,20 @@ const beginningBalanceService = {
       await LedgerModel.deleteBeginning(data)
     } else if (data.type_id == TransType.ACCOUNTS_RECEIVABLE) {
       await SalesModel.deleteBeginning(data)
+    } else if (data.type_id == TransType.LOANS_PAYABLE) {
+      var allCJ = await CashJournalModel.getAllByClientIdRefId(data.client_id, id)
+      var microsaving = 0
+      for (let index = 0; index < allCJ.length; index++) {
+        const element = allCJ[index];
+        if (element.type_id == TransType.MICROSAVINGS && element.flow_type_id == FlowType.OUTFLOW) {
+          microsaving += element.total
+        }
+      }
+      var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(data.client_id, TransType.MICROSAVINGS)
+      if (msBeginning) {
+        msBeginning.total = parseFloat(msBeginning.total) - parseFloat(microsaving);
+        await BeginningBalanceModel.update(msBeginning)
+      }
     }
     var hasData = await CashJournalModel.getByClientIdTypeId(data.client_id, data.type_id)
     if (hasData) {
@@ -158,8 +172,8 @@ const beginningBalanceService = {
       // params.details.next_payment_date = date;
       // params.details.interest = parseFloat(params.total) + parseFloat(params.details.interest_fixed_amount)
       params.details = {
-        balance : params.total,
-        is_completed : false
+        balance: params.total,
+        is_completed: false
       }
     } else if (params.type_id == TransType.NON_OPERATING_EXPENSE) {
       params.total = parseFloat(params.details.interest_fixed_amount) + parseFloat(params.details.non_financial_charges)

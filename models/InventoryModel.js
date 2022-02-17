@@ -111,7 +111,6 @@ const customModel = {
   },
 
   addQuantity: async (params) => {
-    console.log(params,'addQuantity')
     const user = await customModel.model.findOneAndUpdate({ item_id: params.item_id }, {
       $inc: { quantity: params.quantity },
       modified_by: params.admin_id,

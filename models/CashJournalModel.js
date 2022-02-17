@@ -85,6 +85,12 @@ const customModel = {
       justOne: true // for many-to-1 relationships
     });
 
+    itemSchema.virtual('microsaving', {
+      ref: 'cash_journal',
+      localField: 'details.microsaving_id',
+      foreignField: 'transaction_id',
+      justOne: true // for many-to-1 relationships
+    });
     itemSchema.plugin(mongoosePaginate)
     customModel.setModel(db.connection.model('cash_journal', itemSchema))
 
@@ -115,6 +121,16 @@ const customModel = {
       .lean()
     return items
   },
+
+  getAllByClientIdRefId: async (id, refId) => {
+    const items = await customModel.model
+      .find({
+        client_id: id,
+        reference_id: refId,
+      })
+      .lean()
+    return items
+  },
   getByClientId: async (id) => {
     const items = await customModel.model
       .findOne({
@@ -134,10 +150,10 @@ const customModel = {
       .lean()
     return items
   },
-  getPaginatedItems: async (limit, offset, client_id, flow_id, search = "", type_id = "") => {
+  getPaginatedItems: async (limit, offset, client_id, flow_id, search = "", type_id = "", filter) => {
 
     var options = {
-      populate: ['item', 'customer', 'vendor'],
+      populate: ['item', 'customer', 'vendor', 'microsaving'],
       lean: true,
       offset: offset, limit: limit,
       sort: { created_date: -1 }
@@ -148,15 +164,18 @@ const customModel = {
       condition.$or = [{ display_id: { $regex: search } }, { 'details.display_id': { $regex: search } }]
     if (type_id)
       condition.type_id = type_id
+    if (filter) {
+      condition.$and = [{ date: { $gte: filter.dateFrom } }, { date: { $lte: filter.dateTo } }]
+    }
     return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, options)
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
 
-  getPaginatedItemsByTypeIdFlowTypeId: async (limit, offset, client_id, type_id, flow_type_id) => {
+  getPaginatedItemsByTypeIdFlowTypeId: async (limit, offset, client_id, type_id, flow_type_id, is_beginning) => {
 
     var options = {
-      populate: ['item', 'customer', 'vendor'],
+      populate: ['item', 'customer', 'vendor', 'microsaving'],
       lean: true,
       offset: offset, limit: limit,
       sort: { created_date: -1 }
@@ -165,10 +184,10 @@ const customModel = {
     var condition = {
       flow_type_id: flow_type_id,
       type_id: type_id,
-      //  $or: [
-      //   { is_beginning: false },
-      //   { is_beginning: { $exists: false } }
-      // ]
+      $or: [
+        { is_beginning: is_beginning },
+        { is_beginning: { $exists: is_beginning } }
+      ]
     };
     return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, options)
 
@@ -178,7 +197,7 @@ const customModel = {
   getPaginatedItemsByTypeId: async (limit, offset, client_id, type_id) => {
 
     var options = {
-      populate: ['item', 'customer', 'vendor'],
+      populate: ['item', 'customer', 'vendor', 'microsaving'],
       lean: true,
       offset: offset, limit: limit,
       sort: { created_date: -1 }
@@ -194,10 +213,10 @@ const customModel = {
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
 
-  getPaginatedItemsByRefId: async (limit, offset, client_id, search, refId, type_id) => {
+  getPaginatedItemsByRefId: async (limit, offset, client_id, search, refId, type_id, is_beginning) => {
 
     var options = {
-      populate: ['item', 'customer', 'vendor'],
+      populate: ['item', 'customer', 'vendor', 'microsaving'],
       lean: true,
       offset: offset, limit: limit,
       sort: { created_date: -1 }
@@ -205,11 +224,12 @@ const customModel = {
 
     var condition = {
       reference_id: refId,
-      //  $or: [
-      //   { is_beginning: false },
-      //   { is_beginning: { $exists: false } }
-      // ]
+      $or: [
+        { is_beginning: is_beginning },
+        { is_beginning: { $exists: is_beginning } }
+      ]
     };
+
 
     if (type_id) {
       condition.type_id = type_id
@@ -296,7 +316,6 @@ const customModel = {
   },
 
   permanentDeleteByRefId: async (id) => {
-    console.log(id)
     const user = await customModel.model.deleteMany(
       { reference_id: id })
     return user

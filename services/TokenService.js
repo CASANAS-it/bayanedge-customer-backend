@@ -5,7 +5,6 @@ import jsonwebtoken from 'jsonwebtoken'
 const tokenService = {
 
   createToken: async (user) => {
-    console.log(user,'user')
     const token = jsonwebtoken.sign(user, properties.tokenSecret, {
       expiresIn: 10800 // 3 hours
     })

@@ -29,10 +29,10 @@ const customControllers = {
     get: async (req, res) => {
         try {
 
-            const { pageIndex, pageSize, client_id,reference_id } = req.body;
+            const { pageIndex, pageSize, client_id,reference_id,is_beginning } = req.body;
 
             const { limit, offset } = getPagination(pageIndex, pageSize);
-            loanPayableItemService.getAll(limit, offset,client_id,reference_id).then(data => {
+            loanPayableItemService.getAll(limit, offset,client_id,reference_id,is_beginning).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
                 res.send(
                     new CommonMessage({

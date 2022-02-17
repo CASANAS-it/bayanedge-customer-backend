@@ -342,30 +342,38 @@ const reportService = {
     });
 
     var retCashOnHandBeg = cashOnHandBeg
-    var retCashInflow = sales + otherCashIncome + arPaid + microsavingWithdrawal
-    var retCashOutflow = ledger + apPaid + operatingExpense + drawings + nonFinancial
+    var retLoansRepayment = loansRepayment;
+    var retCashInflow = sales + otherCashIncome + arPaid + microsavingWithdrawal + loansProceed
+    var retDebtServicing = loansProceedsPrincipal + loansProceedsInterest + microsavingDeposit
+    var retCashOutflow = ledger + apPaid + operatingExpense + drawings + nonFinancial + retDebtServicing
     var retCashFlow = retCashInflow - retCashOutflow
     var retCashBalanceEnd = retCashFlow + cashOnHandBeg
-    var retDebtServicing = loansProceedsPrincipal + loansProceedsInterest + microsavingDeposit
     var retAfterDebt = retCashBalanceEnd - retDebtServicing
     var retFreshIfusion = loansProceed;
+    var retLoansProceeds = loansProceed;
     var retCashBalance = retAfterDebt + retFreshIfusion
     return [
       {
-        label: "Cash Balance Beg",
-        detail: Number.isNaN(retCashOnHandBeg) ? 0 : retCashOnHandBeg
+        label: "Cash Balance, Beginning",
+        detail: Number.isNaN(retCashOnHandBeg) ? 0 : retCashOnHandBeg,
+        className : "large-font"
       },
       {
-        label: "Add: Cash Inflows",
+        label: "Cash Inflows (Perang Pumasok)",
         detail: ''
       },
       {
-        label: "Sales (On Cash)",
+        label: "Cash Sales",
         detail: Number.isNaN(sales) ? 0 : sales
       },
       {
         label: "Collection of Accounts Receivables",
         detail: Number.isNaN(arPaid) ? 0 : arPaid
+      },
+      
+      {
+        label: "Loan Proceeds",
+        detail: Number.isNaN(retLoansProceeds) ? 0 : retLoansProceeds
       },
       {
         label: "Microsavings Withdrawal",
@@ -377,10 +385,11 @@ const reportService = {
       },
       {
         label: "Total Cash Inflow",
-        detail: Number.isNaN(retCashInflow) ? 0 : retCashInflow
+        detail: Number.isNaN(retCashInflow) ? 0 : retCashInflow,
+        className : "large-font"
       },
       {
-        label: "Less: Cash Outflows",
+        label: "Cash Outflows",
         detail: "",
       },
       {
@@ -392,60 +401,60 @@ const reportService = {
         detail: Number.isNaN(apPaid) ? 0 : apPaid
       },
       {
-        label: "Cash Operating Expense",
+        label: "Cash Operating Expenses",
         detail: Number.isNaN(operatingExpense) ? 0 : operatingExpense
+      },
+      {
+        label : "Loans Repayment (PIF)",
+        detail : Number.isNaN(retDebtServicing) ? 0 : retDebtServicing
       },
       {
         label: "Owner's Drawings",
         detail: Number.isNaN(drawings) ? 0 : drawings
       },
       {
-        label: "Non-Financial Charges",
+        label: "Cash Non-Financial Charges",
         detail: Number.isNaN(nonFinancial) ? 0 : nonFinancial
       },
       {
         label: "Total Cash Outflow",
-        detail: Number.isNaN(retCashOutflow) ? 0 : retCashOutflow
+        detail: Number.isNaN(retCashOutflow) ? 0 : retCashOutflow,
+        className : "large-font"
       },
       {
-        label: (params.isMonthly ? "Monthly Net" : "Net") + " Cash Flow",
+        label: (params.isMonthly ? "Monthly Net" : "Net") + " Cashflows",
         detail: Number.isNaN(retCashFlow) ? 0 : retCashFlow
       },
       {
-        label: "Cash Balance, END (Before Debt Servicing Fresh Fund Infusion)",
+        label: "Cash Balance, END",
         detail: Number.isNaN(retCashBalanceEnd) ? 0 : retCashBalanceEnd
-      },
-      {
-        label: "Debt Servicing ",
-        detail: Number.isNaN(retDebtServicing) ? 0 : retDebtServicing
-      },
-      {
-        label: "Principal",
-        detail: Number.isNaN(loansProceedsPrincipal) ? 0 : loansProceedsPrincipal
-      },
-      {
-        label: "Interest",
-        detail: Number.isNaN(loansProceedsInterest) ? 0 : loansProceedsInterest
-      },
-      {
-        label: "Microsavings",
-        detail: Number.isNaN(microsavingDeposit) ? 0 : microsavingDeposit
-      },
-      {
-        label: "Cash Balance, End (After Debt Servicing But Before Fresh Fund Infusion)",
-        detail: Number.isNaN(retAfterDebt) ? 0 : retAfterDebt
-      },
+      }
+      // ,
+      // {
+      //   label: "Debt Servicing ",
+      //   detail: Number.isNaN(retDebtServicing) ? 0 : retDebtServicing
+      // },
+      // {
+      //   label: "Principal",
+      //   detail: Number.isNaN(loansProceedsPrincipal) ? 0 : loansProceedsPrincipal
+      // },
+      // {
+      //   label: "Interest",
+      //   detail: Number.isNaN(loansProceedsInterest) ? 0 : loansProceedsInterest
+      // },
+      // {
+      //   label: "Microsavings",
+      //   detail: Number.isNaN(microsavingDeposit) ? 0 : microsavingDeposit
+      // },
+      // {
+      //   label: "Cash Balance, End (After Debt Servicing But Before Fresh Fund Infusion)",
+      //   detail: Number.isNaN(retAfterDebt) ? 0 : retAfterDebt
+      // },
 
-      {
-        label: "Fresh Infusion from Bayan Edge",
-        detail: Number.isNaN(retFreshIfusion) ? 0 : retFreshIfusion
-      },
-
-
-      {
-        label: "Cash Balance, End",
-        detail: Number.isNaN(retCashBalance) ? 0 : retCashBalance
-      },
+      // {
+      //   label: "Cash Balance, End",
+      //   detail: Number.isNaN(retCashBalance) ? 0 : retCashBalance
+      // },
 
     ]
   },

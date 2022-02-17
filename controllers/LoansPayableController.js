@@ -25,8 +25,12 @@ const customControllers = {
         router.post(baseUrl + '/', authorize(), customControllers.getById)
         router.post(baseUrl + '/pay', authorize(), customControllers.pay)
         router.post(baseUrl + '/beginning_pay', authorize(), customControllers.beginningPay)
+        router.post(baseUrl + '/beginning_pay_edit', authorize(), customControllers.beginningPayEdit)
+        router.post(baseUrl + '/beginning_pay_delete', authorize(), customControllers.beginningPayDelete)
         router.post(baseUrl + '/delete', authorize(), customControllers.delete)
         router.post(baseUrl + '/summary', authorize(), customControllers.getSummary)
+        router.post(baseUrl + '/pay_edit', authorize(), customControllers.payEdit)
+        router.post(baseUrl + '/pay_delete', authorize(), customControllers.deletePay)
     },
 
     getSummary: async (req, res) => {
@@ -141,7 +145,64 @@ const customControllers = {
             res.status(safeErr.status).json(safeErr)
         }
     },
+    
+    deletePay: async (req, res) => {
+        try {
+            var data = await loansPayableService.deletePay(req.body)
+
+            res.send(
+                new CommonMessage({
+                    data: data
+                })
+            )
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
+    payEdit: async (req, res) => {
+        try {
+            var data = await loansPayableService.payEdit(req.body)
+
+            res.send(
+                new CommonMessage({
+                    data: data
+                })
+            )
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
     beginningPay: async (req, res) => {
+        try {
+            var data = await loansPayableService.beginningPay(req.body)
+
+            res.send(
+                new CommonMessage({
+                    data: data
+                })
+            )
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
+    beginningPayEdit: async (req, res) => {
+        try {
+            var data = await loansPayableService.payBeginningEdit(req.body)
+
+            res.send(
+                new CommonMessage({
+                    data: data
+                })
+            )
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
+    beginningPayDelete: async (req, res) => {
         try {
             var data = await loansPayableService.beginningPay(req.body)
 

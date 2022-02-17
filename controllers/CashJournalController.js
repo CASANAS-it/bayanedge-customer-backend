@@ -29,10 +29,10 @@ const customControllers = {
     get: async (req, res) => {
         try {
 
-            const { pageIndex, pageSize, client_id, type, search, type_id } = req.body;
+            const { pageIndex, pageSize, client_id, type, search, type_id,filter } = req.body;
 
             const { limit, offset } = getPagination(pageIndex, pageSize);
-            cashJournalService.getAll(limit, offset, client_id, type, search, type_id).then(data => {
+            cashJournalService.getAll(limit, offset, client_id, type, search, type_id,filter).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
                 res.send(
                     new CommonMessage({

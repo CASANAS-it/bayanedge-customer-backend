@@ -30,7 +30,6 @@ const customControllers = {
         try {
 
             const { pageIndex, pageSize, client_id } = req.body;
-            console.log(client_id,'clientId')
             const { limit, offset } = getPagination(pageIndex, pageSize);
             assetService.getAll(limit, offset,client_id).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
