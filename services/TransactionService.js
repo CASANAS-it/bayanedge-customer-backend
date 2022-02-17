@@ -143,7 +143,7 @@ const reportService = {
         className: 'large-font'
       },
       {
-        label: "Less: Cost of sales/service (Puhunan)",
+        label: "Less: Cost of Sales/Service (Puhunan)",
         detail1 : "",
         detail2: Number.isNaN(retCostOfGoods) ? 0 : retCostOfGoods,
       },
