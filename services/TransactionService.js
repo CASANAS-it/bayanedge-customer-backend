@@ -137,56 +137,65 @@ const reportService = {
     var retNetProfitAfterNopex = retNetProfit - retNonOperatingExpense
     return [
       {
-        label: "Sales",
-        detail: Number.isNaN(retSales) ? 0 : retSales,
+        label: "Sales (Benta)",
+        detail1 : "",
+        detail2: Number.isNaN(retSales) ? 0 : retSales,
         className: 'large-font'
       },
       {
-        label: "Less: Cost of Goods Sold",
-        detail: Number.isNaN(retCostOfGoods) ? 0 : retCostOfGoods,
+        label: "Less: Cost of sales/service (Puhunan)",
+        detail1 : "",
+        detail2: Number.isNaN(retCostOfGoods) ? 0 : retCostOfGoods,
       },
       {
-        label: "Gross Profit",
-        detail: Number.isNaN(retGrosProfit) ? 0 : retGrosProfit,
+        label: "Gross Profit (Tubo)",
+        detail1 : "",
+        detail2: Number.isNaN(retGrosProfit) ? 0 : retGrosProfit,
         className: 'large-font'
       },
       {
-        label: "Less: Operating Expense",
-        detail: Number.isNaN(retOperatingExpense) ? 0 : retOperatingExpense
+        label: "Less: Operating Expense (Gastos)",
+        detail1 : "",
+        detail2: Number.isNaN(retOperatingExpense) ? 0 : retOperatingExpense
       },
       {
-        label: "Operating Profit",
-        detail: Number.isNaN(retOperatingProfit) ? 0 : retOperatingProfit,
+        label: "Operating Profit (Kita)",
+        detail1 : "",
+        detail2: Number.isNaN(retOperatingProfit) ? 0 : retOperatingProfit,
         className: 'large-font'
       },
       {
-        label: "Other Cash Income",
-        detail: Number.isNaN(retOtherCashIncome) ? 0 : retOtherCashIncome,
+        label: "Other Income",
+        detail1 : "",
+        detail2: Number.isNaN(retOtherCashIncome) ? 0 : retOtherCashIncome,
       },
       {
-        label: "Net Profit before Interest Expense",
-        detail: Number.isNaN(retNetProfit) ? 0 : retNetProfit,
-        className: 'large-font'
+        label: "Net Profit before Non-Operating Expense",
+        detail1 : '',
+        detail2: Number.isNaN(retNetProfit) ? 0 : retNetProfit,
       },
 
       {
-        label: "Non Operating Expense",
-        detail: Number.isNaN(retNonOperatingExpense) ? 0 : retNonOperatingExpense,
-        className: 'large-font'
+        label: "Less : Non Operating Expense",
+        detail1 : '',
+        detail2: Number.isNaN(retNonOperatingExpense) ? 0 : retNonOperatingExpense,
       },
 
       {
-        label: "    Interest Expense",
-        detail: Number.isNaN(retNonOperatingExpenseInterest) ? 0 : retNonOperatingExpenseInterest
+        label: "Interest Expense",
+        detail1: Number.isNaN(retNonOperatingExpenseInterest) ? 0 : retNonOperatingExpenseInterest,
+        detail2 :"",
       },
       {
-        label: "    Non-financial Charges",
-        detail: Number.isNaN(retNonOperatingExpenseNonFinancial) ? 0 : retNonOperatingExpenseNonFinancial,
+        label: "Non-financial Charges",
+        detail1: Number.isNaN(retNonOperatingExpenseNonFinancial) ? 0 : retNonOperatingExpenseNonFinancial,
+        detail2 :"",
       },
 
       {
-        label: "Net Profit after Non-Operating Expense",
-        detail: Number.isNaN(retNetProfitAfterNopex) ? 0 : retNetProfitAfterNopex,
+        label: "Net Profit",
+        detail1 : '',
+        detail2: Number.isNaN(retNetProfitAfterNopex) ? 0 : retNetProfitAfterNopex,
         className: 'large-font'
       }
 
