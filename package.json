@@ -28,10 +28,13 @@
     "mongoose": "^5.11.8",
     "mongoose-paginate": "^5.0.3",
     "node-cron": "^2.0.3",
+    "nodemailer": "^6.7.2",
     "nodemon": "^2.0.6",
     "standard": "^16.0.3",
     "swagger-ui-express": "^4.1.6",
     "tracer": "^1.1.4",
+    "uuid": "^8.3.2",
+    "uuidv4": "^6.2.12",
     "winston": "^3.3.3",
     "yamljs": "^0.3.0"
   },

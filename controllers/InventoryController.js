@@ -31,12 +31,14 @@ const customControllers = {
 
             const { pageIndex, pageSize, client_id } = req.body;
 
+            var total = await inventoryService.getSummary(client_id)
             const { limit, offset } = getPagination(pageIndex, pageSize);
-            inventoryService.getAll(limit, offset,client_id).then(data => {
+            inventoryService.getAll(limit, offset, client_id).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
+                response.total = total
                 res.send(
                     new CommonMessage({
-                        data: response
+                        data: response,
                     })
                 )
             })

@@ -1,8 +1,10 @@
 import mongoose from 'mongoose'
 import Database from '../classes/Database'
+import { sendEmail } from '../classes/email'
 import Logger from '../classes/Logger'
+import properties from '../properties'
 import { encrypt, generateId, decrypt } from '../utils/Crypto'
-
+import { v4 as uuidv4 } from "uuid";
 const customModel = {
 
   init() {
@@ -29,6 +31,9 @@ const customModel = {
       is_active: {
         type: 'Boolean'
       },
+      activation_code: {
+        type: "String"
+      },
       created_by: {
         type: 'String'
       },
@@ -42,8 +47,8 @@ const customModel = {
         type: 'Date'
       },
 
-      
-      user_type:  {
+
+      user_type: {
         type: 'Object',
         references: {
           model: "user_types",
@@ -62,6 +67,50 @@ const customModel = {
   getModel: () => {
     return customModel.model
   },
+
+  async getByActivationCode(id) {
+    let model = await customModel.model.findOne({ activation_code: id });
+    if (model) {
+      model.password = decrypt(model.password)
+    }
+    return model;
+  },
+
+  async initForgotPassword(id) {
+    let item = await customModel.model.findOne({ login_id: id });
+    if (item) {
+      item.activation_code = uuidv4();
+
+      var mailOptions = {
+        from: "MoneyFlow <" + properties.transporter.username + ">",
+        to: id,
+        subject: 'Forgot password',
+        html: 'Click <a href="' + properties.hostName + '#/change_password/' + item.activation_code + '">here</a> to set password'
+      }
+      //send email
+      sendEmail(mailOptions);
+    }
+
+    return await customModel.model.findOneAndUpdate({ login_id: id }, item, { 'new': true });
+  },
+
+  updatePassword: async (idUser, password) => {
+    let user = await customModel.model.findOneAndUpdate({ id: idUser }, {
+      password: encrypt(password),
+      activation_code : ''
+    });
+    return user;
+  },
+  getByIdAndPassword: async (id, password) => {
+    const user = await customModel.model
+      .findOne({
+        id: id,
+        password: password
+      })
+      .lean()
+    if (user) user.password = undefined
+    return user
+  },
   getByUsernameAndPassword: async (username, password) => {
     const user = await customModel.model
       .findOne({
@@ -72,12 +121,12 @@ const customModel = {
     if (user) user.password = undefined
     return user
   },
-  updatePassword: async (idUser, password) => {
-    const user = await customModel.model.findOneAndUpdate({ _id: idUser }, {
-      password: password
-    })
-    return user
-  },
+  // updatePassword: async (idUser, password) => {
+  //   const user = await customModel.model.findOneAndUpdate({ _id: idUser }, {
+  //     password: password
+  //   })
+  //   return user
+  // },
   getAll: async () => {
     return await customModel.getModel()
       .find()
@@ -104,7 +153,7 @@ const customModel = {
     Logger.info(hashPassword)
 
     Logger.info(decrypt(hashPassword))
-  
+
     const admin = new customModel.model({
       id: id,
       login_id: 'client1',
@@ -121,7 +170,7 @@ const customModel = {
     await admin.save()
     return id
   },
-  create: async (loginId,password,clubId,userTypeName, firstName, middleName, lastName,  adminId) => {
+  create: async (loginId, password, clubId, userTypeName, firstName, middleName, lastName, adminId) => {
     Logger.info('Creating user ' + firstName)
     const id = generateId()
     const hashPassword = encrypt(password)
@@ -130,8 +179,8 @@ const customModel = {
       id: id,
       login_id: loginId,
       is_active: true,
-      user_type_name : userTypeName,
-      club_id : clubId,
+      user_type_name: userTypeName,
+      club_id: clubId,
       first_name: firstName,
       middle_name: middleName,
       last_name: lastName,
