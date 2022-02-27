@@ -157,10 +157,6 @@ const loansPayableService = {
     var oldData = await CashJournalModel.getById(details.transaction_id)
     var oldMicro = await CashJournalModel.getById(details.details.microsaving_id)
 
-    //----------deleting old data
-    await CashJournalModel.permanentDelete(details.transaction_id)
-    await CashJournalModel.permanentDelete(oldMicro.transaction_id)
-
     var current = await LoansPayableModel.getById(details.reference_id)
     var oldPrincipal = parseFloat(oldData.total) - parseFloat(oldData.details.interest_fixed_amount)
     var newBalance = (parseFloat(current.balance) + parseFloat(oldPrincipal))
@@ -180,6 +176,11 @@ const loansPayableService = {
     if (newBalance > 0) {
       await LoansPayableModel.markAsInCompleted(ap)
     }
+
+    
+    //----------deleting old data
+    await CashJournalModel.permanentDelete(details.transaction_id)
+    await CashJournalModel.permanentDelete(oldMicro.transaction_id)
     return ap
   },
   pay: async (params) => {
