@@ -43,6 +43,13 @@ const initializeService = {
     await OperatingExpenseTypeModel.createType({ name: OpexType.COMMUNICATIONS })
     await OperatingExpenseTypeModel.createType({ name: OpexType.TRANSPORTATION })
     await OperatingExpenseTypeModel.createType({ name: OpexType.REPRESENTATION })
+
+    await OperatingExpenseTypeModel.createType({ name: OpexType.ADVERTISING_PROMO })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.OFFICE_SUPPLIES })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.REPAIRS_MAINTENANCE })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.SUBSCRIPTION_FEES })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.TAXES_LICENSES })
+    
   },
 
   initializeData: async () => {

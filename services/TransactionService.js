@@ -290,7 +290,7 @@ const reportService = {
       apPaid += parseFloat(element.total)
     });
     allInventoryLedgerCJ.forEach(element => {
-      ledger += parseFloat(element.details.total_unit_cost)
+      ledger += parseFloat(element.total)
     });
 
     allMicrosavingsDepositCJ.forEach(element => {
