@@ -46,7 +46,7 @@ const cashOutflowService = {
     return updated
   },
   delete: async (params) => {
-    var previous = await CashJournalModel.getById(params.transaction_id)
+    var previous = await CashJournalModel.getById(params.id)
     if (previous.type_id == TransType.MICROSAVINGS) {
       var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(previous.client_id, TransType.MICROSAVINGS)
       if (msBeginning) {

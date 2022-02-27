@@ -146,6 +146,7 @@ const reportService = {
         label: "Less: Cost of Sales/Service (Puhunan)",
         detail1 : "",
         detail2: Number.isNaN(retCostOfGoods) ? 0 : retCostOfGoods,
+        className : "red-font"
       },
       {
         label: "Gross Profit (Tubo)",
@@ -156,7 +157,8 @@ const reportService = {
       {
         label: "Less: Operating Expense (Gastos)",
         detail1 : "",
-        detail2: Number.isNaN(retOperatingExpense) ? 0 : retOperatingExpense
+        detail2: Number.isNaN(retOperatingExpense) ? 0 : retOperatingExpense,
+        className : "red-font"
       },
       {
         label: "Operating Profit (Kita)",
@@ -179,6 +181,7 @@ const reportService = {
         label: "Less : Non Operating Expense",
         detail1 : '',
         detail2: Number.isNaN(retNonOperatingExpense) ? 0 : retNonOperatingExpense,
+        className : "red-font"
       },
 
       {
