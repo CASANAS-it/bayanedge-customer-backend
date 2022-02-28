@@ -47,6 +47,7 @@ const ErrorMessages = Object.freeze({
   UNKNOWN_DB: { status: 500, message: 'Unknown DB error' },
   OLD_PWD_NOT_VALID: { status: 500, message: 'Old password not valid' },
   PWD_ADMIN_NOT_VALID: { status: 500, message: 'Password admin not valid' },
+  INVALID_CURRENT_PASSWORD: { status: 500, message: 'Invalid Current Password' },
   CHANGE_PASSWORD_FAILED: { status: 500, message: 'Change password failed' },
   
   TRANSACTION_DELETE_ERROR: { status: 400, message: 'Tranasaction Completed, cannot delete the transaction' },

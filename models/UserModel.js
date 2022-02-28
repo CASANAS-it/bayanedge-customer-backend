@@ -114,19 +114,29 @@ const customModel = {
   getByUsernameAndPassword: async (username, password) => {
     const user = await customModel.model
       .findOne({
-        username: username,
-        password: password
+        login_id: username,
+        password: decrypt(password)
       })
       .lean()
     if (user) user.password = undefined
     return user
   },
-  // updatePassword: async (idUser, password) => {
-  //   const user = await customModel.model.findOneAndUpdate({ _id: idUser }, {
-  //     password: password
-  //   })
-  //   return user
-  // },
+  getByIdAndPassword: async (id, password) => {
+    const user = await customModel.model
+      .findOne({
+        id: id,
+        password: encrypt(password)
+      })
+      .lean()
+    if (user) user.password = undefined
+    return user
+  },
+  updatePassword: async (idUser, password) => {
+    const user = await customModel.model.findOneAndUpdate({ id: idUser }, {
+      password: encrypt(password)
+    })
+    return user
+  },
   getAll: async () => {
     return await customModel.getModel()
       .find()

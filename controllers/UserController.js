@@ -17,7 +17,7 @@ const customControllers = {
   init: router => {
     const baseUrl = `${Properties.api}/user`
     router.post(
-      baseUrl + '/:id/changePassword',
+      baseUrl + '/change-password',
       authorize([]),
       customControllers.changePassword
     )
@@ -35,17 +35,19 @@ const customControllers = {
    */
   changePassword: async (req, res) => {
     try {
-      const user = await UserModel.getByUsernameAndPassword(
-        req.user.username,
-        req.body.passwordAdmin
+      console.log(req.body.admin_id,'hello')
+      const user = await UserModel.getByIdAndPassword(
+        req.body.admin_id,
+        req.body.currentPassword
       )
       if (!user) {
-        throw new Errors.PWD_ADMIN_NOT_VALID()
+        throw new Errors.INVALID_CURRENT_PASSWORD()
       }
-      await UserModel.updatePassword(req.body.admin_id, req.body.passwordNew)
-      res.send({
-        success: true
-      })
+      await UserModel.updatePassword(req.body.admin_id, req.body.password)
+      res.send(
+        new CommonMessage({
+        })
+      )
     } catch (err) {
       const safeErr = ErrorManager.getSafeError(err)
       res.status(safeErr.status).json(safeErr)
