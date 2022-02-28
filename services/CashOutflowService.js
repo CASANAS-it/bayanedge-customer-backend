@@ -1,5 +1,6 @@
 import { FlowType, TransType } from '../classes/Constants'
 import Errors from '../classes/Errors'
+import SafeError from '../classes/SafeError'
 import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import CashJournalModel from '../models/CashJournalModel'
 import { padZeroes } from '../utils/CommonUtil'
@@ -18,6 +19,10 @@ const cashOutflowService = {
   },
   update: async (params) => {
     var previous = await CashJournalModel.getById(params.transaction_id)
+
+    if (params.type_id == TransType.NON_FINANCIAL_CHARGES) {
+      params.total = parseFloat(params.details.non_financial_charges) + parseFloat(params.details.interest_fixed_amount)
+    }
     var transaction = JSON.parse(JSON.stringify(params));;
     transaction.details = params;
     transaction.flow_type_id = FlowType.OUTFLOW
@@ -87,6 +92,9 @@ const cashOutflowService = {
     }
 
 
+    if (params.type_id == TransType.NON_FINANCIAL_CHARGES) {
+      params.total = parseFloat(params.details.non_financial_charges) + parseFloat(params.details.interest_fixed_amount)
+    }
     var transaction = JSON.parse(JSON.stringify(params));;
     transaction.details = params;
     transaction.display_id = displayId

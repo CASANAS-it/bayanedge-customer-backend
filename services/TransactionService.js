@@ -24,6 +24,7 @@ const reportService = {
     var loansProceedsPrincipal = 0;
     var nonFinancial = 0;
     var cogBeginning = 0;
+    var interestExpense = 0, nonFinancialCharges = 0;
 
     var salesBeginning = 0, salesBeginningSelling = 0;
     var opexBeginning = 0, nopexBeginning = 0;
@@ -68,6 +69,8 @@ const reportService = {
 
     allNonFinancialCJ.forEach(element => {
       nonFinancial += parseFloat(element.total)
+      interestExpense += parseFloat(element.details.details.interest_fixed_amount)
+      nonFinancialCharges += parseFloat(element.details.details.non_financial_charges)
     });
 
     var allArHistory = await AccountReceivableModel.getAllByClientId(params.client_id)
@@ -130,8 +133,8 @@ const reportService = {
     var retNetProfitInterest = retNetProfit - loansRepayment;
     var retNonOperatingExpenseInterest = nopexBeginning + loansProceedsInterest
 
-    var retNonOperatingExpenseInterest = nopexBeginning + loansProceedsInterest
-    var retNonOperatingExpenseNonFinancial = nonFinancialBeginning + nonFinancial
+    var retNonOperatingExpenseInterest = nopexBeginning + loansProceedsInterest + interestExpense
+    var retNonOperatingExpenseNonFinancial = nonFinancialBeginning + nonFinancial + nonFinancialCharges
     var retNonOperatingExpense = retNonOperatingExpenseInterest + retNonOperatingExpenseNonFinancial
 
     var retNetProfitAfterNopex = retNetProfit - retNonOperatingExpense
@@ -190,7 +193,7 @@ const reportService = {
         detail2 :"",
       },
       {
-        label: "Non-financial Charges",
+        label: "Non-finance Charges",
         detail1: Number.isNaN(retNonOperatingExpenseNonFinancial) ? 0 : retNonOperatingExpenseNonFinancial,
         detail2 :"",
       },
@@ -416,7 +419,7 @@ const reportService = {
         detail: Number.isNaN(drawings) ? 0 : drawings
       },
       {
-        label: "Cash Non-Financial Charges",
+        label: "Cash Non-Finance Charges",
         detail: Number.isNaN(nonFinancial) ? 0 : nonFinancial
       },
       {
