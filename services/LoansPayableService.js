@@ -4,7 +4,7 @@ import LoansPayableModel from '../models/LoansPayableModel'
 import LoansRepaymentModel from '../models/LoansRepaymentModel'
 import InventoryModel from '../models/InventoryModel'
 import CashJournalModel from '../models/CashJournalModel'
-import { FlowType, TransactionType, TransType } from '../classes/Constants'
+import { Config, FlowType, TransactionType, TransType } from '../classes/Constants'
 import moment from 'moment'
 import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import { cashJournalService } from './CashJournalService'
@@ -47,10 +47,13 @@ const loansPayableService = {
     var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
 
+    params.service_fee = parseFloat(params.total) * parseFloat(Config.SERVICE_FEE_PERCENT)
+
     var loansPayable = await LoansPayableModel.update(params)
     await CashJournalModel.permanentDeleteByRefId(loansPayable.transaction_id)
 
     var transaction = JSON.parse(JSON.stringify(params));
+    transaction.total = parseFloat(params.total) - parseFloat(params.service_fee)
     transaction.reference_id = loansPayable.transaction_id;
     transaction.type_id = TransType.LOANS_PROCEED;
     transaction.details = loansPayable;
@@ -177,7 +180,7 @@ const loansPayableService = {
       await LoansPayableModel.markAsInCompleted(ap)
     }
 
-    
+
     //----------deleting old data
     await CashJournalModel.permanentDelete(details.transaction_id)
     await CashJournalModel.permanentDelete(oldMicro.transaction_id)
@@ -358,10 +361,12 @@ const loansPayableService = {
     // params.interest = parseFloat(params.total) + parseFloat(params.interest_fixed_amount)
     var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
-
+    params.service_fee = parseFloat(params.total) * parseFloat(Config.SERVICE_FEE_PERCENT)
     var loansPayable = await LoansPayableModel.create(params)
 
     var transaction = JSON.parse(JSON.stringify(params));
+
+    transaction.total = parseFloat(params.total) - parseFloat(params.service_fee)
     transaction.reference_id = loansPayable.transaction_id;
     transaction.type_id = TransType.LOANS_PROCEED;
     transaction.details = loansPayable;

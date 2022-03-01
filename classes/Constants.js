@@ -9,7 +9,8 @@ const FlowType = Object.freeze({
 })
 
 const Config = Object.freeze({
-  PAYMENT_TERMS : 30 // in days
+  PAYMENT_TERMS : 30, // in days
+  SERVICE_FEE_PERCENT : 0.02
 })
 
 const TransType = Object.freeze({

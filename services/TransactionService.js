@@ -65,6 +65,7 @@ const reportService = {
     var allNonFinancialCJ = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES && !x.is_beginning)
     var allSales = await SalesModel.getAllByClientId(params.client_id)
     var allLedger = await LedgerModel.getAllByClientId(params.client_id)
+    var allLoans = await LoansPayableModel.getAllByClientId(params.client_id)
 
 
     allNonFinancialCJ.forEach(element => {
@@ -77,6 +78,8 @@ const reportService = {
     if (params.isMonthly) {
       allArHistory = allArHistory.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
       allSales = allSales.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
+
+      allLoans = allLoans.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
     }
 
     allSalesCJ.forEach(element => {
@@ -92,6 +95,12 @@ const reportService = {
         arTotalUnitCost += parseFloat(element.total_unit_cost)
       }
     });
+
+    allLoans.forEach(element => {
+      if (element.service_fee)
+        nonFinancialCharges += parseFloat(element.service_fee)
+    });
+
     allOtherCICJ.forEach(element => {
       otherCashIncome += parseFloat(element.total)
     });
@@ -141,66 +150,66 @@ const reportService = {
     return [
       {
         label: "Sales (Benta)",
-        detail1 : "",
+        detail1: "",
         detail2: Number.isNaN(retSales) ? 0 : retSales,
-        className:'large-font report-highlight'
+        className: 'large-font report-highlight'
       },
       {
         label: "Less: Cost of Sales/Service (Puhunan)",
-        detail1 : "",
+        detail1: "",
         detail2: Number.isNaN(retCostOfGoods) ? 0 : retCostOfGoods,
-        className : "red-font"
+        className: "red-font"
       },
       {
         label: "Gross Profit (Tubo)",
-        detail1 : "",
+        detail1: "",
         detail2: Number.isNaN(retGrosProfit) ? 0 : retGrosProfit,
         className: 'large-font report-highlight'
       },
       {
         label: "Less: Operating Expense (Gastos)",
-        detail1 : "",
+        detail1: "",
         detail2: Number.isNaN(retOperatingExpense) ? 0 : retOperatingExpense,
-        className : "red-font"
+        className: "red-font"
       },
       {
         label: "Operating Profit (Kita)",
-        detail1 : "",
+        detail1: "",
         detail2: Number.isNaN(retOperatingProfit) ? 0 : retOperatingProfit,
         className: 'large-font report-highlight'
       },
       {
         label: "Other Income",
-        detail1 : "",
+        detail1: "",
         detail2: Number.isNaN(retOtherCashIncome) ? 0 : retOtherCashIncome,
       },
       {
         label: "Net Profit before Non-Operating Expense",
-        detail1 : '',
+        detail1: '',
         detail2: Number.isNaN(retNetProfit) ? 0 : retNetProfit,
       },
 
       {
         label: "Less : Non Operating Expense",
-        detail1 : '',
+        detail1: '',
         detail2: Number.isNaN(retNonOperatingExpense) ? 0 : retNonOperatingExpense,
-        className : "red-font"
+        className: "red-font"
       },
 
       {
         label: "Interest Expense",
         detail1: Number.isNaN(retNonOperatingExpenseInterest) ? 0 : retNonOperatingExpenseInterest,
-        detail2 :"",
+        detail2: "",
       },
       {
         label: "Non-finance Charges",
         detail1: Number.isNaN(retNonOperatingExpenseNonFinancial) ? 0 : retNonOperatingExpenseNonFinancial,
-        detail2 :"",
+        detail2: "",
       },
 
       {
         label: "Net Profit",
-        detail1 : '',
+        detail1: '',
         detail2: Number.isNaN(retNetProfitAfterNopex) ? 0 : retNetProfitAfterNopex,
         className: 'large-font report-highlight'
       }
@@ -247,8 +256,8 @@ const reportService = {
     var allOpexCJ = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE && !x.is_beginning)
     var allOtherCICJ = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME && !x.is_beginning)
     var allLoansProceedInterestCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && !x.is_beginning && x.flow_type_id === FlowType.OUTFLOW)
-    var allMicrosavingsDepositCJ = cj.filter(x => x.type_id === TransType.MICROSAVINGS  && x.flow_type_id === FlowType.OUTFLOW)
-    var allMicrosavingsWithdrawalCJ = cj.filter(x => x.type_id === TransType.MICROSAVINGS  && x.flow_type_id === FlowType.INFLOW)
+    var allMicrosavingsDepositCJ = cj.filter(x => x.type_id === TransType.MICROSAVINGS && x.flow_type_id === FlowType.OUTFLOW)
+    var allMicrosavingsWithdrawalCJ = cj.filter(x => x.type_id === TransType.MICROSAVINGS && x.flow_type_id === FlowType.INFLOW)
     var allDrawingsCJ = cj.filter(x => x.type_id === TransType.DRAWINGS && !x.is_beginning)
     var allNonFinancialCJ = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES && !x.is_beginning)
     var allLoansProceedCashCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED)
@@ -362,7 +371,7 @@ const reportService = {
       {
         label: "Cash Balance, Beginning",
         detail: Number.isNaN(retCashOnHandBeg) ? 0 : retCashOnHandBeg,
-        className : "large-font report-highlight"
+        className: "large-font report-highlight"
       },
       {
         label: "Cash Inflows (Perang Pumasok)",
@@ -376,7 +385,7 @@ const reportService = {
         label: "Collection of Accounts Receivables",
         detail: Number.isNaN(arPaid) ? 0 : arPaid
       },
-      
+
       {
         label: "Loan Proceeds",
         detail: Number.isNaN(retLoansProceeds) ? 0 : retLoansProceeds
@@ -392,7 +401,7 @@ const reportService = {
       {
         label: "Total Cash Inflow",
         detail: Number.isNaN(retCashInflow) ? 0 : retCashInflow,
-        className : "large-font report-highlight"
+        className: "large-font report-highlight"
       },
       {
         label: "Cash Outflows",
@@ -411,8 +420,8 @@ const reportService = {
         detail: Number.isNaN(operatingExpense) ? 0 : operatingExpense
       },
       {
-        label : "Loans Repayment (PIF)",
-        detail : Number.isNaN(retDebtServicing) ? 0 : retDebtServicing
+        label: "Loans Repayment (PIF)",
+        detail: Number.isNaN(retDebtServicing) ? 0 : retDebtServicing
       },
       {
         label: "Owner's Drawings",
@@ -425,17 +434,17 @@ const reportService = {
       {
         label: "Total Cash Outflow",
         detail: Number.isNaN(retCashOutflow) ? 0 : retCashOutflow,
-        className : "large-font report-highlight"
+        className: "large-font report-highlight"
       },
       {
         label: (params.isMonthly ? "Monthly Net" : "Net") + " Cashflows",
         detail: Number.isNaN(retCashFlow) ? 0 : retCashFlow,
-        className : "large-font report-highlight"
+        className: "large-font report-highlight"
       },
       {
         label: "Cash Balance, END",
         detail: Number.isNaN(retCashBalanceEnd) ? 0 : retCashBalanceEnd,
-        className : "large-font report-highlight"
+        className: "large-font report-highlight"
       }
       // ,
       // {
