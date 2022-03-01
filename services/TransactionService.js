@@ -28,7 +28,7 @@ const reportService = {
 
     var salesBeginning = 0, salesBeginningSelling = 0;
     var opexBeginning = 0, nopexBeginning = 0;
-    var otherBeginning = 0, nonFinancialBeginning = 0;
+    var otherBeginning = 0, nonFinancialBeginning = 0, loansBeginning = null;
 
     if (params.isMonthly) {
       cj = cj.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
@@ -55,6 +55,7 @@ const reportService = {
     nonFinancialBeginning = begBalance.find(x => x.type_id == TransType.NON_FINANCIAL_CHARGES)
     nonFinancialBeginning = nonFinancialBeginning ? parseFloat(nonFinancialBeginning.total) : 0;
 
+    loansBeginning = begBalance.find(x => x.type_id == TransType.LOANS_PAYABLE)
 
     var allSalesCJ = cj.filter(x => x.type_id === TransType.SALES && !x.is_beginning)
     var allArCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE && !x.is_beginning)
@@ -67,6 +68,9 @@ const reportService = {
     var allLedger = await LedgerModel.getAllByClientId(params.client_id)
     var allLoans = await LoansPayableModel.getAllByClientId(params.client_id)
 
+    // if (loansBeginning) {
+    //   nonFinancialBeginning += parseFloat(element.details.service_fee)
+    // }
 
     allNonFinancialCJ.forEach(element => {
       nonFinancial += parseFloat(element.total)
@@ -333,6 +337,8 @@ const reportService = {
 
     allLoansProceeds.forEach(element => {
       loansProceed += parseFloat(element.total)
+      if (element.service_fee)
+        nonFinancial += parseFloat(element.service_fee)
     });
 
     allOtherCICJ.forEach(element => {

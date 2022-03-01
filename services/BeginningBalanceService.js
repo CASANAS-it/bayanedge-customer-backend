@@ -3,7 +3,7 @@ import VendorModel from '../models/VendorModel'
 import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import InventoryModel from '../models/InventoryModel'
 import CashJournalModel from '../models/CashJournalModel'
-import { FlowType, TransactionType, TransType } from '../classes/Constants'
+import { Config, FlowType, TransactionType, TransType } from '../classes/Constants'
 import AccountPayableModel from '../models/AccountPayableModel'
 import { salesService } from './SalesService'
 import { accountReceivableService } from './AccountReceivableService'
@@ -171,9 +171,11 @@ const beginningBalanceService = {
       // var date = moment(params.date, "YYYY-MM-DD").add(params.details.payment_terms, 'days').format("YYYY-MM-DD")
       // params.details.next_payment_date = date;
       // params.details.interest = parseFloat(params.total) + parseFloat(params.details.interest_fixed_amount)
+      // params.service_fee = parseFloat(params.total) * parseFloat(Config.SERVICE_FEE_PERCENT)
       params.details = {
         balance: params.total,
-        is_completed: false
+        is_completed: false,
+        // service_fee: params.service_fee
       }
     } else if (params.type_id == TransType.NON_OPERATING_EXPENSE) {
       params.total = parseFloat(params.details.interest_fixed_amount) + parseFloat(params.details.non_financial_charges)
@@ -220,6 +222,11 @@ const beginningBalanceService = {
 
     if (params.flow_type_id) {
       var transaction = JSON.parse(JSON.stringify(params));
+      // if (params.type_id == TransType.LOANS_PAYABLE) {
+
+      //   transaction.total = parseFloat(params.total) - parseFloat(params.service_fee)
+      // }
+
       transaction.reference_id = beginningBalance.transaction_id;
       transaction.type_id = params.type_id;
       transaction.details = beginningBalance;
