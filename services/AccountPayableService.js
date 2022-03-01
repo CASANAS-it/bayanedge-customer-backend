@@ -92,6 +92,10 @@ const accountPayableService = {
     var date = moment().add(vendor.terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
     current.next_payment_date = date
+    if (current.previous_payment_date == null || params.date > current.previous_payment_date)
+      params.previous_payment_date = params.date
+    else params.previous_payment_date = current.previous_payment_date
+
     var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
     params.balance = newBalance
     current.balance = newBalance
@@ -131,7 +135,6 @@ const accountPayableService = {
 
   beginningPay: async (params) => {
     var current = await BeginningBalanceModel.getById(params.transaction_id)
-
     var newBalance = parseFloat(current.details.balance) - parseFloat(params.amount_paid);
     var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
     var summary = await cashJournalService.getSummary(params)
@@ -146,6 +149,8 @@ const accountPayableService = {
         })
       }
     }
+    if (!current.details.previous_payment_date || params.date > current.details.previous_payment_date)
+      current.details.previous_payment_date = params.date
 
     current.details.next_payment_date = date;
     current.details.balance = newBalance

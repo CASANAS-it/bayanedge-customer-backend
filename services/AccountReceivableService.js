@@ -91,15 +91,20 @@ const accountReceivableService = {
   // },
   pay: async (params) => {
     var current = await SalesModel.getById(params.transaction_id)
-
     var customer = await CustomerModel.getByCustomerId(current.customer_id)
     var date = moment().add(customer.terms, 'days').format("YYYY-MM-DD")
     var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
     params.next_payment_date = date;
     params.balance = newBalance
+
+    if (current.previous_payment_date == null || params.date > current.previous_payment_date)
+      params.previous_payment_date = params.date
+    else params.previous_payment_date = current.previous_payment_date
+
     current.next_payment_date = date;
     current.balance = newBalance
 
+    console.log(params, '------------')
     var ap = await SalesModel.pay(params);
     if (newBalance === 0) {
       await SalesModel.markAsComplete(params.transaction_id, params.admin_id)
@@ -121,10 +126,11 @@ const accountReceivableService = {
 
   beginningPay: async (params) => {
     var current = await BeginningBalanceModel.getById(params.transaction_id)
-
     var newBalance = parseFloat(current.details.balance) - parseFloat(params.amount_paid);
     var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
 
+    if (current.details.previous_payment_date == null || params.date > current.details.previous_payment_date)
+      current.details.previous_payment_date = params.date
     current.details.next_payment_date = date;
     current.details.balance = newBalance
     if (newBalance === 0) {

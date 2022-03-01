@@ -43,6 +43,9 @@ const customModel = {
       next_payment_date: {
         type: 'String'
       },
+      previous_payment_date: {
+        type: 'String'
+      },
       is_completed: {
         type: 'Boolean',
       },
@@ -202,6 +205,7 @@ const customModel = {
   pay: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
       next_payment_date: params.next_payment_date,
+      previous_payment_date: params.previous_payment_date,
       balance: params.balance,
       modified_by: params.admin_id,
       modified_date: new Date(),
