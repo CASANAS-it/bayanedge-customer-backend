@@ -8,6 +8,7 @@ import { Config, FlowType, TransactionType, TransType } from '../classes/Constan
 import moment from 'moment'
 import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import { cashJournalService } from './CashJournalService'
+import { padZeroes } from '../utils/CommonUtil'
 const loansPayableService = {
   getAll: async (limit, offset, client_id) => {
     return await LoansPayableModel.getPaginatedItems(limit, offset, client_id)
@@ -50,8 +51,9 @@ const loansPayableService = {
     params.service_fee = parseFloat(params.total) * parseFloat(Config.SERVICE_FEE_PERCENT)
 
     var loansPayable = await LoansPayableModel.update(params)
-    await CashJournalModel.permanentDeleteByRefId(loansPayable.transaction_id)
 
+    var oldNF = await CashJournalModel.getByClientIdTypeIdRefId(params.client_id, TransType.NON_FINANCIAL_CHARGES, loansPayable.transaction_id)
+    await CashJournalModel.permanentDeleteByRefId(loansPayable.transaction_id)
     var transaction = JSON.parse(JSON.stringify(params));
     transaction.total = parseFloat(params.total) - parseFloat(params.service_fee)
     transaction.reference_id = loansPayable.transaction_id;
@@ -60,6 +62,21 @@ const loansPayableService = {
     transaction.display_id = loansPayable.display_id
     transaction.flow_type_id = FlowType.INFLOW
     await CashJournalModel.create(transaction)
+
+    var nf = JSON.parse(JSON.stringify(params));
+
+    nf.total = parseFloat(params.service_fee)
+    nf.reference_id = loansPayable.transaction_id;
+    nf.type_id = TransType.NON_FINANCIAL_CHARGES;
+    nf.details = {
+      isLoansPayable: true,
+      name: params.name + ' (Service Fee)',
+      description: params.description + '(Service Fee)'
+    };
+    nf.display_id = oldNF.display_id
+    nf.flow_type_id = FlowType.OUTFLOW
+    await CashJournalModel.create(nf)
+
     return loansPayable
   },
 
@@ -373,6 +390,30 @@ const loansPayableService = {
     transaction.display_id = loansPayable.display_id
     transaction.flow_type_id = FlowType.INFLOW
     await CashJournalModel.create(transaction)
+
+    // service fee - non Finance Charges
+
+    var nf = JSON.parse(JSON.stringify(params));
+    var displayId = "NF000001";
+    var lastDisplay = await CashJournalModel.getLastDisplayId(params.client_id, TransType.NON_FINANCIAL_CHARGES, FlowType.OUTFLOW)
+    if (lastDisplay) {
+      var disId = lastDisplay.display_id
+      disId = parseInt(disId.substring(2)) + 1;
+      displayId = "NF" + padZeroes(disId)
+    }
+
+    nf.total = parseFloat(params.service_fee)
+    nf.reference_id = loansPayable.transaction_id;
+    nf.type_id = TransType.NON_FINANCIAL_CHARGES;
+    nf.details = {
+      isLoansPayable: true,
+      name: params.name + ' (Service Fee)',
+      description: params.description + '(Service Fee)'
+    };
+    nf.display_id = displayId
+    nf.flow_type_id = FlowType.OUTFLOW
+    await CashJournalModel.create(nf)
+
 
     return loansPayable
   },

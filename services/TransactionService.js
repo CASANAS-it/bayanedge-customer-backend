@@ -47,7 +47,8 @@ const reportService = {
     opexBeginning = opexBeginning ? parseFloat(opexBeginning.total) : 0;
 
     nopexBeginning = begBalance.find(x => x.type_id == TransType.NON_OPERATING_EXPENSE)
-    nopexBeginning = nopexBeginning ? parseFloat(nopexBeginning.total) : 0;
+    var nopexBeginningNF = nopexBeginning ? parseFloat(nopexBeginning.details.non_financial_charges) : 0;
+    var nopexBeginningIF = nopexBeginning ? parseFloat(nopexBeginning.details.interest_fixed_amount) : 0;
 
     otherBeginning = begBalance.find(x => x.type_id == TransType.OTHER_CASH_INCOME)
     otherBeginning = otherBeginning ? parseFloat(otherBeginning.total) : 0;
@@ -74,8 +75,8 @@ const reportService = {
 
     allNonFinancialCJ.forEach(element => {
       nonFinancial += parseFloat(element.total)
-      interestExpense += parseFloat(element.details.details.interest_fixed_amount)
-      nonFinancialCharges += parseFloat(element.details.details.non_financial_charges)
+      // interestExpense += parseFloat(element.details.details.interest_fixed_amount)
+      // nonFinancialCharges += parseFloat(element.details.details.non_financial_charges)
     });
 
     var allArHistory = await AccountReceivableModel.getAllByClientId(params.client_id)
@@ -100,10 +101,10 @@ const reportService = {
       }
     });
 
-    allLoans.forEach(element => {
-      if (element.service_fee)
-        nonFinancialCharges += parseFloat(element.service_fee)
-    });
+    // allLoans.forEach(element => {
+    //   if (element.service_fee)
+    //     nonFinancialCharges += parseFloat(element.service_fee)
+    // });
 
     allOtherCICJ.forEach(element => {
       otherCashIncome += parseFloat(element.total)
@@ -144,10 +145,10 @@ const reportService = {
     var retOtherCashIncome = (otherCashIncome + otherBeginning)
     var retNetProfit = retOperatingProfit + retOtherCashIncome;
     var retNetProfitInterest = retNetProfit - loansRepayment;
-    var retNonOperatingExpenseInterest = nopexBeginning + loansProceedsInterest
+    // var retNonOperatingExpenseInterest = nopexBeginning + loansProceedsInterest
 
-    var retNonOperatingExpenseInterest = nopexBeginning + loansProceedsInterest + interestExpense
-    var retNonOperatingExpenseNonFinancial = nonFinancialBeginning + nonFinancial + nonFinancialCharges
+    var retNonOperatingExpenseInterest = nopexBeginningIF + loansProceedsInterest + interestExpense
+    var retNonOperatingExpenseNonFinancial = nonFinancialBeginning + nonFinancial + nopexBeginningNF
     var retNonOperatingExpense = retNonOperatingExpenseInterest + retNonOperatingExpenseNonFinancial
 
     var retNetProfitAfterNopex = retNetProfit - retNonOperatingExpense
@@ -337,8 +338,8 @@ const reportService = {
 
     allLoansProceeds.forEach(element => {
       loansProceed += parseFloat(element.total)
-      if (element.service_fee)
-        nonFinancial += parseFloat(element.service_fee)
+      // if (element.service_fee)
+        // nonFinancial += parseFloat(element.service_fee)
     });
 
     allOtherCICJ.forEach(element => {

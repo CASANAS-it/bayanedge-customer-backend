@@ -20,9 +20,9 @@ const cashOutflowService = {
   update: async (params) => {
     var previous = await CashJournalModel.getById(params.transaction_id)
 
-    if (params.type_id == TransType.NON_FINANCIAL_CHARGES) {
-      params.total = parseFloat(params.details.non_financial_charges) + parseFloat(params.details.interest_fixed_amount)
-    }
+    // if (params.type_id == TransType.NON_FINANCIAL_CHARGES) {
+    //   params.total = parseFloat(params.details.non_financial_charges) + parseFloat(params.details.interest_fixed_amount)
+    // }
     var transaction = JSON.parse(JSON.stringify(params));;
     transaction.details = params;
     transaction.flow_type_id = FlowType.OUTFLOW
@@ -92,9 +92,9 @@ const cashOutflowService = {
     }
 
 
-    if (params.type_id == TransType.NON_FINANCIAL_CHARGES) {
-      params.total = parseFloat(params.details.non_financial_charges) + parseFloat(params.details.interest_fixed_amount)
-    }
+    // if (params.type_id == TransType.NON_FINANCIAL_CHARGES) {
+    //   params.total = parseFloat(params.details.non_financial_charges) + parseFloat(params.details.interest_fixed_amount)
+    // }
     var transaction = JSON.parse(JSON.stringify(params));;
     transaction.details = params;
     transaction.display_id = displayId

@@ -131,6 +131,16 @@ const customModel = {
       .lean()
     return items
   },
+  getByClientIdTypeIdRefId: async (id,typeId, refId) => {
+    const items = await customModel.model
+      .findOne({
+        client_id: id,
+        type_id : typeId,
+        reference_id: refId,
+      })
+      .lean()
+    return items
+  },
   getByClientId: async (id) => {
     const items = await customModel.model
       .findOne({
