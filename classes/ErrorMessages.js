@@ -18,6 +18,7 @@ const ErrorMessages = Object.freeze({
   LASTNAME_IS_REQUIRED: { status: 200, message: 'Last Name is required', code: 110 },
   SITENAME_IS_REQUIRED: { status: 200, message: 'Site Name is required', code: 111 },
   USERNAME_IS_REQUIRED: { status: 200, message: 'Account Reference is required', code: 112 },
+  RECORD_ALREADY_EXISTS: { status: 200, message: 'Record already exists.', code: 113 },
 
   // 200 series
   INVALID_MERCHANT_CODE: { status: 200, message: 'Invalid merchant code', code: 201 },

@@ -24,15 +24,15 @@ const customModel = {
       contact_information: {
         type: 'Object'
       },
-      terms : {
-        type : "Number"
+      terms: {
+        type: "Number"
       },
-      credit_limit : {
-        type : "Number"
+      credit_limit: {
+        type: "Number"
       },
-      
-      available_credit : {
-        type : "Number"
+
+      available_credit: {
+        type: "Number"
       },
       is_active: {
         type: 'Boolean'
@@ -49,7 +49,7 @@ const customModel = {
       modified_date: {
         type: 'Date'
       },
-      
+
     })
     customerSchema.plugin(mongoosePaginate)
     customModel.setModel(db.connection.model('customers', customerSchema))
@@ -75,17 +75,17 @@ const customModel = {
     const customer = await customModel.model
       .findOne({
         client_id: id,
-        is_active : true
+        is_active: true
       })
       .lean()
     return customer
   },
-  
+
   getAllByClientId: async (id) => {
     const customer = await customModel.model
       .find({
         client_id: id,
-        is_active : true
+        is_active: true
       })
       .lean()
     return customer
@@ -100,10 +100,20 @@ const customModel = {
     return customer
   },
 
-
+  getByCustomerName: async (id, name, clientId) => {
+    const customer = await customModel.model
+      .findOne({
+        customer_id: {$ne : id},
+        customer_name : name,
+        client_id : clientId,
+        is_active: true
+      })
+      .lean()
+    return customer
+  },
   updateCredit: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ customer_id: params.customer_id }, {
-      available_credit : params.available_credit,
+      available_credit: params.available_credit,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -115,9 +125,9 @@ const customModel = {
       customer_name: params.customer_name,
       address: params.address,
       contact_information: params.contact_information,
-      terms : params.terms,
-      available_credit : params.credit_limit,
-      credit_limit : params.credit_limit,
+      terms: params.terms,
+      available_credit: params.credit_limit,
+      credit_limit: params.credit_limit,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -139,11 +149,11 @@ const customModel = {
       customer_name: params.customer_name,
       client_id: params.client_id,
       address: params.address,
-      available_credit : params.credit_limit,
+      available_credit: params.credit_limit,
       contact_information: params.contact_information,
       is_active: true,
-      terms : params.terms,
-      credit_limit : params.credit_limit,
+      terms: params.terms,
+      credit_limit: params.credit_limit,
       created_by: params.admin_id,
       created_date: new Date(),
       modified_by: params.admin_id,

@@ -99,6 +99,19 @@ const customModel = {
       .lean()
     return vendor
   },
+  
+
+  getByVendorName: async (id, name, clientId) => {
+    const customer = await customModel.model
+      .findOne({
+        vendor_id: {$ne : id},
+        vendor_name : name,
+        client_id : clientId,
+        is_active: true
+      })
+      .lean()
+    return customer
+  },
   updateCredit: async (params) => {
     const item = await customModel.model.findOneAndUpdate({ vendor_id: params.vendor_id }, {
       available_credit : params.available_credit,
