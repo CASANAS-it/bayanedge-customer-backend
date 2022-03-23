@@ -14,6 +14,7 @@ import Errors from '../classes/Errors'
 import ErrorManager from '../classes/ErrorManager'
 import { lookupService } from '../services/LookupService'
 import { UserType } from '../classes/Constants'
+import { reportService } from '../services/TransactionService'
 
 const customControllers = {
   init: router => {
@@ -28,7 +29,8 @@ const customControllers = {
     router.get(baseUrl + '/vendor', authorize(), customControllers.getVendors)
     router.get(baseUrl + '/inventory', authorize(), customControllers.getInventory)
     router.get(baseUrl + '/opex_type', authorize(), customControllers.getOpexType)
-    
+    router.post(baseUrl + '/dashboard', authorize(), customControllers.getDashBoard)
+
   },
 
   getAssetType: async (req, res) => {
@@ -130,6 +132,20 @@ const customControllers = {
           data: data
         })
       )
+    } catch (err) {
+      const safeErr = ErrorManager.getSafeError(err)
+      res.status(safeErr.status).json(safeErr)
+    }
+  },
+  getDashBoard: async (req, res) => {
+    try {
+      reportService.getDashboard(req.body).then(data => {
+        res.send(
+          new CommonMessage({
+            data: data
+          })
+        )
+      })
     } catch (err) {
       const safeErr = ErrorManager.getSafeError(err)
       res.status(safeErr.status).json(safeErr)
