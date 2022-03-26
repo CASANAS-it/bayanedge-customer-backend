@@ -636,22 +636,25 @@ const reportService = {
     return [
 
       {
-        label: "Cash Balance",
+        label: "Cash",
         detail: Number.isNaN(retCashBalanceEnd) ? 0 : retCashBalanceEnd,
       },
 
       {
+        label: "Accounts Receivables",
+        detail: Number.isNaN(arPaid) ? 0 : arPaid,
+      },
+      {
         label: "Inventory",
         detail: Number.isNaN(ledger) ? 0 : ledger
       },
-      {
-        label: "Accounts Receivable",
-        detail: Number.isNaN(arPaid) ? 0 : arPaid,
-        className: "small-font"
-      },
 
       {
-        label: "Loan Proceeds",
+        label: "Accounts Payable",
+        detail: Number.isNaN(apPaid) ? 0 : apPaid,
+      },
+      {
+        label: "Loans Payable",
         detail: Number.isNaN(retLoansProceeds) ? 0 : retLoansProceeds
       },
 
@@ -661,14 +664,8 @@ const reportService = {
       },
 
       {
-        label: "Accounts Payable",
-        detail: Number.isNaN(apPaid) ? 0 : apPaid,
-        className: "small-font"
-      },
-      {
-        label: "Profit/Loss",
+        label: "Net Profit/ (Net Loss)",
         detail: Number.isNaN(retNetProfitAfterNopex) ? 0 : retNetProfitAfterNopex,
-
       }
 
     ]
