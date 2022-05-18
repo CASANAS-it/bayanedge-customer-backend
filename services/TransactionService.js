@@ -217,7 +217,7 @@ const reportService = {
       },
 
       {
-        label: "Net Profit",
+        label: "Net Profit (Netong Kita)",
         detail1: '',
         detail2: Number.isNaN(retNetProfitAfterNopex) ? 0 : retNetProfitAfterNopex,
         className: 'large-font report-highlight'
@@ -664,7 +664,7 @@ const reportService = {
       },
 
       {
-        label: "Net Profit/ (Net Loss)",
+        label: "/ (Net Loss)",
         detail: Number.isNaN(retNetProfitAfterNopex) ? 0 : retNetProfitAfterNopex,
       }
 
