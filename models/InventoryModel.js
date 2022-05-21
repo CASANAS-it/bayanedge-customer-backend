@@ -71,7 +71,7 @@ const customModel = {
     const items = await customModel.model
       .find({
         client_id: id,
-        is_active : true
+        is_active: true
       })
       .lean()
     return items
@@ -80,12 +80,19 @@ const customModel = {
     const items = await customModel.model
       .findOne({
         client_id: id,
-        is_active : true
+        is_active: true
       }).lean()
     return items
   },
-  getPaginatedItems: async (limit, offset, client_id) => {
-    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, { offset: offset, limit: limit })
+  getPaginatedItems: async (limit, offset, client_id, search) => {
+    var fields = {
+      is_active: true, client_id: client_id,
+      name: { $regex: search,$options : 'i' }
+    }
+    if (!search) {
+      delete fields.name
+    }
+    return await customModel.getModel().paginate(fields, { offset: offset, limit: limit, sort: { name: 1 } })
   },
   getByItemId: async (id) => {
     const item = await customModel.model
@@ -103,7 +110,7 @@ const customModel = {
       unit_selling_price: parseFloat(params.unit_selling_price),
       unit_of_measurement: params.unit_of_measurement,
       // quantity: params.quantity,
-      beginning_quantity : params.beginning_quantity,
+      beginning_quantity: params.beginning_quantity,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -146,7 +153,7 @@ const customModel = {
       unit_selling_price: parseFloat(params.unit_selling_price),
       unit_of_measurement: params.unit_of_measurement,
       quantity: params.beginning_quantity,
-      beginning_quantity : params.beginning_quantity,
+      beginning_quantity: params.beginning_quantity,
       is_active: true,
       created_by: params.admin_id,
       created_date: new Date(),

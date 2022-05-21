@@ -2,8 +2,8 @@ import Errors from '../classes/Errors'
 import InventoryModel from '../models/InventoryModel'
 
 const inventoryService = {
-  getAll: async (limit, offset, client_id) => {
-    return await InventoryModel.getPaginatedItems(limit, offset, client_id)
+  getAll: async (limit, offset, client_id,search) => {
+    return await InventoryModel.getPaginatedItems(limit, offset, client_id,search)
   },
   getSummary: async (client_id) => {
     var items = await InventoryModel.getAllByClientId(client_id)
