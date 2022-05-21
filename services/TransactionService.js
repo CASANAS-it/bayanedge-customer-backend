@@ -528,7 +528,6 @@ const reportService = {
     var allNonFinancialCJ = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES && !x.is_beginning)
     var allLoansProceedCashCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED)
 
-
     var allArHistory = await AccountReceivableModel.getAllByClientId(params.client_id)
     var allApHistory = await AccountPayableModel.getAllByClientId(params.client_id)
     var allLoansProceeds = await LoansPayableModel.getAllByClientId(params.client_id)
@@ -565,6 +564,7 @@ const reportService = {
     allApCJ.forEach(element => {
       apPaid += parseFloat(element.total)
     });
+    // console.log(allInventoryLedgerCJ, 'all Ledger')
     allInventoryLedgerCJ.forEach(element => {
       ledger += parseFloat(element.total)
     });
@@ -612,11 +612,33 @@ const reportService = {
       nonFinancial += parseFloat(element.total)
     });
 
+    var ledgerB, saleB, apB, loanB, arB = 0
+
     allBeginning.forEach(element => {
       if (element.flow_type_id === FlowType.INFLOW)
         beginningBalance += parseFloat(element.total)
       else
         beginningBalance -= parseFloat(element.total)
+
+      switch (element.type_id) {
+        case TransType.INVENTORY:
+          ledgerB = parseFloat(element.total)
+          break;
+        case TransType.SALES:
+          saleB = parseFloat(element.details.selling_price)
+          break;
+        case TransType.ACCOUNTS_PAYABLE:
+          apB = parseFloat(element.total)
+          break;
+        case TransType.ACCOUNTS_RECEIVABLE:
+          arB = parseFloat(element.total)
+          break;
+        case TransType.LOANS_PAYABLE:
+          loanB = parseFloat(element.total)
+          break;
+        default:
+          break;
+      }
     });
 
     var retCashOnHandBeg = cashOnHandBeg
@@ -637,35 +659,35 @@ const reportService = {
 
       {
         label: "Cash",
-        detail: Number.isNaN(retCashBalanceEnd) ? 0 : retCashBalanceEnd,
+        detail: Number.isNaN(retCashBalanceEnd) ? "0" : retCashBalanceEnd,
       },
 
       {
         label: "Accounts Receivables",
-        detail: Number.isNaN(arPaid) ? 0 : arPaid,
+        detail: Number.isNaN(arPaid) ? "0" : arPaid + arB,
       },
       {
         label: "Inventory",
-        detail: Number.isNaN(ledger) ? 0 : ledger
+        detail: Number.isNaN(ledger) ? "0" : ledger + ledgerB
       },
 
       {
         label: "Accounts Payable",
-        detail: Number.isNaN(apPaid) ? 0 : apPaid,
+        detail: Number.isNaN(apPaid) ? "0" : apPaid + apB,
       },
       {
         label: "Loans Payable",
-        detail: Number.isNaN(retLoansProceeds) ? 0 : retLoansProceeds
+        detail: Number.isNaN(retLoansProceeds) ? "0" : retLoansProceeds + loanB
       },
 
       {
         label: "Sales",
-        detail: Number.isNaN(sales) ? 0 : sales
+        detail: Number.isNaN(sales) ? "0" : sales + saleB
       },
 
       {
-        label: "/ (Net Loss)",
-        detail: Number.isNaN(retNetProfitAfterNopex) ? 0 : retNetProfitAfterNopex,
+        label: "Net Profit/ (Net Loss)",
+        detail: Number.isNaN(retNetProfitAfterNopex) ? "0" : retNetProfitAfterNopex,
       }
 
     ]

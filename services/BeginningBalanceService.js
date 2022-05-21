@@ -78,6 +78,7 @@ const beginningBalanceService = {
           total_unit_cost: 0,
           total_unit_selling: 0,
           balance: element.amount,
+          next_payment_date: element.next_payment_date,
           is_beginning: true,
           is_completed: false,
           date: params.date,
@@ -99,7 +100,8 @@ const beginningBalanceService = {
           balance: element.amount,
           is_beginning: true,
           is_completed: false,
-          date: params.date,
+          date: element.date,
+          next_payment_date: element.next_payment_date,
         }
         await SalesModel.create(ar)
       }
@@ -195,7 +197,8 @@ const beginningBalanceService = {
           balance: element.amount,
           is_beginning: true,
           is_completed: false,
-          date: params.date,
+          date: element.date,
+          next_payment_date: element.next_payment_date,
         }
         await LedgerModel.create(ap)
       }
@@ -212,9 +215,11 @@ const beginningBalanceService = {
           total_unit_cost: 0,
           total_unit_selling: 0,
           balance: element.amount,
+          date: element.date,
+          next_payment_date: element.next_payment_date,
           is_beginning: true,
           is_completed: false,
-          date: params.date,
+          // date: params.date,
         }
         await SalesModel.create(ar)
       }
