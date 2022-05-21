@@ -17,6 +17,9 @@ const customModel = {
       vendor_name: {
         type: 'String'
       },
+      reference_no : {
+        type : 'String'
+      },
       address: {
         type: 'String'
       },
@@ -128,6 +131,7 @@ const customModel = {
       account_number: params.account_number,
       terms : params.terms,
       credit_limit : params.credit_limit,
+      reference_no : params.reference_no,
       available_credit : params.credit_limit,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -150,6 +154,7 @@ const customModel = {
       vendor_name: params.vendor_name,
       client_id: params.client_id,
       address: params.address,
+      reference_no : params.reference_no,
       contact_information: params.contact_information,
       account_number: params.account_number,
       is_active: true,
