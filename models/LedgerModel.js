@@ -133,6 +133,9 @@ const customModel = {
       if (filter.item_id) {
         condition['details.item_id'] = filter.item_id
       }
+      if (filter.dateFrom && filter.dateTo) {
+        condition.$and = [{ date: { $gte: filter.dateFrom } }, { date: { $lte: filter.dateTo } }]
+      }
     }
     return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, { ...options, offset: offset, limit: limit })
 
