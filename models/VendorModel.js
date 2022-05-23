@@ -111,7 +111,7 @@ const customModel = {
         vendor_name : name,
         client_id : clientId,
         is_active: true
-      })
+      })  
       .lean()
     return customer
   },

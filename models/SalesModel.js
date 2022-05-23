@@ -139,6 +139,10 @@ const customModel = {
       if (filter.item_id) {
         condition['details.item_id'] = filter.item_id
       }
+      if (filter.dateFrom && filter.dateTo) {
+        condition.$and = [{ date: { $gte: filter.dateFrom } }, { date: { $lte: filter.dateTo } }]
+      }
+
     }
     return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, { ...options, offset: offset, limit: limit })
 
@@ -193,7 +197,7 @@ const customModel = {
       details: params.details,
       total_unit_cost: params.total_unit_cost,
       total_unit_selling: params.total_unit_selling,
-      reference_no : params.reference_no,
+      reference_no: params.reference_no,
       balance: params.balance,
       total: params.total,
       is_completed: params.is_completed,
@@ -218,9 +222,9 @@ const customModel = {
   },
   pay: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
-      next_payment_date : params.next_payment_date,
+      next_payment_date: params.next_payment_date,
       balance: params.balance,
-      previous_payment_date : params.previous_payment_date,
+      previous_payment_date: params.previous_payment_date,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -268,7 +272,7 @@ const customModel = {
       display_id: displayId,
       client_id: params.client_id,
       customer_id: params.customer_id,
-      reference_no : params.reference_no,
+      reference_no: params.reference_no,
       trans_type: params.trans_type,
       details: params.details,
       total_unit_cost: params.total_unit_cost,
@@ -276,7 +280,7 @@ const customModel = {
       balance: params.balance,
       is_beginning: params.is_beginning,
       is_completed: params.is_completed,
-      next_payment_date : params.next_payment_date,
+      next_payment_date: params.next_payment_date,
       date: params.date,
       is_active: true,
       total: params.total,
