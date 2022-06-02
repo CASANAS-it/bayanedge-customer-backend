@@ -24,7 +24,7 @@ const customModel = {
       customer_id: {
         type: 'String',
       },
-     
+
       details: {
         type: "Object"
       },
@@ -116,8 +116,16 @@ const customModel = {
       offset: offset, limit: limit
     }
 
+    var condition = {
+      $or: [
+        { is_beginning: false },
+        { is_beginning: { $exists: false } }
+      ],
+      is_active: true, client_id: client_id
+    }
 
-    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, options)
+    return await customModel.getModel().paginate(condition, options)
+
 
     // return await customModel.getModel().find().select().populate('item').populate('vendor').lean()
   },
@@ -154,8 +162,8 @@ const customModel = {
       details: params.details,
       total_unit_cost: params.total_unit_cost,
       total_unit_selling: params.total_unit_selling,
-      balance  : params.total_unit_selling,
-      trans_type : params.trans_type,
+      balance: params.total_unit_selling,
+      trans_type: params.trans_type,
       date: params.date,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -204,7 +212,7 @@ const customModel = {
     })
     return user
   },
- 
+
   permanentDelete: async (id) => {
     const user = await customModel.model.deleteOne(
       { transaction_id: id })
@@ -222,12 +230,12 @@ const customModel = {
       display_id: displayId,
       transaction_id: generateId(),
       client_id: params.client_id,
-      customer_id : params.customer_id,
+      customer_id: params.customer_id,
       details: params.details,
-      trans_type : params.trans_type,
+      trans_type: params.trans_type,
       total_unit_cost: params.total_unit_cost,
       total_unit_selling: params.total_unit_selling,
-      balance  : params.total_unit_selling,
+      balance: params.total_unit_selling,
       date: params.date,
       is_active: true,
       is_completed: false,

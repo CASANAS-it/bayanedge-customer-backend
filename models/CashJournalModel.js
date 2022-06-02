@@ -131,11 +131,11 @@ const customModel = {
       .lean()
     return items
   },
-  getByClientIdTypeIdRefId: async (id,typeId, refId) => {
+  getByClientIdTypeIdRefId: async (id, typeId, refId) => {
     const items = await customModel.model
       .findOne({
         client_id: id,
-        type_id : typeId,
+        type_id: typeId,
         reference_id: refId,
       })
       .lean()
@@ -169,7 +169,13 @@ const customModel = {
       sort: { created_date: -1 }
     }
 
-    var condition = { flow_type_id: flow_id };
+    var condition = {
+      flow_type_id: flow_id,
+      $or: [
+        { is_beginning: false },
+        { is_beginning: { $exists: false } }
+      ]
+    };
     if (search)
       condition.$or = [{ display_id: { $regex: search } }, { 'details.display_id': { $regex: search } }]
     if (type_id)
@@ -214,9 +220,21 @@ const customModel = {
     }
 
     var condition = {
-      type_id: type_id, $or: [
-        { is_beginning: false },
-        { is_beginning: { $exists: false } }]
+      type_id: type_id,
+      $and: [
+        {
+          $or: [
+            { is_beginning: false },
+            { is_beginning: { $exists: false } }
+          ]
+        },
+
+        {
+          $or: [
+            { 'details.is_beginning': false },
+            { 'details.is_beginning': { $exists: false } }
+          ]
+        }]
     };
     return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, options)
 

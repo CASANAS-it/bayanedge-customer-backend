@@ -43,6 +43,9 @@ const customModel = {
       next_payment_date: {
         type: 'String'
       },
+      reference_no: {
+        type: 'String'
+      },
       previous_payment_date: {
         type: 'String'
       },
@@ -122,7 +125,13 @@ const customModel = {
       populate: ['item', 'vendor'],
       lean: true
     }
-    var condition = {}
+    var condition = {
+      $or: [
+        { is_beginning: false },
+        { is_beginning: { $exists: false } }
+      ]
+    }
+
     if (filter) {
       if (filter.search) {
         condition.$or = [{ display_id: { $regex: filter.search } }, { 'details.display_id': { $regex: filter.search } }]
@@ -146,7 +155,13 @@ const customModel = {
       populate: ['item', 'vendor'],
       lean: true
     }
-    var condition = {}
+    var condition = {
+
+      $or: [
+        { is_beginning: false },
+        { is_beginning: { $exists: false } }
+      ],
+    }
     if (filter) {
       if (filter.search) {
         condition.$or = [{ display_id: { $regex: filter.search } }, { 'details.display_id': { $regex: filter.search } }]
@@ -190,6 +205,7 @@ const customModel = {
       total_unit_cost: params.total_unit_cost,
       total_unit_selling: params.total_unit_selling,
       balance: params.balance,
+      reference_no: params.reference_no,
       is_completed: params.is_completed,
       date: params.date,
       modified_by: params.admin_id,
@@ -265,6 +281,7 @@ const customModel = {
       vendor_id: params.vendor_id,
       trans_type: params.trans_type,
       details: params.details,
+      reference_no: params.reference_no,
       total_unit_cost: params.total_unit_cost,
       total_unit_selling: params.total_unit_selling,
       balance: params.balance,

@@ -225,7 +225,7 @@ const beginningBalanceService = {
       }
     }
 
-    if (params.flow_type_id) {
+    if (params.flow_type_id && params.type_id != TransType.LOANS_PAYABLE) {
       var transaction = JSON.parse(JSON.stringify(params));
       // if (params.type_id == TransType.LOANS_PAYABLE) {
 

@@ -104,7 +104,7 @@ const customModel = {
     const items = await customModel.model
       .find({
         client_id: id,
-        is_active : true
+        is_active: true
       })
       .lean()
     return items
@@ -113,7 +113,7 @@ const customModel = {
     const items = await customModel.model
       .findOne({
         client_id: id,
-        is_active : true
+        is_active: true
       })
       .lean()
     return items
@@ -125,8 +125,15 @@ const customModel = {
       offset: offset, limit: limit
     }
 
+    var condition = {
+      $or: [
+        { is_beginning: false },
+        { is_beginning: { $exists: false } }
+      ],
+      is_active: true, client_id: client_id
+    }
 
-    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, options)
+    return await customModel.getModel().paginate(condition, options)
 
     // return await customModel.getModel().find().select().populate('item').populate('vendor').lean()
   },
@@ -227,7 +234,7 @@ const customModel = {
       disId = parseInt(disId.substring(2)) + 1;
       displayId = "AP" + padZeroes(disId)
     }
-    
+
     const item = new customModel.model({
       display_id: displayId,
       transaction_id: generateId(),

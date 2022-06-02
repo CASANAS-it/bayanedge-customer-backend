@@ -128,7 +128,12 @@ const customModel = {
       populate: ['item', 'customer'],
       lean: true
     }
-    var condition = {}
+    var condition = {
+      $or: [
+        { is_beginning: false },
+        { is_beginning: { $exists: false } }
+      ]
+    }
     if (filter) {
       if (filter.search) {
         condition.$or = [{ display_id: { $regex: filter.search } }, { 'details.display_id': { $regex: filter.search } }]
@@ -154,7 +159,13 @@ const customModel = {
       lean: true
     }
 
-    var condition = {}
+    var condition = {
+      
+      $or: [
+        { is_beginning: false },
+        { is_beginning: { $exists: false } }
+      ],
+    }
     if (filter) {
       if (filter.search) {
         condition.$or = [{ display_id: { $regex: filter.search } }, { 'details.display_id': { $regex: filter.search } }]
