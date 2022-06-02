@@ -55,6 +55,9 @@ const customModel = {
         type: "Number"
       },
 
+      service_fee_percentage: {
+        type: "Number"
+      },
       is_completed: {
         type: 'Boolean'
       },
@@ -184,6 +187,7 @@ const customModel = {
       date: params.date,
       // interest_fixed_amount: params.interest_fixed_amount,
       // payment_terms: params.payment_terms,
+      service_fee_percentage : params.service_fee_percentage,
       balance: params.total,
       service_fee : params.service_fee,
       // interest: params.interest,
@@ -220,6 +224,7 @@ const customModel = {
       next_payment_date: params.next_payment_date,
       date: params.date,
       service_fee : params.service_fee,
+      service_fee_percentage : params.service_fee_percentage,
       // interest_fixed_amount: params.interest_fixed_amount,
       balance: params.total,
       // interest: parseFloat(params.total) + parseFloat(params.interest_fixed_amount),
