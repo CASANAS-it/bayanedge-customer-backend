@@ -27,7 +27,7 @@ const customControllers = {
     router.get(baseUrl + '/transaction_type', authorize(), customControllers.getTransactionType)
     router.get(baseUrl + '/customer', authorize(), customControllers.getCustomers)
     router.get(baseUrl + '/vendor', authorize(), customControllers.getVendors)
-    router.get(baseUrl + '/inventory', authorize(), customControllers.getInventory)
+    router.get(baseUrl + '/inventory_list', authorize(), customControllers.getInventory)
     router.get(baseUrl + '/opex_type', authorize(), customControllers.getOpexType)
     router.post(baseUrl + '/dashboard', authorize(), customControllers.getDashBoard)
 

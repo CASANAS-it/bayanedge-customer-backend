@@ -2,6 +2,7 @@ import CashJournalModel from '../models/CashJournalModel';
 import JobsModel from '../models/JobsModel'
 import LoansRepaymentModel from '../models/LoansRepaymentModel';
 import { generateId } from '../utils/Crypto'
+import moment from 'moment'
 
 const jobsService = {
   run: async () => {

@@ -68,11 +68,11 @@ const customModel = {
       .lean()
   },
   getAllByClientId: async (id) => {
-    const items = await customModel.model
+    const items = await customModel.getModel()
       .find({
         client_id: id,
         is_active: true
-      })
+      },[], { sort: { name: 1 } })
       .lean()
     return items
   },
@@ -87,7 +87,7 @@ const customModel = {
   getPaginatedItems: async (limit, offset, client_id, search) => {
     var fields = {
       is_active: true, client_id: client_id,
-      name: { $regex: search,$options : 'i' }
+      name: { $regex: search, $options: 'i' }
     }
     if (!search) {
       delete fields.name

@@ -17,8 +17,8 @@ const customModel = {
       vendor_name: {
         type: 'String'
       },
-      reference_no : {
-        type : 'String'
+      reference_no: {
+        type: 'String'
       },
       address: {
         type: 'String'
@@ -26,14 +26,14 @@ const customModel = {
       contact_information: {
         type: 'Object'
       },
-      terms : {
-        type : "Number"
+      terms: {
+        type: "Number"
       },
-      credit_limit : {
-        type : "Number"
+      credit_limit: {
+        type: "Number"
       },
-      available_credit : {
-        type : "Number"
+      available_credit: {
+        type: "Number"
       },
       account_number: {
         type: 'String'
@@ -72,13 +72,13 @@ const customModel = {
       .select(['-_id', '-__v'])
       .lean()
   },
-  
+
   getAllByClientId: async (id) => {
     const items = await customModel.model
       .find({
         client_id: id,
-        is_active : true
-      })
+        is_active: true
+      }, [], { sort: { vendor_name: 1 } })
       .lean()
     return items
   },
@@ -102,22 +102,22 @@ const customModel = {
       .lean()
     return vendor
   },
-  
+
 
   getByVendorName: async (id, name, clientId) => {
     const customer = await customModel.model
       .findOne({
-        vendor_id: {$ne : id},
-        vendor_name : name,
-        client_id : clientId,
+        vendor_id: { $ne: id },
+        vendor_name: name,
+        client_id: clientId,
         is_active: true
-      })  
+      })
       .lean()
     return customer
   },
   updateCredit: async (params) => {
     const item = await customModel.model.findOneAndUpdate({ vendor_id: params.vendor_id }, {
-      available_credit : params.available_credit,
+      available_credit: params.available_credit,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -129,10 +129,10 @@ const customModel = {
       address: params.address,
       contact_information: params.contact_information,
       account_number: params.account_number,
-      terms : params.terms,
-      credit_limit : params.credit_limit,
-      reference_no : params.reference_no,
-      available_credit : params.credit_limit,
+      terms: params.terms,
+      credit_limit: params.credit_limit,
+      reference_no: params.reference_no,
+      available_credit: params.credit_limit,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -154,15 +154,15 @@ const customModel = {
       vendor_name: params.vendor_name,
       client_id: params.client_id,
       address: params.address,
-      reference_no : params.reference_no,
+      reference_no: params.reference_no,
       contact_information: params.contact_information,
       account_number: params.account_number,
       is_active: true,
       created_by: params.admin_id,
       created_date: new Date(),
-      terms : params.terms,
-      available_credit : params.credit_limit,
-      credit_limit : params.credit_limit,
+      terms: params.terms,
+      available_credit: params.credit_limit,
+      credit_limit: params.credit_limit,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
