@@ -90,7 +90,7 @@ const salesService = {
       var isRefExists = await SalesModel.getByRef(params.id, params.reference_no, params.client_id)
 
       if (isRefExists)
-        throw new Errors.DUPLICATE_REF()
+        throw new Errors.DUPLICATE_REFERENCE()
     }
 
     // for (let index = 0; index < params.details.length; index++) {
@@ -163,7 +163,7 @@ const salesService = {
       var isRefExists = await SalesModel.getByRef(0, params.reference_no, params.client_id)
 
       if (isRefExists)
-        throw new Errors.DUPLICATE_REF()
+        throw new Errors.DUPLICATE_REFERENCE()
 
     } else {
       var hasSales = await beginningBalanceService.hasDataByClient({ client_id: params.client_id, type_id: TransType.ACCOUNTS_RECEIVABLE })
