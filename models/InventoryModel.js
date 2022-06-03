@@ -72,7 +72,7 @@ const customModel = {
       .find({
         client_id: id,
         is_active: true
-      },[], { sort: { name: 1 } })
+      }, [], { sort: { name: 1 } })
       .lean()
     return items
   },
@@ -98,6 +98,17 @@ const customModel = {
     const item = await customModel.model
       .findOne({
         item_id: id,
+        is_active: true
+      })
+      .lean()
+    return item
+  },
+  getByName: async (id, name, client_id) => {
+    const item = await customModel.model
+      .findOne({
+        name: name,
+        item_id: { $ne: id },
+        client_id: client_id,
         is_active: true
       })
       .lean()

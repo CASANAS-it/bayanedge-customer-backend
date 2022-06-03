@@ -2,8 +2,8 @@ import Errors from '../classes/Errors'
 import InventoryModel from '../models/InventoryModel'
 
 const inventoryService = {
-  getAll: async (limit, offset, client_id,search) => {
-    return await InventoryModel.getPaginatedItems(limit, offset, client_id,search)
+  getAll: async (limit, offset, client_id, search) => {
+    return await InventoryModel.getPaginatedItems(limit, offset, client_id, search)
   },
   getSummary: async (client_id) => {
     var items = await InventoryModel.getAllByClientId(client_id)
@@ -25,13 +25,21 @@ const inventoryService = {
     return inventory
   },
   update: async (params) => {
-    return await InventoryModel.update(params)
+    var inventory = await InventoryModel.getByName(params.item_id, params.name, params.client_id)
+    if (inventory) {
+      throw new Errors.DUPLICATE_ENTRY()
+    } else
+      return await InventoryModel.update(params)
   },
   delete: async (params) => {
     return await InventoryModel.delete(params)
   },
   create: async (params) => {
-    return await InventoryModel.create(params)
+    var inventory = await InventoryModel.getByName(0, params.name, params.client_id)
+    if (inventory) {
+      throw new Errors.DUPLICATE_ENTRY()
+    } else
+      return await InventoryModel.create(params)
   }
 }
 
