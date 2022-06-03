@@ -153,6 +153,43 @@ const customModel = {
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
+  getAllFiltered: async (client_id, filter) => {
+    var options = {
+      populate: ['item', 'customer'],
+      lean: true
+    }
+    var condition = {
+      $or: [
+        { is_beginning: false },
+        { is_beginning: { $exists: false } }
+      ],
+      is_active: true, client_id: client_id
+    }
+    if (filter) {
+      if (filter.search) {
+        condition.$or = [{ display_id: { $regex: filter.search } }, { 'details.display_id': { $regex: filter.search } }]
+      }
+      if (filter.customer_id) {
+        condition.customer_id = filter.customer_id
+      }
+      if (filter.item_id) {
+        condition['details.item_id'] = filter.item_id
+      }
+      if (filter.dateFrom && filter.dateTo) {
+        condition.$and = [{ date: { $gte: filter.dateFrom } }, { date: { $lte: filter.dateTo } }]
+      }
+
+    }
+
+    console.log(condition, 'condition-------')
+    return await customModel.getModel().aggregate([
+      { $match: condition },
+      {
+        $group: { _id: null, sum: { $sum: "$total_unit_selling" } }
+      }
+    ])
+    // return await customModel.getModel().find({ is_active: true, client_id: client_id, ...condition }, [{ $sum: "total" }], { ...options })
+  },
   getPaginatedARItems: async (limit, offset, client_id, filter) => {
     var options = {
       populate: ['item', 'customer'],
@@ -160,7 +197,7 @@ const customModel = {
     }
 
     var condition = {
-      
+
       $or: [
         { is_beginning: false },
         { is_beginning: { $exists: false } }

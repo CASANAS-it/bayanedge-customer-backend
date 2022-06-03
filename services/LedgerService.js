@@ -16,6 +16,9 @@ const ledgerService = {
   getAll: async (limit, offset, client_id, filter) => {
     return await LedgerModel.getPaginatedItems(limit, offset, client_id, filter)
   },
+  getAllTotal: async (client_id, filter) => {
+    return await LedgerModel.getAllFiltered(client_id, filter)
+  },
   getAllAP: async (limit, offset, client_id, filter) => {
     return await LedgerModel.getPaginatedAPItems(limit, offset, client_id, filter)
   },

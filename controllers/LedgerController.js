@@ -51,8 +51,10 @@ const customControllers = {
             const { pageIndex, pageSize, client_id, filter } = req.body;
 
             const { limit, offset } = getPagination(pageIndex, pageSize);
+            const total = await ledgerService.getAllTotal(client_id, filter)
             ledgerService.getAll(limit, offset, client_id, filter).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
+                response.subTotal = total[0].sum
                 res.send(
                     new CommonMessage({
                         data: response
