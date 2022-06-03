@@ -123,6 +123,17 @@ const customModel = {
       .lean()
     return items
   },
+  getByRef: async (id, name, client_id) => {
+    const item = await customModel.model
+      .findOne({
+        reference_no: name,
+        item_id: { $ne: id },
+        client_id: client_id,
+        is_active: true
+      })
+      .lean()
+    return item
+  },
   getPaginatedItems: async (limit, offset, client_id, filter) => {
     var options = {
       populate: ['item', 'customer'],

@@ -54,6 +54,7 @@ const ErrorMessages = Object.freeze({
   TRANSACTION_DELETE_ERROR: { status: 400, message: 'Tranasaction Completed, cannot delete the transaction' },
   
   DUPLICATE_ENTRY: { status: 200, message: 'Name already exists', code: 601 },
+  DUPLICATE_REF: { status: 200, message: 'REF already exists', code: 602 },
   
 })
 
