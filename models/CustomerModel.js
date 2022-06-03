@@ -86,7 +86,7 @@ const customModel = {
       .find({
         client_id: id,
         is_active: true
-      })
+      } ,[], { sort: { customer_name: 1 }})
       .lean()
     return customer
   },
