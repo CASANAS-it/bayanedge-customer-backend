@@ -107,18 +107,18 @@ const beginningBalanceService = {
       }
     }
 
-    await CashJournalModel.permanentDeleteByRefId(beginningBalance.transaction_id)
+    // await CashJournalModel.permanentDeleteByRefId(beginningBalance.transaction_id)
 
-    if (params.flow_type_id) {
-      var transaction = JSON.parse(JSON.stringify(params));
-      transaction.reference_id = params.transaction_id;
-      transaction.type_id = beginningBalance.type_id;
-      transaction.details = params;
-      transaction.display_id = beginningBalance.display_id
-      transaction.flow_type_id = beginningBalance.flow_type_id
-      transaction.is_beginning = true;
-      await CashJournalModel.create(transaction)
-    }
+    // if (params.flow_type_id) {
+    //   var transaction = JSON.parse(JSON.stringify(params));
+    //   transaction.reference_id = params.transaction_id;
+    //   transaction.type_id = beginningBalance.type_id;
+    //   transaction.details = params;
+    //   transaction.display_id = beginningBalance.display_id
+    //   transaction.flow_type_id = beginningBalance.flow_type_id
+    //   transaction.is_beginning = true;
+    //   await CashJournalModel.create(transaction)
+    // }
     // else if (params.type_id == TransType.SALES) {
     //   var transaction = JSON.parse(JSON.stringify(params));
     //   transaction.reference_id = beginningBalance.transaction_id;
@@ -225,21 +225,21 @@ const beginningBalanceService = {
       }
     }
 
-    if (params.flow_type_id && params.type_id != TransType.LOANS_PAYABLE) {
-      var transaction = JSON.parse(JSON.stringify(params));
-      // if (params.type_id == TransType.LOANS_PAYABLE) {
+    // if (params.flow_type_id && params.type_id != TransType.LOANS_PAYABLE) {
+    //   var transaction = JSON.parse(JSON.stringify(params));
+    //   // if (params.type_id == TransType.LOANS_PAYABLE) {
 
-      //   transaction.total = parseFloat(params.total) - parseFloat(params.service_fee)
-      // }
+    //   //   transaction.total = parseFloat(params.total) - parseFloat(params.service_fee)
+    //   // }
 
-      transaction.reference_id = beginningBalance.transaction_id;
-      transaction.type_id = params.type_id;
-      transaction.details = beginningBalance;
-      transaction.display_id = params.display_id
-      transaction.flow_type_id = params.flow_type_id
-      transaction.is_beginning = true;
-      await CashJournalModel.create(transaction)
-    }
+    //   transaction.reference_id = beginningBalance.transaction_id;
+    //   transaction.type_id = params.type_id;
+    //   transaction.details = beginningBalance;
+    //   transaction.display_id = params.display_id
+    //   transaction.flow_type_id = params.flow_type_id
+    //   transaction.is_beginning = true;
+    //   await CashJournalModel.create(transaction)
+    // }
     // else if (params.type_id == TransType.SALES) {
 
     //   var transaction = JSON.parse(JSON.stringify(params));

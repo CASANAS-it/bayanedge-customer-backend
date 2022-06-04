@@ -188,6 +188,40 @@ const customModel = {
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
 
+  getAllFiltered: async (client_id, flow_id, search = "", type_id = "", filter) => {
+
+    var options = {
+      populate: ['item', 'customer', 'vendor', 'microsaving'],
+      lean: true,
+      sort: { created_date: -1 }
+    }
+
+    var condition = {
+      flow_type_id: flow_id,
+      $or: [
+        { is_beginning: false },
+        { is_beginning: { $exists: false } },
+      ],
+      is_active: true,
+      client_id: client_id,
+    };
+    if (search)
+      condition.$or = [{ display_id: { $regex: search } }, { 'details.display_id': { $regex: search } }]
+    if (type_id)
+      condition.type_id = type_id
+    if (filter) {
+      condition.$and = [{ date: { $gte: filter.dateFrom } }, { date: { $lte: filter.dateTo } }]
+    }
+
+    return await customModel.getModel().aggregate([
+      { $match: condition },
+      {
+        $group: { _id: null, sum: { $sum: "$total" } }
+      }
+    ])
+    // return await customModel.getModel().find({ is_active: true, client_id: client_id, ...condition }, [{ $sum: "total" }], { ...options })
+  },
+
   getPaginatedItemsByTypeIdFlowTypeId: async (limit, offset, client_id, type_id, flow_type_id, is_beginning) => {
 
     var options = {

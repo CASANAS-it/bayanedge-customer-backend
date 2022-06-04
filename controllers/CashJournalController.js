@@ -32,8 +32,12 @@ const customControllers = {
             const { pageIndex, pageSize, client_id, type, search, type_id,filter } = req.body;
 
             const { limit, offset } = getPagination(pageIndex, pageSize);
+            const total = await cashJournalService.getAllTotal(client_id, type, search, type_id,filter)
+            
             cashJournalService.getAll(limit, offset, client_id, type, search, type_id,filter).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
+                response.subTotal = total.length > 0 ? total[0].sum : 0
+           
                 res.send(
                     new CommonMessage({
                         data: response

@@ -9,6 +9,9 @@ const cashJournalService = {
   getAll: async (limit, offset, client_id, type, search,type_id ,filter = null) => {
     return await CashJournalModel.getPaginatedItems(limit, offset, client_id, type, search,type_id,filter)
   },
+  getAllTotal: async ( client_id, type, search,type_id ,filter = null) => {
+    return await CashJournalModel.getAllFiltered(client_id, type, search,type_id,filter)
+  },
   getAllByRefId: async (limit, offset, client_id, search,ref_id, type_id ) => {
     return await CashJournalModel.getPaginatedItemsByRefId(limit, offset, client_id, search,ref_id,type_id )
   },
