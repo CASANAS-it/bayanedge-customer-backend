@@ -16,8 +16,8 @@ const salesService = {
   getAll: async (limit, offset, client_id, filter) => {
     return await SalesModel.getPaginatedItems(limit, offset, client_id, filter)
   },
-  getAllTotal: async (type,client_id, filter) => {
-    return await SalesModel.getAllFiltered(type,client_id, filter)
+  getAllTotal: async (type, client_id, filter) => {
+    return await SalesModel.getAllFiltered(type, client_id, filter)
   },
   getAllAR: async (limit, offset, client_id, filter) => {
     return await SalesModel.getPaginatedARItems(limit, offset, client_id, filter)
@@ -85,8 +85,8 @@ const salesService = {
         })
         throw error
       }
-    }else{
-      
+    } else {
+
       var isRefExists = await SalesModel.getByRef(params.id, params.reference_no, params.client_id)
 
       if (isRefExists)
@@ -144,10 +144,11 @@ const salesService = {
   },
   delete: async (params) => {
     var oldSales = await SalesModel.getById(params.id);
-    for (let index = 0; index < oldSales.details.length; index++) {
-      const item = oldSales.details[index];
-      var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: item.item_id, quantity: item.quantity })
-    }
+    if (oldSales.details)
+      for (let index = 0; index < oldSales.details.length; index++) {
+        const item = oldSales.details[index];
+        var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: item.item_id, quantity: item.quantity })
+      }
 
     await CashJournalModel.permanentDeleteByRefId(params.id)
     return await SalesModel.delete(params)
