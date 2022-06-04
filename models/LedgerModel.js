@@ -178,7 +178,6 @@ const customModel = {
 
     }
 
-    console.log(condition, 'condition-------')
     return await customModel.getModel().aggregate([
       { $match: condition },
       {

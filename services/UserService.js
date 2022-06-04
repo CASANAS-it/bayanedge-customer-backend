@@ -32,7 +32,7 @@ const userService = {
             user.client_id = client_user.client_id
         }
         const token = jsonwebtoken.sign(user, properties.tokenSecret, {
-            expiresIn: 10800 // 3 hours
+            expiresIn: 28800 // 8 hours
         })
         user.token = token
         return user

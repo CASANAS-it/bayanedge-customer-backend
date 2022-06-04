@@ -193,8 +193,7 @@ const customModel = {
 
     }
 
-    console.log(condition, 'condition-------')
-    return await customModel.getModel().aggregate([
+     return await customModel.getModel().aggregate([
       { $match: condition },
       {
         $group: { _id: null, sum: { $sum: "$total_unit_selling" } }

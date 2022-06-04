@@ -91,10 +91,10 @@ const reportService = {
       allLoans = allLoans.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
     }
 
-    allSalesCJ.forEach(element => {
-      sales += parseFloat(element.details.total_unit_selling)
-      salesUnitCost += parseFloat(element.details.total_unit_cost)
-    });
+    // allSalesCJ.forEach(element => {
+    //   sales += parseFloat(element.details.total_unit_selling)
+    //   salesUnitCost += parseFloat(element.details.total_unit_cost)
+    // });
     allArCJ.forEach(element => {
       arPaid += parseFloat(element.total)
     });
@@ -102,6 +102,10 @@ const reportService = {
       if (element.trans_type == "On Credit") {
         arTotal += parseFloat(element.total_unit_selling)
         arTotalUnitCost += parseFloat(element.total_unit_cost)
+      }else {
+        sales += parseFloat(element.total_unit_selling)
+        salesUnitCost += parseFloat(element.total_unit_cost)
+
       }
     });
 
@@ -561,10 +565,10 @@ const reportService = {
       }
     });
 
-    allSalesCJ.forEach(element => {
-      sales += parseFloat(element.details.total_unit_selling)
-      salesUnitCost += parseFloat(element.details.total_unit_cost)
-    });
+    // allSalesCJ.forEach(element => {
+    //   sales += parseFloat(element.details.total_unit_selling)
+    //   salesUnitCost += parseFloat(element.details.total_unit_cost)
+    // });
     allArCJ.forEach(element => {
       arPaid += parseFloat(element.total)
     });
@@ -586,6 +590,10 @@ const reportService = {
       if (element.trans_type == "On Credit") {
         arTotal += parseFloat(element.total_unit_selling)
         arTotalUnitCost += parseFloat(element.total_unit_cost)
+      }else {
+        sales += parseFloat(element.total_unit_selling)
+        salesUnitCost += parseFloat(element.total_unit_cost)
+    
       }
     });
 
