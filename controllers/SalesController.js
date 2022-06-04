@@ -48,7 +48,7 @@ const customControllers = {
             const { pageIndex, pageSize, client_id, filter } = req.body;
 
             const { limit, offset } = getPagination(pageIndex, pageSize);
-            const total = await salesService.getAllTotal(client_id, filter)
+            const total = await salesService.getAllTotal("On Cash",client_id, filter)
             salesService.getAll(limit, offset, client_id, filter).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
                 response.subTotal = total.length > 0 ? total[0].sum : 0

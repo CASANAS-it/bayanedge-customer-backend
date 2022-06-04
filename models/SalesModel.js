@@ -164,7 +164,7 @@ const customModel = {
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
-  getAllFiltered: async (client_id, filter) => {
+  getAllFiltered: async (type, client_id, filter) => {
     var options = {
       populate: ['item', 'customer'],
       lean: true
@@ -174,6 +174,7 @@ const customModel = {
         { is_beginning: false },
         { is_beginning: { $exists: false } }
       ],
+      trans_type : type,
       is_active: true, client_id: client_id
     }
     if (filter) {

@@ -52,9 +52,12 @@ const beginningBalanceService = {
     } else if (params.type_id == TransType.LOANS_PAYABLE) {
       // var date = moment(params.date, "YYYY-MM-DD").add(params.details.payment_terms, 'days').format("YYYY-MM-DD")
       // params.details.next_payment_date = date;
-      params.details.interest = parseFloat(params.total) + parseFloat(params.details.interest_fixed_amount)
-      params.details.balance = params.details.interest
-      params.details.is_completed = false;
+      // params.details.interest = parseFloat(params.total)
+      params.details = {
+        balance: params.total,
+        is_completed: false,
+        // service_fee: params.service_fee
+      }
     } else if (params.type_id == TransType.NON_OPERATING_EXPENSE) {
       params.total = parseFloat(params.details.interest_fixed_amount) + parseFloat(params.details.non_financial_charges)
     }

@@ -4,16 +4,17 @@ import CustomerModel from '../models/CustomerModel'
 import CashJournalModel from '../models/CashJournalModel'
 import InventoryModel from '../models/InventoryModel'
 import { FlowType, TransType } from '../classes/Constants'
+import BeginningBalanceModel from '../models/BeginningBalanceModel'
 
 const cashJournalService = {
-  getAll: async (limit, offset, client_id, type, search,type_id ,filter = null) => {
-    return await CashJournalModel.getPaginatedItems(limit, offset, client_id, type, search,type_id,filter)
+  getAll: async (limit, offset, client_id, type, search, type_id, filter = null) => {
+    return await CashJournalModel.getPaginatedItems(limit, offset, client_id, type, search, type_id, filter)
   },
-  getAllTotal: async ( client_id, type, search,type_id ,filter = null) => {
-    return await CashJournalModel.getAllFiltered(client_id, type, search,type_id,filter)
+  getAllTotal: async (client_id, type, search, type_id, filter = null) => {
+    return await CashJournalModel.getAllFiltered(client_id, type, search, type_id, filter)
   },
-  getAllByRefId: async (limit, offset, client_id, search,ref_id, type_id ) => {
-    return await CashJournalModel.getPaginatedItemsByRefId(limit, offset, client_id, search,ref_id,type_id )
+  getAllByRefId: async (limit, offset, client_id, search, ref_id, type_id) => {
+    return await CashJournalModel.getPaginatedItemsByRefId(limit, offset, client_id, search, ref_id, type_id)
   },
   getById: async (id) => {
     var sales = await CashJournalModel.getById(id)
@@ -24,7 +25,11 @@ const cashJournalService = {
   },
   getSummary: async (params) => {
     var cj = await CashJournalModel.getAllByClientId(params.client_id)
-    var total = 0;
+    var begBalance = await BeginningBalanceModel.getAllByClientId(params.client_id)
+    var cashOnHandBeg = begBalance.find(x => x.type_id == TransType.CASH_ON_HAND)
+    cashOnHandBeg = cashOnHandBeg ? parseFloat(cashOnHandBeg.total) : 0;
+
+    var total = cashOnHandBeg;
     var inflowTotal = 0;
     var outflowTotal = 0;
     cj.forEach(element => {
@@ -33,7 +38,7 @@ const cashJournalService = {
       else
         outflowTotal += element.total
     });
-    total = inflowTotal - outflowTotal;
+    total += inflowTotal - outflowTotal;
     var result = {
       total: total,
       inflowTotal: inflowTotal,

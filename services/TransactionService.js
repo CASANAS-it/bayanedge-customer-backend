@@ -62,13 +62,13 @@ const reportService = {
 
     loansBeginning = begBalance.find(x => x.type_id == TransType.LOANS_PAYABLE)
 
-    var allSalesCJ = cj.filter(x => x.type_id === TransType.SALES && !x.is_beginning)
-    var allArCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE && !x.is_beginning)
-    var allOpexCJ = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE && !x.is_beginning)
-    var allOtherCICJ = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME && !x.is_beginning)
-    var allLoansProceedCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && !x.is_beginning && x.flow_type_id === FlowType.OUTFLOW)
+    var allSalesCJ = cj.filter(x => x.type_id === TransType.SALES)
+    var allArCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE)
+    var allOpexCJ = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE)
+    var allOtherCICJ = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME)
+    var allLoansProceedCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && x.flow_type_id === FlowType.OUTFLOW)
     var allLoansProceedCashCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED)
-    var allNonFinancialCJ = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES && !x.is_beginning)
+    var allNonFinancialCJ = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES)
     var allSales = await SalesModel.getAllByClientId(params.client_id)
     var allLedger = await LedgerModel.getAllByClientId(params.client_id)
     var allLoans = await LoansPayableModel.getAllByClientId(params.client_id)
@@ -257,17 +257,18 @@ const reportService = {
     if (params.isMonthly) {
       cj = cj.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
     }
-    var allSalesCJ = cj.filter(x => x.type_id === TransType.SALES && !x.is_beginning)
-    var allArCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE && !x.is_beginning)
-    var allInventoryLedgerCJ = cj.filter(x => x.type_id === TransType.LEDGER && !x.is_beginning)
-    var allApCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_PAYABLE && !x.is_beginning)
-    var allOpexCJ = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE && !x.is_beginning)
-    var allOtherCICJ = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME && !x.is_beginning)
-    var allLoansProceedInterestCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && !x.is_beginning && x.flow_type_id === FlowType.OUTFLOW)
+    var allSalesCJ = cj.filter(x => x.type_id === TransType.SALES)
+    // console.log(allSalesCJ.length,'allSalesCount----')
+    var allArCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE)
+    var allInventoryLedgerCJ = cj.filter(x => x.type_id === TransType.LEDGER)
+    var allApCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_PAYABLE)
+    var allOpexCJ = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE)
+    var allOtherCICJ = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME)
+    var allLoansProceedInterestCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && x.flow_type_id === FlowType.OUTFLOW)
     var allMicrosavingsDepositCJ = cj.filter(x => x.type_id === TransType.MICROSAVINGS && x.flow_type_id === FlowType.OUTFLOW)
     var allMicrosavingsWithdrawalCJ = cj.filter(x => x.type_id === TransType.MICROSAVINGS && x.flow_type_id === FlowType.INFLOW)
-    var allDrawingsCJ = cj.filter(x => x.type_id === TransType.DRAWINGS && !x.is_beginning)
-    var allNonFinancialCJ = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES && !x.is_beginning)
+    var allDrawingsCJ = cj.filter(x => x.type_id === TransType.DRAWINGS)
+    var allNonFinancialCJ = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES)
     var allLoansProceedCashCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED)
 
     var allArHistory = await AccountReceivableModel.getAllByClientId(params.client_id)
@@ -280,6 +281,8 @@ const reportService = {
       allArHistory = allArHistory.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
       allApHistory = allApHistory.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
       allLoansProceeds = allLoansProceeds.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
+      allSales = allSales.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
+      allLedger = allLedger.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
     }
 
     allLoansProceedCashCJ.forEach(element => {
@@ -302,10 +305,10 @@ const reportService = {
       }
     });
 
-    allSalesCJ.forEach(element => {
-      sales += parseFloat(element.details.total_unit_selling)
-      salesUnitCost += parseFloat(element.details.total_unit_cost)
-    });
+    // allSalesCJ.forEach(element => {
+    //   sales += parseFloat(element.details.total_unit_selling)
+    //   salesUnitCost += parseFloat(element.details.total_unit_cost)
+    // });
     allArCJ.forEach(element => {
       arPaid += parseFloat(element.total)
     });
@@ -326,6 +329,10 @@ const reportService = {
       if (element.trans_type == "On Credit") {
         arTotal += parseFloat(element.total_unit_selling)
         arTotalUnitCost += parseFloat(element.total_unit_cost)
+      } else {
+        sales += parseFloat(element.total_unit_selling)
+        salesUnitCost += parseFloat(element.total_unit_cost)
+
       }
     });
 
@@ -515,17 +522,17 @@ const reportService = {
 
     cashOnHandBeg = await reportService.getCashBeginningBalance(params)
 
-    var allSalesCJ = cj.filter(x => x.type_id === TransType.SALES && !x.is_beginning)
-    var allArCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE && !x.is_beginning)
-    var allInventoryLedgerCJ = cj.filter(x => x.type_id === TransType.LEDGER && !x.is_beginning)
-    var allApCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_PAYABLE && !x.is_beginning)
-    var allOpexCJ = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE && !x.is_beginning)
-    var allOtherCICJ = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME && !x.is_beginning)
-    var allLoansProceedInterestCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && !x.is_beginning && x.flow_type_id === FlowType.OUTFLOW)
+    var allSalesCJ = cj.filter(x => x.type_id === TransType.SALES)
+    var allArCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE)
+    var allInventoryLedgerCJ = cj.filter(x => x.type_id === TransType.LEDGER)
+    var allApCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_PAYABLE)
+    var allOpexCJ = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE)
+    var allOtherCICJ = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME)
+    var allLoansProceedInterestCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && x.flow_type_id === FlowType.OUTFLOW)
     var allMicrosavingsDepositCJ = cj.filter(x => x.type_id === TransType.MICROSAVINGS && x.flow_type_id === FlowType.OUTFLOW)
     var allMicrosavingsWithdrawalCJ = cj.filter(x => x.type_id === TransType.MICROSAVINGS && x.flow_type_id === FlowType.INFLOW)
-    var allDrawingsCJ = cj.filter(x => x.type_id === TransType.DRAWINGS && !x.is_beginning)
-    var allNonFinancialCJ = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES && !x.is_beginning)
+    var allDrawingsCJ = cj.filter(x => x.type_id === TransType.DRAWINGS)
+    var allNonFinancialCJ = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES)
     var allLoansProceedCashCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED)
 
     var allArHistory = await AccountReceivableModel.getAllByClientId(params.client_id)
@@ -738,17 +745,17 @@ const reportService = {
     if (params.isMonthly) {
       cj = cj.filter(x => x.date < params.dateFrom)
     }
-    var allSalesCJ = cj.filter(x => x.type_id === TransType.SALES && !x.is_beginning)
-    var allArCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE && !x.is_beginning)
-    var allInventoryLedgerCJ = cj.filter(x => x.type_id === TransType.LEDGER && !x.is_beginning)
-    var allApCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_PAYABLE && !x.is_beginning)
-    var allOpexCJ = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE && !x.is_beginning)
-    var allOtherCICJ = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME && !x.is_beginning)
-    var allLoansProceedInterestCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && !x.is_beginning && x.flow_type_id === FlowType.OUTFLOW)
+    var allSalesCJ = cj.filter(x => x.type_id === TransType.SALES)
+    var allArCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE)
+    var allInventoryLedgerCJ = cj.filter(x => x.type_id === TransType.LEDGER)
+    var allApCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_PAYABLE)
+    var allOpexCJ = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE)
+    var allOtherCICJ = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME)
+    var allLoansProceedInterestCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && x.flow_type_id === FlowType.OUTFLOW)
     var allMicrosavingsDepositCJ = cj.filter(x => x.type_id === TransType.MICROSAVINGS && x.flow_type_id === FlowType.OUTFLOW)
     var allMicrosavingsWithdrawalCJ = cj.filter(x => x.type_id === TransType.MICROSAVINGS && x.flow_type_id === FlowType.INFLOW)
-    var allDrawingsCJ = cj.filter(x => x.type_id === TransType.DRAWINGS && !x.is_beginning)
-    var allNonFinancialCJ = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES && !x.is_beginning)
+    var allDrawingsCJ = cj.filter(x => x.type_id === TransType.DRAWINGS)
+    var allNonFinancialCJ = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES)
     var allLoansProceedCashCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED)
 
     var allArHistory = await AccountReceivableModel.getAllByClientId(params.client_id)
@@ -914,13 +921,13 @@ const reportService = {
 
     loansBeginning = begBalance.find(x => x.type_id == TransType.LOANS_PAYABLE)
 
-    var allSalesCJ = cj.filter(x => x.type_id === TransType.SALES && !x.is_beginning)
-    var allArCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE && !x.is_beginning)
-    var allOpexCJ = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE && !x.is_beginning)
-    var allOtherCICJ = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME && !x.is_beginning)
-    var allLoansProceedCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && !x.is_beginning && x.flow_type_id === FlowType.OUTFLOW)
+    var allSalesCJ = cj.filter(x => x.type_id === TransType.SALES)
+    var allArCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE)
+    var allOpexCJ = cj.filter(x => x.type_id === TransType.OPERATING_EXPENSE)
+    var allOtherCICJ = cj.filter(x => x.type_id === TransType.OTHER_CASH_INCOME)
+    var allLoansProceedCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED && x.flow_type_id === FlowType.OUTFLOW)
     var allLoansProceedCashCJ = cj.filter(x => x.type_id === TransType.LOANS_PROCEED)
-    var allNonFinancialCJ = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES && !x.is_beginning)
+    var allNonFinancialCJ = cj.filter(x => x.type_id === TransType.NON_FINANCIAL_CHARGES)
     var allSales = await SalesModel.getAllByClientId(params.client_id)
     var allLedger = await LedgerModel.getAllByClientId(params.client_id)
     var allLoans = await LoansPayableModel.getAllByClientId(params.client_id)

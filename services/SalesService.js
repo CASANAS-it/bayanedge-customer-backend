@@ -16,8 +16,8 @@ const salesService = {
   getAll: async (limit, offset, client_id, filter) => {
     return await SalesModel.getPaginatedItems(limit, offset, client_id, filter)
   },
-  getAllTotal: async (client_id, filter) => {
-    return await SalesModel.getAllFiltered(client_id, filter)
+  getAllTotal: async (type,client_id, filter) => {
+    return await SalesModel.getAllFiltered(type,client_id, filter)
   },
   getAllAR: async (limit, offset, client_id, filter) => {
     return await SalesModel.getPaginatedARItems(limit, offset, client_id, filter)
