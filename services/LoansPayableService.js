@@ -214,6 +214,12 @@ const loansPayableService = {
 
     current.next_payment_date = date;
     current.balance = newBalance
+    current.reference_no = params.reference_no;
+    if (params.reference_no) {
+      var isRefExists = await cashJournalService.getByRef(0, params.reference_no, params.client_id, TransType.LOANS_PROCEED)
+      if (isRefExists)
+        throw new Errors.DUPLICATE_REFERENCE()
+    }
     current.interest_fixed_amount = params.interest_fixed_amount;
     current.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
     var summary = await cashJournalService.getSummary(params)

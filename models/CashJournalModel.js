@@ -357,6 +357,18 @@ const customModel = {
     })
     return user
   },
+  getByRef: async (id, name, client_id, type) => {
+    const item = await customModel.model
+      .findOne({
+        "details.reference_no": name,
+        type_id: type,
+        transaction_id: { $ne: id },
+        client_id: client_id,
+        is_active: true
+      })
+      .lean()
+    return item
+  },
   updateByReferenceId: async (params) => {
     const user = await customModel.getModel().findOneAndUpdate({ reference_id: params.reference_id }, {
       client_id: params.client_id,

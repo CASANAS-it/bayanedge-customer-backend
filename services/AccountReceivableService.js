@@ -103,7 +103,11 @@ const accountReceivableService = {
 
     current.next_payment_date = date;
     current.balance = newBalance
+    current.reference_no = params.reference_no;
+    var isRefExists = await cashJournalService.getByRef(0, params.reference_no, params.client_id,TransType.ACCOUNTS_RECEIVABLE)
 
+    if (isRefExists)
+      throw new Errors.DUPLICATE_REFERENCE()
     console.log(params, '------------')
     var ap = await SalesModel.pay(params);
     if (newBalance === 0) {
