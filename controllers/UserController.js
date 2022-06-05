@@ -35,7 +35,6 @@ const customControllers = {
    */
   changePassword: async (req, res) => {
     try {
-      console.log(req.body.admin_id,'hello')
       const user = await UserModel.getByIdAndPassword(
         req.body.admin_id,
         req.body.currentPassword

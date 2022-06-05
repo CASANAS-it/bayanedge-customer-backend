@@ -16,7 +16,7 @@ const accountPayableService = {
     return await AccountPayableModel.getPaginatedItems(limit, offset, client_id)
   },
   getAllCompleted: async (limit, offset, client_id) => {
-    return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.ACCOUNTS_PAYABLE)
+    return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.ACCOUNTS_PAYABLE,true)
   },
   hasDataByClient: async (id) => {
     var items = await AccountPayableModel.getByClientId(id)

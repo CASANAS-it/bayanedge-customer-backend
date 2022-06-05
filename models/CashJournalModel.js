@@ -244,7 +244,7 @@ const customModel = {
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
 
-  getPaginatedItemsByTypeId: async (limit, offset, client_id, type_id) => {
+  getPaginatedItemsByTypeId: async (limit, offset, client_id, type_id, is_beginning_balance_included = false) => {
 
     var options = {
       populate: ['item', 'customer', 'vendor', 'microsaving'],
@@ -255,7 +255,9 @@ const customModel = {
 
     var condition = {
       type_id: type_id,
-      $and: [
+    };
+    if (!is_beginning_balance_included) {
+      condition['$and'] = [
         {
           $or: [
             { is_beginning: false },
@@ -269,7 +271,7 @@ const customModel = {
             { 'details.is_beginning': { $exists: false } }
           ]
         }]
-    };
+    }
     return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, options)
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()

@@ -193,10 +193,10 @@ const customModel = {
     }
     var condition = {
 
-      $or: [
-        { is_beginning: false },
-        { is_beginning: { $exists: false } }
-      ],
+      // $or: [
+      //   { is_beginning: false },
+      //   { is_beginning: { $exists: false } }
+      // ],
     }
     if (filter) {
       if (filter.search) {

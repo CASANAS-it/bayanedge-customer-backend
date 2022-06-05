@@ -16,7 +16,7 @@ const accountReceivableService = {
   },
 
   getAllCompleted: async (limit, offset, client_id) => {
-    return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.ACCOUNTS_RECEIVABLE)
+    return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.ACCOUNTS_RECEIVABLE,true)
   },
   hasDataByClient: async (id) => {
     var items = await AccountReceivableModel.getByClientId(id)
