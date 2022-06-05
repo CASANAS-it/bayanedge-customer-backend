@@ -391,7 +391,7 @@ const customModel = {
   },
   create: async (params) => {
     const id = generateId()
-    const item = new customModel.getModel()({
+    const item = new customModel.model({
       transaction_id: id,
       display_id: params.display_id,
       reference_id: params.reference_id,
