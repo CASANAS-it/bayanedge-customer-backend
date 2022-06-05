@@ -234,11 +234,13 @@ const customModel = {
     var condition = {
       flow_type_id: flow_type_id,
       type_id: type_id,
-      $or: [
+    };
+    if (is_beginning) {
+      condition['$or'] = [
         { is_beginning: is_beginning },
         { is_beginning: { $exists: is_beginning } }
       ]
-    };
+    }
     return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, options)
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
@@ -288,12 +290,15 @@ const customModel = {
 
     var condition = {
       reference_id: refId,
-      $or: [
+
+    };
+
+    if (is_beginning) {
+      condition['$or'] = [
         { is_beginning: is_beginning },
         { is_beginning: { $exists: is_beginning } }
       ]
-    };
-
+    }
 
     if (type_id) {
       condition.type_id = type_id
