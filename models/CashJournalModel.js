@@ -109,7 +109,7 @@ const customModel = {
       .lean()
   },
   getAllByClientId: async (id) => {
-    const items = await customModel.model
+    const items = await customModel.getModel()
       .find({
         client_id: id,
         is_active: true,
@@ -123,7 +123,7 @@ const customModel = {
   },
 
   getAllByClientIdRefId: async (id, refId) => {
-    const items = await customModel.model
+    const items = await customModel.getModel()
       .find({
         client_id: id,
         reference_id: refId,
@@ -132,7 +132,7 @@ const customModel = {
     return items
   },
   getByClientIdTypeIdRefId: async (id, typeId, refId) => {
-    const items = await customModel.model
+    const items = await customModel.getModel()
       .findOne({
         client_id: id,
         type_id: typeId,
@@ -142,7 +142,7 @@ const customModel = {
     return items
   },
   getByClientId: async (id) => {
-    const items = await customModel.model
+    const items = await customModel.getModel()
       .findOne({
         client_id: id,
         is_active: true
@@ -151,7 +151,7 @@ const customModel = {
     return items
   },
   getLastDisplayId: async (client_id, type_id, flow_type_id) => {
-    const items = await customModel.model
+    const items = await customModel.getModel()
       .findOne({
         client_id: client_id,
         type_id: type_id,
@@ -308,7 +308,7 @@ const customModel = {
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
   getById: async (id) => {
-    const item = await customModel.model
+    const item = await customModel.getModel()
       .findOne({
         transaction_id: id,
         is_active: true
@@ -317,7 +317,7 @@ const customModel = {
     return item
   },
   getAllNonPosted: async (date) => {
-    const items = await customModel.model
+    const items = await customModel.getModel()
       .find({
         is_posted: false,
         date: date
@@ -327,13 +327,13 @@ const customModel = {
   },
 
   markAsPosted: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
+    const user = await customModel.getModel().findOneAndUpdate({ transaction_id: params.transaction_id }, {
       is_posted: true
     })
     return user
   },
   getByClientIdTypeId: async (id, type_id) => {
-    const items = await customModel.model
+    const items = await customModel.getModel()
       .findOne({
         client_id: id,
         type_id: type_id,
@@ -346,7 +346,7 @@ const customModel = {
     return items
   },
   update: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
+    const user = await customModel.getModel().findOneAndUpdate({ transaction_id: params.transaction_id }, {
       client_id: params.client_id,
       details: params.details,
       total: params.total,
@@ -358,7 +358,7 @@ const customModel = {
     return user
   },
   updateByReferenceId: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ reference_id: params.reference_id }, {
+    const user = await customModel.getModel().findOneAndUpdate({ reference_id: params.reference_id }, {
       client_id: params.client_id,
       details: params.details,
       total: params.total,
@@ -370,7 +370,7 @@ const customModel = {
     return user
   },
   delete: async (params) => {
-    const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
+    const user = await customModel.getModel().findOneAndUpdate({ transaction_id: params.transaction_id }, {
       is_active: false,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -379,19 +379,19 @@ const customModel = {
   },
 
   permanentDelete: async (id) => {
-    const user = await customModel.model.deleteOne(
+    const user = await customModel.getModel().deleteOne(
       { transaction_id: id })
     return user
   },
 
   permanentDeleteByRefId: async (id) => {
-    const user = await customModel.model.deleteMany(
+    const user = await customModel.getModel().deleteMany(
       { reference_id: id })
     return user
   },
   create: async (params) => {
     const id = generateId()
-    const item = new customModel.model({
+    const item = new customModel.getModel()({
       transaction_id: id,
       display_id: params.display_id,
       reference_id: params.reference_id,

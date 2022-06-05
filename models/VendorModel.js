@@ -91,7 +91,7 @@ const customModel = {
     return items
   },
   getPaginatedItems: async (limit, offset, client_id) => {
-    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, { offset: offset, limit: limit })
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, { offset: offset, limit: limit, sort: { vendor_name: 1 } })
   },
   getByVendorId: async (id) => {
     const vendor = await customModel.model

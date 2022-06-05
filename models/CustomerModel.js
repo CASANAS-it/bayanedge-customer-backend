@@ -69,7 +69,7 @@ const customModel = {
       .lean()
   },
   getPaginatedItems: async (limit, offset, client_id) => {
-    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, { offset: offset, limit: limit })
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, { offset: offset, limit: limit,sort : {customer_name : 1} })
   },
   getByClientId: async (id) => {
     const customer = await customModel.model

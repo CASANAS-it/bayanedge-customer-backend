@@ -241,6 +241,7 @@ const customModel = {
       total_unit_cost: params.total_unit_cost,
       total_unit_selling: params.total_unit_selling,
       balance: params.balance,
+      next_payment_date : params.next_payment_date,
       reference_no: params.reference_no,
       is_completed: params.is_completed,
       date: params.date,
