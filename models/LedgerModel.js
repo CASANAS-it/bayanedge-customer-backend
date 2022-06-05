@@ -232,6 +232,17 @@ const customModel = {
       .lean()
     return item
   },
+  getByRef: async (id, name, client_id) => {
+    const item = await customModel.model
+      .findOne({
+        reference_no: name,
+        transaction_id: { $ne: id },
+        client_id: client_id,
+        is_active: true
+      })
+      .lean()
+    return item
+  },
   update: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ transaction_id: params.transaction_id }, {
       client_id: params.client_id,

@@ -127,7 +127,7 @@ const customModel = {
     const item = await customModel.model
       .findOne({
         reference_no: name,
-        item_id: { $ne: id },
+        transaction_id: { $ne: id },
         client_id: client_id,
         is_active: true
       })

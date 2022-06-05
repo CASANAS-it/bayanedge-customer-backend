@@ -70,6 +70,10 @@ const ledgerService = {
       }
     }
 
+    var isRefExists = await LedgerModel.getByRef(params.transaction_id, params.reference_no, params.client_id)
+
+    if (isRefExists)
+      throw new Errors.DUPLICATE_REFERENCE()
 
     if (!params.vendor_id) {
       var vendor = await VendorModel.create(params)
@@ -160,6 +164,10 @@ const ledgerService = {
         throw new Errors.NO_BEGINNING_BALANCE()
       }
     }
+    var isRefExists = await LedgerModel.getByRef(0, params.reference_no, params.client_id)
+
+    if (isRefExists)
+      throw new Errors.DUPLICATE_REFERENCE()
     var summary = await cashJournalService.getSummary(params)
 
     if (summary) {
