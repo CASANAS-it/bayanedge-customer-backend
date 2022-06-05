@@ -216,7 +216,7 @@ const loansPayableService = {
     current.balance = newBalance
     current.reference_no = params.reference_no;
     if (params.reference_no) {
-      var isRefExists = await cashJournalService.getByRef(0, params.reference_no, params.client_id, TransType.LOANS_PROCEED)
+      var isRefExists = await cashJournalService.getByRef(params.transaction_id, params.reference_no, params.client_id, TransType.LOANS_PROCEED)
       if (isRefExists)
         throw new Errors.DUPLICATE_REFERENCE()
     }

@@ -16,7 +16,7 @@ const accountReceivableService = {
   },
 
   getAllCompleted: async (limit, offset, client_id) => {
-    return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.ACCOUNTS_RECEIVABLE,true)
+    return await CashJournalModel.getPaginatedItemsByTypeId(limit, offset, client_id, TransType.ACCOUNTS_RECEIVABLE, true)
   },
   hasDataByClient: async (id) => {
     var items = await AccountReceivableModel.getByClientId(id)
@@ -104,10 +104,12 @@ const accountReceivableService = {
     current.next_payment_date = date;
     current.balance = newBalance
     current.reference_no = params.reference_no;
-    var isRefExists = await cashJournalService.getByRef(0, params.reference_no, params.client_id,TransType.ACCOUNTS_RECEIVABLE)
+    if (params.reference_no) {
+      var isRefExists = await CashJournalModel.getByRef(params.transaction_id, params.reference_no, params.client_id, TransType.ACCOUNTS_RECEIVABLE)
 
-    if (isRefExists)
-      throw new Errors.DUPLICATE_REFERENCE()
+      if (isRefExists)
+        throw new Errors.DUPLICATE_REFERENCE()
+    }
     console.log(params, '------------')
     var ap = await SalesModel.pay(params);
     if (newBalance === 0) {

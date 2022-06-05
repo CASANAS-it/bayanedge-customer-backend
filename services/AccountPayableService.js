@@ -102,11 +102,13 @@ const accountPayableService = {
 
     current.reference_no = params.reference_no;
 
-    var isRefExists = await cashJournalService.getByRef(0, params.reference_no, params.client_id,TransType.ACCOUNTS_PAYABLE)
+    if (params.reference_no) {
+      var isRefExists = await CashJournalModel.getByRef(params.transaction_id, params.reference_no, params.client_id, TransType.ACCOUNTS_PAYABLE)
 
-    if (isRefExists)
-      throw new Errors.DUPLICATE_REFERENCE()
+      if (isRefExists)
+        throw new Errors.DUPLICATE_REFERENCE()
 
+    }
 
     var summary = await cashJournalService.getSummary(params)
 
