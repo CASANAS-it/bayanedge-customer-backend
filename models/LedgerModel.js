@@ -123,7 +123,8 @@ const customModel = {
   getPaginatedItems: async (limit, offset, client_id, filter) => {
     var options = {
       populate: ['item', 'vendor'],
-      lean: true
+      lean: true,
+      sort : {date : 1}
     }
     var condition = {
       $or: [
@@ -189,7 +190,8 @@ const customModel = {
   getPaginatedAPItems: async (limit, offset, client_id, filter) => {
     var options = {
       populate: ['item', 'vendor'],
-      lean: true
+      lean: true,
+      sort : {date : 1}
     }
     var condition = {
 

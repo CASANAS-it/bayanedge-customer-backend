@@ -166,7 +166,7 @@ const customModel = {
       populate: ['item', 'customer', 'vendor', 'microsaving'],
       lean: true,
       offset: offset, limit: limit,
-      sort: { created_date: -1 }
+      sort: { date: 1 }
     }
 
     var condition = {
@@ -228,7 +228,7 @@ const customModel = {
       populate: ['item', 'customer', 'vendor', 'microsaving'],
       lean: true,
       offset: offset, limit: limit,
-      sort: { created_date: -1 }
+      sort : {date : 1}
     }
 
     var condition = {
@@ -252,7 +252,7 @@ const customModel = {
       populate: ['item', 'customer', 'vendor', 'microsaving'],
       lean: true,
       offset: offset, limit: limit,
-      sort: { created_date: -1 }
+      sort : {date : 1}
     }
 
     var condition = {
@@ -285,7 +285,7 @@ const customModel = {
       populate: ['item', 'customer', 'vendor', 'microsaving'],
       lean: true,
       offset: offset, limit: limit,
-      sort: { created_date: -1 }
+      sort : {date : 1}
     }
 
     var condition = {
