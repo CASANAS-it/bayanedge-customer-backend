@@ -121,7 +121,7 @@ const customModel = {
       unit_selling_price: parseFloat(params.unit_selling_price),
       unit_of_measurement: params.unit_of_measurement,
       // quantity: params.quantity,
-      beginning_quantity: params.beginning_quantity,
+      // beginning_quantity: params.beginning_quantity,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })

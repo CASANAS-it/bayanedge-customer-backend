@@ -53,11 +53,11 @@ const cashJournalService = {
     }
 
     // revert quantity for inventory
-    var oldSales = await CashJournalModel.getById(params.sales_id);
-    var revertInventory = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: oldSales.item_id, quantity: oldSales.quantity })
+    // var oldSales = await CashJournalModel.getById(params.sales_id);
+    // var revertInventory = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: oldSales.item_id, quantity: oldSales.quantity })
     // -----------------------------
     var sales = await CashJournalModel.update(params)
-    var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
+    // var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
     return sales
   },
   delete: async (params) => {
@@ -69,7 +69,7 @@ const cashJournalService = {
       params.customer_id = customer.customer_id
     }
     var sales = await CashJournalModel.create(params)
-    var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
+    // var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
 
     return sales
   }
