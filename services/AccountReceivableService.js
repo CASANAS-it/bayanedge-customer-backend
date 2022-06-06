@@ -36,8 +36,8 @@ const accountReceivableService = {
       throw new Errors.EDIT_ERROR_WITH_EXISTING_DATA()
     }
 
-    var revertInventory = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: oldData.item_id, quantity: oldData.quantity })
-    var inventor = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
+    // var revertInventory = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: oldData.item_id, quantity: oldData.quantity })
+    // var inventor = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
 
     var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
@@ -53,11 +53,11 @@ const accountReceivableService = {
     // }
 
     var ap = await AccountReceivableModel.create(params)
-    for (let index = 0; index < params.details.length; index++) {
-      const item = params.details[index];
+    // for (let index = 0; index < params.details.length; index++) {
+    //   const item = params.details[index];
 
-      var inventor = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: item.item_id, quantity: item.quantity })
-    }
+    //   var inventor = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: item.item_id, quantity: item.quantity })
+    // }
 
     return ap
   },

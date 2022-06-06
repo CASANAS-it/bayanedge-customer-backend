@@ -152,6 +152,18 @@ const customModel = {
 
     // return await customModel.getModel().find().select().populate('item').populate('vendor').lean()
   },
+  getItemDetails: async (client_id, item_id) => {
+    var options = {
+      lean: true,
+      sort: { date: 1 }
+    }
+    var condition = {
+      is_active: true, client_id: client_id,
+      details: { $elemMatch: { item_id: item_id } }
+    }
+
+    return await customModel.getModel().find({ is_active: true, client_id: client_id, ...condition }, { ...options }).select({ 'details': 1, "date": 1, 'type': "Purchase" }).lean()
+  },
   getAllFiltered: async (client_id, filter) => {
     var options = {
       populate: ['item', 'customer'],

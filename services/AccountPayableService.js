@@ -37,8 +37,8 @@ const accountPayableService = {
       throw new Errors.EDIT_ERROR_WITH_EXISTING_DATA()
     }
 
-    var revertInventory = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: oldData.item_id, quantity: oldData.quantity })
-    var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
+    // var revertInventory = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: oldData.item_id, quantity: oldData.quantity })
+    // var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
 
     var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
@@ -55,7 +55,7 @@ const accountPayableService = {
     var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
     var ap = await AccountPayableModel.create(params);
-    var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
+    // var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: params.item_id, quantity: params.quantity })
 
     return ap
   },
@@ -185,7 +185,7 @@ const accountPayableService = {
 
   delete: async (params) => {
     var oldData = await AccountPayableModel.getById(params.transaction_id);
-    var revertInventory = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: oldData.item_id, quantity: oldData.quantity })
+    // var revertInventory = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: oldData.item_id, quantity: oldData.quantity })
 
     await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
     await AccountPayableModel.delete(params)

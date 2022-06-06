@@ -62,6 +62,15 @@ function padZeroes(num, size = 6) {
   while (num.length < size) num = "0" + num;
   return num;
 }
+function compare( a, b, field ) {
+  if ( a[field] < b[field] ){
+    return -1;
+  }
+  if ( a[field] > b[field] ){
+    return 1;
+  }
+  return 0;
+}
 
 export {
   getUserFromToken,
@@ -71,5 +80,6 @@ export {
   getPagination,
   getPagingData,
   generateDisplayId,
-  padZeroes
+  padZeroes,
+  compare
 }

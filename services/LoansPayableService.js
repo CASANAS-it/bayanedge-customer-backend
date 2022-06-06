@@ -284,7 +284,7 @@ const loansPayableService = {
 
     var newBalance = parseFloat(current.details.balance) - parseFloat(params.amount_paid);
     var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
-    var currentDate = moment().format("YYYY-MM-DD")
+    var currentDate = moment(params.date).format("YYYY-MM-DD")
 
     current.details.next_payment_date = date;
     current.details.balance = newBalance

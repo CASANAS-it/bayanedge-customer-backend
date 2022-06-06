@@ -195,6 +195,7 @@ const customModel = {
 
     }
 
+
     return await customModel.getModel().aggregate([
       { $match: condition },
       {
@@ -202,6 +203,19 @@ const customModel = {
       }
     ])
     // return await customModel.getModel().find({ is_active: true, client_id: client_id, ...condition }, [{ $sum: "total" }], { ...options })
+  },
+
+  getItemDetails: async (client_id, item_id) => {
+    var options = {
+      lean: true,
+      sort: { date: 1 }
+    }
+    var condition = {
+      is_active: true, client_id: client_id,
+      details: { $elemMatch: { item_id: item_id } }
+    }
+
+    return await customModel.getModel().find({ is_active: true, client_id: client_id, ...condition }, { ...options }).select({'details': 1, "date": 1, 'type': "Sell" }).lean()
   },
   getPaginatedARItems: async (limit, offset, client_id, filter) => {
     var options = {
