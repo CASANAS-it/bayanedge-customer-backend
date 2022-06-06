@@ -138,7 +138,7 @@ const customModel = {
     var options = {
       populate: ['item', 'customer'],
       lean: true,
-      sort : {date : 1}
+      sort: { date: 1 }
     }
     var condition = {
       $or: [
@@ -154,7 +154,7 @@ const customModel = {
         condition.customer_id = filter.customer_id
       }
       if (filter.item_id) {
-        condition['details.item_id'] = filter.item_id
+        condition['details'] = { $elemMatch: { item_id: filter.item_id } }
       }
       if (filter.dateFrom && filter.dateTo) {
         condition.$and = [{ date: { $gte: filter.dateFrom } }, { date: { $lte: filter.dateTo } }]
@@ -175,7 +175,7 @@ const customModel = {
         { is_beginning: false },
         { is_beginning: { $exists: false } }
       ],
-      trans_type : type,
+      trans_type: type,
       is_active: true, client_id: client_id
     }
     if (filter) {
@@ -186,7 +186,8 @@ const customModel = {
         condition.customer_id = filter.customer_id
       }
       if (filter.item_id) {
-        condition['details.item_id'] = filter.item_id
+        condition['details'] = { $elemMatch: { item_id: filter.item_id } }
+
       }
       if (filter.dateFrom && filter.dateTo) {
         condition.$and = [{ date: { $gte: filter.dateFrom } }, { date: { $lte: filter.dateTo } }]
@@ -194,7 +195,7 @@ const customModel = {
 
     }
 
-     return await customModel.getModel().aggregate([
+    return await customModel.getModel().aggregate([
       { $match: condition },
       {
         $group: { _id: null, sum: { $sum: "$total_unit_selling" } }
@@ -206,7 +207,7 @@ const customModel = {
     var options = {
       populate: ['item', 'customer'],
       lean: true,
-      sort : {date : 1}
+      sort: { date: 1 }
     }
 
     var condition = {
@@ -224,7 +225,8 @@ const customModel = {
         condition.vendor_id = filter.vendor_id
       }
       if (filter.item_id) {
-        condition['details.item_id'] = filter.item_id
+        condition['details'] = { $elemMatch: { item_id: filter.item_id } }
+
       }
     }
     return await customModel.getModel().paginate({ is_active: true, client_id: client_id, trans_type: "On Credit", ...condition }, { ...options, offset: offset, limit: limit })
@@ -259,7 +261,7 @@ const customModel = {
       total_unit_cost: params.total_unit_cost,
       total_unit_selling: params.total_unit_selling,
       reference_no: params.reference_no,
-      next_payment_date : params.next_payment_date,
+      next_payment_date: params.next_payment_date,
       balance: params.balance,
       total: params.total,
       is_completed: params.is_completed,
