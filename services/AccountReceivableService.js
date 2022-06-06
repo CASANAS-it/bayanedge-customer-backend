@@ -89,10 +89,10 @@ const accountReceivableService = {
   //   await CashJournalModel.create(cashJournal)
   //   return ap
   // },
-  pay: async (params) => {
+  pay: async (params) => {   
     var current = await SalesModel.getById(params.transaction_id)
     var customer = await CustomerModel.getByCustomerId(current.customer_id)
-    var date = moment().add(customer.terms, 'days').format("YYYY-MM-DD")
+    var date = moment(params.date).add(customer.terms, 'days').format("YYYY-MM-DD")
     var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
     params.next_payment_date = date;
     params.balance = newBalance

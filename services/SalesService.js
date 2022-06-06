@@ -69,7 +69,8 @@ const salesService = {
     // -----------------------------
     var customer = await CustomerModel.getByCustomerId(params.customer_id)
     if (params.trans_type == "On Credit") {
-      var date = moment().add(customer.terms, 'days').format("YYYY-MM-DD")
+      var date = moment(params.date).add(customer.terms, 'days').format("YYYY-MM-DD")
+
       params.next_payment_date = date;
 
       params.balance = params.total_unit_selling
@@ -179,7 +180,9 @@ const salesService = {
     }
     var customer = await CustomerModel.getByCustomerId(params.customer_id)
     if (params.trans_type == "On Credit") {
-      var date = moment().add(customer.terms, 'days').format("YYYY-MM-DD")
+      var date = moment(params.date).add(customer.terms, 'days').format("YYYY-MM-DD")
+      console.log(date,customer.terms)
+      console.log(params.date,'date----------')
       params.next_payment_date = date;
 
       params.balance = params.total_unit_selling

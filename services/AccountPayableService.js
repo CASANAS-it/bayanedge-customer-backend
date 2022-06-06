@@ -89,7 +89,7 @@ const accountPayableService = {
   pay: async (params) => {
     var current = await LedgerModel.getById(params.transaction_id)
     var vendor = await VendorModel.getByVendorId(current.vendor_id)
-    var date = moment().add(vendor.terms, 'days').format("YYYY-MM-DD")
+    var date = moment(params.date).add(vendor.terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
     current.next_payment_date = date
     if (current.previous_payment_date == null || params.date > current.previous_payment_date)

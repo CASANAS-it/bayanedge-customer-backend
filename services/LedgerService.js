@@ -90,7 +90,7 @@ const ledgerService = {
     // -----------------------------
     var vendor = await VendorModel.getByVendorId(params.vendor_id)
     if (params.trans_type == "On Credit") {
-      var date = moment().add(vendor.terms, 'days').format("YYYY-MM-DD")
+      var date = moment(params.date).add(vendor.terms, 'days').format("YYYY-MM-DD")
       console.log(date, 'date--------')
       params.next_payment_date = date;
 
@@ -183,7 +183,7 @@ const ledgerService = {
 
     var vendor = await VendorModel.getByVendorId(params.vendor_id)
     if (params.trans_type == "On Credit") {
-      var date = moment().add(vendor.terms, 'days').format("YYYY-MM-DD")
+      var date = moment(params.date).add(vendor.terms, 'days').format("YYYY-MM-DD")
       params.next_payment_date = date;
 
       params.balance = params.total_unit_cost

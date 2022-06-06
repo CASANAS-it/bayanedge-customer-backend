@@ -12,9 +12,10 @@ import CommonMessage from '../classes/CommonMessage'
 // Errors
 import Errors from '../classes/Errors'
 import ErrorManager from '../classes/ErrorManager'
-import { UserType } from '../classes/Constants'
+import { TransType, UserType } from '../classes/Constants'
 import { getPagination, getPagingData } from '../utils/CommonUtil'
 import { loansPayableService } from '../services/LoansPayableService'
+import { beginningBalanceService } from '../services/BeginningBalanceService'
 
 const customControllers = {
     init: router => {
@@ -47,14 +48,23 @@ const customControllers = {
             res.status(safeErr.status).json(safeErr)
         }
     },
+
+
     get: async (req, res) => {
         try {
 
             const { pageIndex, pageSize, client_id } = req.body;
 
             const { limit, offset } = getPagination(pageIndex, pageSize);
+            var beginning;
+            if (pageIndex == 0)
+                beginning = await beginningBalanceService.getByTypeId(client_id, TransType.LOANS_PAYABLE)
             loansPayableService.getAll(limit, offset, client_id).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
+                if (beginning) {
+                    beginning.is_beginning = true
+                    response.rows.push(beginning)
+                }
                 res.send(
                     new CommonMessage({
                         data: response
@@ -67,7 +77,7 @@ const customControllers = {
             res.status(safeErr.status).json(safeErr)
         }
     },
-    
+
     getItems: async (req, res) => {
         try {
 
@@ -145,7 +155,7 @@ const customControllers = {
             res.status(safeErr.status).json(safeErr)
         }
     },
-    
+
     deletePay: async (req, res) => {
         try {
             var data = await loansPayableService.deletePay(req.body)

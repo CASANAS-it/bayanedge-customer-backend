@@ -279,7 +279,7 @@ const loansPayableService = {
   },
 
 
-  beginningPay: async (params) => {
+    beginningPay: async (params) => {
     var current = await BeginningBalanceModel.getById(params.transaction_id)
 
     var newBalance = parseFloat(current.details.balance) - parseFloat(params.amount_paid);

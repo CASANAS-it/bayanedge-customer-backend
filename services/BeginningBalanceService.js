@@ -106,6 +106,8 @@ const beginningBalanceService = {
           date: element.date,
           next_payment_date: element.next_payment_date,
         }
+
+        console.log(element,'ar payment ')
         await SalesModel.create(ar)
       }
     }

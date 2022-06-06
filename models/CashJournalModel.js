@@ -319,7 +319,10 @@ const customModel = {
   getAllNonPosted: async (date) => {
     const items = await customModel.getModel()
       .find({
-        is_posted: false,
+        $and: [
+          { is_posted: false },
+          { is_posted: { $exists: true } }
+        ],
         date: date
       })
       .lean()
