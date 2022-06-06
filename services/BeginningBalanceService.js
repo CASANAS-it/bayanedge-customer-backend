@@ -43,8 +43,8 @@ const beginningBalanceService = {
 
   update: async (params) => {
     if (params.type_id == TransType.ACCOUNTS_PAYABLE || params.type_id == TransType.ACCOUNTS_RECEIVABLE) {
-      var date = moment(params.date, "YYYY-MM-DD").add(params.details.payment_terms, 'days').format("YYYY-MM-DD")
-      params.details.next_payment_date = date;
+      // var date = moment(params.date, "YYYY-MM-DD").add(params.details.payment_terms, 'days').format("YYYY-MM-DD")
+      // params.details.next_payment_date = date;
       params.details.is_completed = false;
       params.details.balance = params.total
     } else if (params.type_id == TransType.MICROSAVINGS) {
