@@ -137,8 +137,10 @@ const accountPayableService = {
     cashJournal.type_id = TransType.ACCOUNTS_PAYABLE;
     cashJournal.flow_type_id = FlowType.OUTFLOW
     await CashJournalModel.create(cashJournal)
-    vendor.available_credit = parseFloat(vendor.available_credit) + parseFloat(params.amount_paid)
-    await VendorModel.updateCredit(vendor)
+    if (vendor.credit_limit) {
+      vendor.available_credit = parseFloat(vendor.available_credit) + parseFloat(params.amount_paid)
+      await VendorModel.updateCredit(vendor)
+    }
 
     return ap
   },

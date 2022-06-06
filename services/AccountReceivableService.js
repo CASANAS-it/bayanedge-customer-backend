@@ -89,7 +89,7 @@ const accountReceivableService = {
   //   await CashJournalModel.create(cashJournal)
   //   return ap
   // },
-  pay: async (params) => {   
+  pay: async (params) => {
     var current = await SalesModel.getById(params.transaction_id)
     var customer = await CustomerModel.getByCustomerId(current.customer_id)
     var date = moment(params.date).add(customer.terms, 'days').format("YYYY-MM-DD")
@@ -124,8 +124,10 @@ const accountReceivableService = {
     cashJournal.type_id = TransType.ACCOUNTS_RECEIVABLE;
     cashJournal.flow_type_id = FlowType.INFLOW
     await CashJournalModel.create(cashJournal)
-    customer.available_credit = parseFloat(customer.available_credit) + parseFloat(params.amount_paid)
-    await CustomerModel.updateCredit(customer)
+    if (customer.credit_limit) {
+      customer.available_credit = parseFloat(customer.available_credit) + parseFloat(params.amount_paid)
+      await CustomerModel.updateCredit(customer)
+    }
 
     return ap
   },
