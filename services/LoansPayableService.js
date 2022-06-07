@@ -23,6 +23,9 @@ const loansPayableService = {
   getAllRepayment: async (limit, offset, client_id) => {
     return await LoansRepaymentModel.getPaginatedItems(limit, offset, client_id)
   },
+  getAllMicrosavingsItems: async (limit, offset, client_id) => {
+    return await CashJournalModel.getPaginatedItemsByTypeIdBeginningOnly(limit, offset, client_id, TransType.MICROSAVINGS)
+  },
   getById: async (id) => {
     var loansPayable = await LoansPayableModel.getById(id)
     if (!loansPayable) {

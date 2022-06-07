@@ -228,7 +228,7 @@ const customModel = {
       populate: ['item', 'customer', 'vendor', 'microsaving'],
       lean: true,
       offset: offset, limit: limit,
-      sort : {date : 1}
+      sort: { date: 1 }
     }
 
     var condition = {
@@ -252,7 +252,7 @@ const customModel = {
       populate: ['item', 'customer', 'vendor', 'microsaving'],
       lean: true,
       offset: offset, limit: limit,
-      sort : {date : 1}
+      sort: { date: 1 }
     }
 
     var condition = {
@@ -279,13 +279,49 @@ const customModel = {
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
 
+  getPaginatedItemsByTypeIdBeginningOnly: async (limit, offset, client_id, type_id) => {
+
+    var options = {
+      populate: ['item', 'customer', 'vendor', 'microsaving'],
+      lean: true,
+      offset: offset, limit: limit,
+      sort: { date: 1 }
+    }
+
+    var condition = {
+      type_id: type_id,
+      $or: [
+        { is_beginning: true },
+        { is_beginning: { $exists: true } }
+      ]
+    };
+    // condition['$and'] = [
+    //   {
+    //     $or: [
+    //       { is_beginning: true },
+    //       { is_beginning: { $exists: true } }
+    //     ]
+    //   },
+
+    //   {
+    //     $or: [
+    //       { 'details.is_beginning': true },
+    //       { 'details.is_beginning': { $exists: true } }
+    //     ]
+    //   }]
+
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id, ...condition }, options)
+
+    // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
+  },
+
   getPaginatedItemsByRefId: async (limit, offset, client_id, search, refId, type_id, is_beginning) => {
 
     var options = {
       populate: ['item', 'customer', 'vendor', 'microsaving'],
       lean: true,
       offset: offset, limit: limit,
-      sort : {date : 1}
+      sort: { date: 1 }
     }
 
     var condition = {

@@ -25,6 +25,8 @@ const customControllers = {
         router.post(baseUrl + '/save', authorize(), customControllers.save)
         router.post(baseUrl + '/', authorize(), customControllers.getById)
         router.post(baseUrl + '/pay', authorize(), customControllers.pay)
+        // router.post(baseUrl + '/microsaving', authorize(), customControllers.getBeginningMicroItems)
+        
         router.post(baseUrl + '/beginning_pay', authorize(), customControllers.beginningPay)
         router.post(baseUrl + '/beginning_pay_edit', authorize(), customControllers.beginningPayEdit)
         router.post(baseUrl + '/beginning_pay_delete', authorize(), customControllers.beginningPayDelete)

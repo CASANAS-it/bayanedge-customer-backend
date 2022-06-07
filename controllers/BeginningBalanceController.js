@@ -15,6 +15,7 @@ import ErrorManager from '../classes/ErrorManager'
 import { UserType } from '../classes/Constants'
 import { getPagination, getPagingData } from '../utils/CommonUtil'
 import { beginningBalanceService } from '../services/BeginningBalanceService'
+import { loansPayableService } from '../services/LoansPayableService'
 
 const customControllers = {
     init: router => {
@@ -26,8 +27,30 @@ const customControllers = {
         router.post(baseUrl + '/pay', authorize(), customControllers.pay)
         router.post(baseUrl + '/types', authorize(), customControllers.setup)
         router.post(baseUrl + '/delete', authorize(), customControllers.delete)
+        router.post(baseUrl + '/microsavings', authorize(), customControllers.getBeginningMicroItems)
+
         router.post(baseUrl + '/get_inventory_total', authorize(), customControllers.getInventoryTotal)
-        
+
+    },
+    getBeginningMicroItems: async (req, res) => {
+        try {
+
+            const { pageIndex, pageSize, client_id } = req.body;
+
+            const { limit, offset } = getPagination(pageIndex, pageSize);
+            loansPayableService.getAllMicrosavingsItems(limit, offset, client_id).then(data => {
+                const response = getPagingData(data, pageIndex, limit);
+                res.send(
+                    new CommonMessage({
+                        data: response
+                    })
+                )
+            }).catch(ex =>{console.log(ex,'----------')})
+
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
     },
 
 
@@ -52,10 +75,10 @@ const customControllers = {
         }
     },
 
-    
+
     getAll: async (req, res) => {
         try {
-            const {  client_id } = req.body;
+            const { client_id } = req.body;
             res.send(
                 new CommonMessage({
                     data: await beginningBalanceService.getAllByClientId(client_id)
@@ -67,7 +90,7 @@ const customControllers = {
             res.status(safeErr.status).json(safeErr)
         }
     },
-    
+
     getById: async (req, res) => {
         try {
 
@@ -82,14 +105,14 @@ const customControllers = {
             res.status(safeErr.status).json(safeErr)
         }
     },
-    
+
     getByTypeId: async (req, res) => {
         try {
 
-            const {client_id, id } = req.body;
+            const { client_id, id } = req.body;
             res.send(
                 new CommonMessage({
-                    data: await beginningBalanceService.getByTypeId(client_id,id)
+                    data: await beginningBalanceService.getByTypeId(client_id, id)
                 })
             )
         } catch (err) {
@@ -97,11 +120,11 @@ const customControllers = {
             res.status(safeErr.status).json(safeErr)
         }
     },
-    
+
     getInventoryTotal: async (req, res) => {
         try {
 
-            const {client_id, id } = req.body;
+            const { client_id, id } = req.body;
             res.send(
                 new CommonMessage({
                     data: await beginningBalanceService.getInventoryTotal(client_id)
