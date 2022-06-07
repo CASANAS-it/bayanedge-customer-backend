@@ -127,6 +127,12 @@ const customModel = {
     })
     return user
   },
+  updateQuantity: async (params) => {
+    const user = await customModel.model.findOneAndUpdate({ item_id: params.item_id }, {
+      quantity : params.quantity
+    })
+    return user
+  },
 
   addQuantity: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ item_id: params.item_id }, {

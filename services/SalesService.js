@@ -182,7 +182,6 @@ const salesService = {
     if (params.trans_type == "On Credit") {
       var date = moment(params.date).add(customer.terms, 'days').format("YYYY-MM-DD")
       console.log(date,customer.terms)
-      console.log(params.date,'date----------')
       params.next_payment_date = date;
 
       params.balance = params.total_unit_selling

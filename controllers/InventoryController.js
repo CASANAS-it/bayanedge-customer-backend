@@ -15,6 +15,7 @@ import ErrorManager from '../classes/ErrorManager'
 import { inventoryService } from '../services/InventoryService'
 import { UserType } from '../classes/Constants'
 import { getPagination, getPagingData } from '../utils/CommonUtil'
+import JobsService from '../services/JobsService'
 
 const customControllers = {
     init: router => {
@@ -68,7 +69,7 @@ const customControllers = {
         try {
 
             const { id, client_id } = req.body;
-
+            // JobsService.cleanUpInventory(client_id,id)
             res.send(
                 new CommonMessage({
                     data: await inventoryService.getSalesPurchaseById(client_id, id)
