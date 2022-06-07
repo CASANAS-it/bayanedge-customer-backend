@@ -162,6 +162,9 @@ const loansPayableService = {
     cashJournal.total = current.interest;
     cashJournal.display_id = params.display_id;
     cashJournal.details = current;
+
+    cashJournal.details.name = "Total Amortization"
+    cashJournal.details.description = "Total Amortization"
     cashJournal.type_id = TransType.LOANS_PROCEED;
     cashJournal.flow_type_id = FlowType.OUTFLOW
     cashJournal.is_posted = postToCashJournal;
@@ -271,6 +274,8 @@ const loansPayableService = {
     cashJournal.total = current.interest;
     cashJournal.display_id = params.display_id;
     cashJournal.details = current;
+    cashJournal.details.name = "Total Amortization"
+    cashJournal.details.description = "Total Amortization"
     cashJournal.type_id = TransType.LOANS_PROCEED;
     cashJournal.flow_type_id = FlowType.OUTFLOW
     cashJournal.is_posted = postToCashJournal;
@@ -279,7 +284,7 @@ const loansPayableService = {
   },
 
 
-    beginningPay: async (params) => {
+  beginningPay: async (params) => {
     var current = await BeginningBalanceModel.getById(params.transaction_id)
 
     var newBalance = parseFloat(current.details.balance) - parseFloat(params.amount_paid);
@@ -343,6 +348,8 @@ const loansPayableService = {
     cashJournal.reference_id = current.transaction_id;
     cashJournal.total = current.details.interest;
     cashJournal.details = current;
+    cashJournal.details.name = "Total Amortization"
+    cashJournal.details.description = "Total Amortization"
     cashJournal.display_id = params.display_id;
     cashJournal.is_beginning = true
     cashJournal.type_id = TransType.LOANS_PROCEED;
