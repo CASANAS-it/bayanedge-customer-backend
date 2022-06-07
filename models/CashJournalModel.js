@@ -290,10 +290,10 @@ const customModel = {
 
     var condition = {
       type_id: type_id,
-      $or: [
-        { is_beginning: true },
-        { is_beginning: { $exists: true } }
-      ]
+      // $or: [
+      //   { is_beginning: true },
+      //   { is_beginning: { $exists: true } }
+      // ]
     };
     // condition['$and'] = [
     //   {
