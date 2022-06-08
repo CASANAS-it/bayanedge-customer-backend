@@ -33,7 +33,7 @@ const reportService = {
 
     if (params.isMonthly) {
       cj = cj.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
-      begBalance = begBalance.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
+      // begBalance = begBalance.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
 
     }
 
