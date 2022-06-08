@@ -31,19 +31,20 @@ const reportService = {
     var opexBeginning = 0, nopexBeginning = 0;
     var otherBeginning = 0, nonFinancialBeginning = 0, loansBeginning = null;
 
-    salesBeginning = begBalance.find(x => x.type_id == TransType.SALES)
-    salesBeginning = salesBeginning ? parseFloat(salesBeginning.total) : 0;
-
-    salesBeginningSelling = begBalance.find(x => x.type_id == TransType.SALES)
-    salesBeginningSelling = salesBeginningSelling ? parseFloat(salesBeginningSelling.details.selling_price) : 0;
-
     if (params.isMonthly) {
       cj = cj.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
       begBalance = begBalance.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
 
     }
 
+    console.log(begBalance,'-----------')
 
+    salesBeginning = begBalance.find(x => x.type_id == TransType.SALES)
+    salesBeginning = salesBeginning ? parseFloat(salesBeginning.total) : 0;
+
+
+    salesBeginningSelling = begBalance.find(x => x.type_id == TransType.SALES)
+    salesBeginningSelling = salesBeginningSelling ? parseFloat(salesBeginningSelling.details.selling_price) : 0;
 
     cogBeginning = begBalance.find(x => x.type_id == TransType.SALES)
     cogBeginning = cogBeginning ? parseFloat(cogBeginning.details.cost_of_goods_sold) : 0;
