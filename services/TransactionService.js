@@ -8,6 +8,7 @@ import LedgerModel from '../models/LedgerModel'
 import LoansPayableModel from '../models/LoansPayableModel'
 import LoansProceedModel from '../models/LoansProceedModel'
 import SalesModel from '../models/SalesModel'
+import { inventoryService } from './InventoryService'
 
 const reportService = {
   getIncomeStatement: async (params) => {
@@ -36,9 +37,6 @@ const reportService = {
       begBalance = begBalance.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
 
     }
-
-    console.log(begBalance,'-----------')
-
     salesBeginning = begBalance.find(x => x.type_id == TransType.SALES)
     salesBeginning = salesBeginning ? parseFloat(salesBeginning.total) : 0;
 
@@ -550,6 +548,8 @@ const reportService = {
     var allSales = await SalesModel.getAllByClientId(params.client_id)
     var allLedger = await LedgerModel.getAllByClientId(params.client_id)
 
+    var inventorySummary = await inventoryService.getSummary(params.client_id)
+
     allLoansProceedCashCJ.forEach(element => {
       if (element.is_beginning) {
         if (element.details.details) {
@@ -690,6 +690,8 @@ const reportService = {
 
 
     var retNetProfitAfterNopex = await reportService.getProfit(params)
+
+
     return [
 
       {
@@ -703,7 +705,7 @@ const reportService = {
       },
       {
         label: "Inventory",
-        detail: Number.isNaN(ledger) ? "0" : ledger + ledgerB
+        detail: Number.isNaN(inventorySummary) ? "0" : inventorySummary
       },
 
       {
@@ -924,9 +926,11 @@ const reportService = {
 
     }
 
+    console.log(begBalance, '-----------')
 
     salesBeginning = begBalance.find(x => x.type_id == TransType.SALES)
     salesBeginning = salesBeginning ? parseFloat(salesBeginning.total) : 0;
+
 
     salesBeginningSelling = begBalance.find(x => x.type_id == TransType.SALES)
     salesBeginningSelling = salesBeginningSelling ? parseFloat(salesBeginningSelling.details.selling_price) : 0;
@@ -978,10 +982,10 @@ const reportService = {
       allLoans = allLoans.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
     }
 
-    allSalesCJ.forEach(element => {
-      sales += parseFloat(element.details.total_unit_selling)
-      salesUnitCost += parseFloat(element.details.total_unit_cost)
-    });
+    // allSalesCJ.forEach(element => {
+    //   sales += parseFloat(element.details.total_unit_selling)
+    //   salesUnitCost += parseFloat(element.details.total_unit_cost)
+    // });
     allArCJ.forEach(element => {
       arPaid += parseFloat(element.total)
     });
@@ -989,6 +993,10 @@ const reportService = {
       if (element.trans_type == "On Credit") {
         arTotal += parseFloat(element.total_unit_selling)
         arTotalUnitCost += parseFloat(element.total_unit_cost)
+      } else {
+        sales += parseFloat(element.total_unit_selling)
+        salesUnitCost += parseFloat(element.total_unit_cost)
+
       }
     });
 
@@ -1043,7 +1051,7 @@ const reportService = {
     var retNonOperatingExpense = retNonOperatingExpenseInterest + retNonOperatingExpenseNonFinancial
 
     var retNetProfitAfterNopex = retNetProfit - retNonOperatingExpense
-    return Number.isNaN(retNetProfitAfterNopex) ? 0 : retNetProfitAfterNopex
+    return isNaN(retNetProfitAfterNopex) ? 0 : retNetProfitAfterNopex
   },
 }
 
