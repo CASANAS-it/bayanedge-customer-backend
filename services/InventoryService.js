@@ -29,14 +29,17 @@ const inventoryService = {
   getSalesPurchaseById: async (clientId, id) => {
     var sales = await SalesModel.getItemDetails(clientId, id)
     var ledger = await LedgerModel.getItemDetails(clientId, id)
-    var details = [...sales,...ledger]
+    var details = [...sales, ...ledger]
     details = details.sort((a, b) => (a.date > b.date) ? 1 : ((b.date > a.date) ? -1 : 0))
     var result = [];
     for (let index = 0; index < details.length; index++) {
       const element = details[index];
-      var findIndex = element.details.findIndex(x => x.item_id == id);
-      if (findIndex >= 0) {
-        result.push({ type: element.type, date: element.date, data: element.details[findIndex] })
+      var data = element.details.filter(x => x.item_id == id);
+      if (data) {
+        for (let ii = 0; ii < data.length; ii++) {
+          const elem = data[ii];
+          result.push({ type: element.type, date: element.date, data: elem })
+        }
       }
     }
     return result

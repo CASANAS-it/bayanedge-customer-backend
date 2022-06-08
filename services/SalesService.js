@@ -93,22 +93,22 @@ const salesService = {
     if (isRefExists)
       throw new Errors.DUPLICATE_REFERENCE()
 
-    // for (let index = 0; index < params.details.length; index++) {
-    //   const item = params.details[index];
-    //   var inv = await InventoryModel.getByItemId(item.item_id)
-    //   var oldInv = oldSales.details.find(x => x.item_id == inv.item_id)
-    //   var quantity = parseFloat(inv.quantity) + parseFloat(oldInv ? oldInv.quantity : 0)
+    for (let index = 0; index < params.details.length; index++) {
+      const item = params.details[index];
+      var inv = await InventoryModel.getByItemId(item.item_id)
+      var oldInv = oldSales.details.find(x => x.item_id == inv.item_id)
+      var quantity = parseFloat(inv.quantity) + parseFloat(oldInv ? oldInv.quantity : 0)
 
-    //   if (quantity < item.quantity) {
-    //     var error = new SafeError({
-    //       status: 200,
-    //       code: 209,
-    //       message: inv.name + " : Insufficient Quantity",
-    //       name: "Sales"
-    //     })
-    //     throw error
-    //   }
-    // }
+      if (quantity < item.quantity) {
+        var error = new SafeError({
+          status: 200,
+          code: 209,
+          message: inv.name + " : Insufficient Quantity",
+          name: "Sales"
+        })
+        throw error
+      }
+    }
 
 
     for (let index = 0; index < params.details.length; index++) {
@@ -197,20 +197,20 @@ const salesService = {
       }
     }
 
-    // // checking of quantity
-    // for (let index = 0; index < params.details.length; index++) {
-    //   const item = params.details[index];
-    //   var inv = await InventoryModel.getByItemId(item.item_id)
-    //   if (inv.quantity < item.quantity) {
-    //     var error = new SafeError({
-    //       status: 200,
-    //       code: 209,
-    //       message: inv.name + " : Insufficient Quantity",
-    //       name: "Sales"
-    //     })
-    //     throw error
-    //   }
-    // }
+    // checking of quantity
+    for (let index = 0; index < params.details.length; index++) {
+      const item = params.details[index];
+      var inv = await InventoryModel.getByItemId(item.item_id)
+      if (inv.quantity < item.quantity) {
+        var error = new SafeError({
+          status: 200,
+          code: 209,
+          message: inv.name + " : Insufficient Quantity",
+          name: "Sales"
+        })
+        throw error
+      }
+    }
 
     for (let index = 0; index < params.details.length; index++) {
       const item = params.details[index];
