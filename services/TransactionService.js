@@ -102,7 +102,7 @@ const reportService = {
       if (element.trans_type == "On Credit") {
         arTotal += parseFloat(element.total_unit_selling)
         arTotalUnitCost += parseFloat(element.total_unit_cost)
-      }else {
+      } else {
         sales += parseFloat(element.total_unit_selling)
         salesUnitCost += parseFloat(element.total_unit_cost)
 
@@ -502,6 +502,9 @@ const reportService = {
     var sales = 0;
     var salesUnitCost = 0;
     var arPaid = 0;
+    var arBalance = 0;
+    var apBalance = 0;
+    var loansProceedBalance = 0;
     var arTotal = 0;
     var arTotalUnitCost = 0;
     var otherCashIncome = 0;
@@ -590,16 +593,18 @@ const reportService = {
       if (element.trans_type == "On Credit") {
         arTotal += parseFloat(element.total_unit_selling)
         arTotalUnitCost += parseFloat(element.total_unit_cost)
-      }else {
+        arBalance += parseFloat(element.balance)
+      } else {
         sales += parseFloat(element.total_unit_selling)
         salesUnitCost += parseFloat(element.total_unit_cost)
-    
+
       }
     });
 
     allLedger.forEach(element => {
       if (element.trans_type == "On Credit")
         apTotal += parseFloat(element.total_unit_cost)
+        apBalance += parseFloat(element.balance)
     });
 
     allDrawingsCJ.forEach(element => {
@@ -609,6 +614,7 @@ const reportService = {
 
     allLoansProceeds.forEach(element => {
       loansProceed += parseFloat(element.total)
+      loansProceedBalance += parseFloat(element.balance)
       // if (element.service_fee)
       // nonFinancial += parseFloat(element.service_fee)
     });
@@ -643,13 +649,13 @@ const reportService = {
           saleB = parseFloat(element.details.selling_price)
           break;
         case TransType.ACCOUNTS_PAYABLE:
-          apB = parseFloat(element.total)
+          apB = parseFloat(element.balance)
           break;
         case TransType.ACCOUNTS_RECEIVABLE:
-          arB = parseFloat(element.total)
+          arB = parseFloat(element.balance)
           break;
         case TransType.LOANS_PAYABLE:
-          loanB = parseFloat(element.total)
+          loanB = parseFloat(element.balance)
           break;
         default:
           break;
@@ -679,7 +685,7 @@ const reportService = {
 
       {
         label: "Accounts Receivables",
-        detail: Number.isNaN(arPaid) ? "0" : arPaid + arB,
+        detail: Number.isNaN(arBalance) ? "0" : arBalance + arB,
       },
       {
         label: "Inventory",
@@ -688,11 +694,11 @@ const reportService = {
 
       {
         label: "Accounts Payable",
-        detail: Number.isNaN(apPaid) ? "0" : apPaid + apB,
+        detail: Number.isNaN(apBalance) ? "0" : apBalance + apB,
       },
       {
         label: "Loans Payable",
-        detail: Number.isNaN(retLoansProceeds) ? "0" : retLoansProceeds + loanB
+        detail: Number.isNaN(loansProceedBalance) ? "0" : loansProceedBalance + loanB
       },
 
       {
