@@ -593,7 +593,9 @@ const reportService = {
       if (element.trans_type == "On Credit") {
         arTotal += parseFloat(element.total_unit_selling)
         arTotalUnitCost += parseFloat(element.total_unit_cost)
-        arBalance += parseFloat(element.balance)
+
+        if (element.balance)
+          arBalance += parseFloat(element.balance)
       } else {
         sales += parseFloat(element.total_unit_selling)
         salesUnitCost += parseFloat(element.total_unit_cost)
@@ -602,10 +604,15 @@ const reportService = {
     });
 
     allLedger.forEach(element => {
-      if (element.trans_type == "On Credit")
+      if (element.trans_type == "On Credit") {
+        // console.log(element.balance, '------------')
+        // console.log(params.client_id, '------------')
         apTotal += parseFloat(element.total_unit_cost)
-        apBalance += parseFloat(element.balance)
+        if (element.balance)
+          apBalance += parseFloat(element.balance)
+      }
     });
+
 
     allDrawingsCJ.forEach(element => {
       drawings += parseFloat(element.total)
@@ -644,18 +651,23 @@ const reportService = {
       switch (element.type_id) {
         case TransType.INVENTORY:
           ledgerB = parseFloat(element.total)
+          ledgerB = isNaN(ledgerB) ? 0 : ledgerB;
           break;
         case TransType.SALES:
           saleB = parseFloat(element.details.selling_price)
+          saleB = isNaN(saleB) ? 0 : saleB;
           break;
         case TransType.ACCOUNTS_PAYABLE:
           apB = parseFloat(element.balance)
+          apB = isNaN(apB) ? 0 : apB;
           break;
         case TransType.ACCOUNTS_RECEIVABLE:
           arB = parseFloat(element.balance)
+          arB = isNaN(arB) ? 0 : arB;
           break;
         case TransType.LOANS_PAYABLE:
-          loanB = parseFloat(element.balance)
+          loanB = parseFloat(element.details.balance)
+          loanB = isNaN(loanB) ? 0 : loanB;
           break;
         default:
           break;
