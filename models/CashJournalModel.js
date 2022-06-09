@@ -201,7 +201,17 @@ const customModel = {
 
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
-
+  // getByRef: async (id, name, client_id) => {
+  //   const item = await customModel.model
+  //     .findOne({
+  //       reference_no: name,
+  //       transaction_id: { $ne: id },
+  //       client_id: client_id,
+  //       is_active: true
+  //     })
+  //     .lean()
+  //   return item
+  // },
   getAllFiltered: async (client_id, flow_id, search = "", type_id = "", filter) => {
 
     var options = {

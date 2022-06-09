@@ -168,6 +168,7 @@ const loansPayableService = {
 
     cashJournal.details.name = "Total Amortization"
     cashJournal.details.description = "Total Amortization"
+    cashJournal.details.reference_no = params.reference_no;
     cashJournal.type_id = TransType.LOANS_PROCEED;
     cashJournal.flow_type_id = FlowType.OUTFLOW
     cashJournal.is_posted = postToCashJournal;
@@ -222,7 +223,7 @@ const loansPayableService = {
     current.balance = newBalance
     current.reference_no = params.reference_no;
     if (params.reference_no) {
-      var isRefExists = await cashJournalService.getByRef(params.transaction_id, params.reference_no, params.client_id, TransType.LOANS_PROCEED)
+      var isRefExists = await CashJournalModel.getByRef(params.transaction_id, params.reference_no, params.client_id, TransType.LOANS_PROCEED)
       if (isRefExists)
         throw new Errors.DUPLICATE_REFERENCE()
     }
@@ -279,6 +280,7 @@ const loansPayableService = {
     cashJournal.details = current;
     cashJournal.details.name = "Total Amortization"
     cashJournal.details.description = "Total Amortization"
+    cashJournal.details.reference_no = params.reference_no;
     cashJournal.type_id = TransType.LOANS_PROCEED;
     cashJournal.flow_type_id = FlowType.OUTFLOW
     cashJournal.is_posted = postToCashJournal;

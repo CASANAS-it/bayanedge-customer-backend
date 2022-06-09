@@ -39,10 +39,19 @@ const customControllers = {
             const { pageIndex, pageSize, client_id } = req.body;
 
             var total = await cashJournalService.getSummaryByType(client_id, TransType.MICROSAVINGS)
+            var beginning;
+            if (pageIndex == 0)
+                beginning = await beginningBalanceService.getByTypeId(client_id, TransType.MICROSAVINGS)
+
             const { limit, offset } = getPagination(pageIndex, pageSize);
             loansPayableService.getAllMicrosavingsItems(limit, offset, client_id).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
                 response.total = total
+                if (beginning) {
+                    beginning.is_beginning = true
+                    response.rows.unshift(beginning)
+                }
+
                 res.send(
                     new CommonMessage({
                         data: response

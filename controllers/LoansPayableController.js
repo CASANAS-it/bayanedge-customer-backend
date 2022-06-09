@@ -26,7 +26,7 @@ const customControllers = {
         router.post(baseUrl + '/', authorize(), customControllers.getById)
         router.post(baseUrl + '/pay', authorize(), customControllers.pay)
         // router.post(baseUrl + '/microsaving', authorize(), customControllers.getBeginningMicroItems)
-        
+
         router.post(baseUrl + '/beginning_pay', authorize(), customControllers.beginningPay)
         router.post(baseUrl + '/beginning_pay_edit', authorize(), customControllers.beginningPayEdit)
         router.post(baseUrl + '/beginning_pay_delete', authorize(), customControllers.beginningPayDelete)
@@ -65,7 +65,7 @@ const customControllers = {
                 const response = getPagingData(data, pageIndex, limit);
                 if (beginning) {
                     beginning.is_beginning = true
-                    response.rows.push(beginning)
+                    response.rows.unshift(beginning)
                 }
                 res.send(
                     new CommonMessage({
