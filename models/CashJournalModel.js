@@ -121,6 +121,20 @@ const customModel = {
       .lean()
     return items
   },
+  getAllByClientIdTypeId: async (id, type_id) => {
+    const items = await customModel.getModel()
+      .find({
+        client_id: id,
+        is_active: true,
+        type_id: type_id,
+        $or: [
+          { is_posted: true },
+          { is_posted: { $exists: false } }
+        ]
+      }).populate('item')
+      .lean()
+    return items
+  },
 
   getAllByClientIdRefId: async (id, refId) => {
     const items = await customModel.getModel()

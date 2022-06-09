@@ -23,6 +23,16 @@ const cashJournalService = {
     }
     return sales
   },
+  getSummaryByType: async (client_id, type_id) => {
+    var beginningBalance = await BeginningBalanceModel.getByClientIdTypeId(client_id, type_id)
+    var total = beginningBalance ? parseFloat(beginningBalance.details.beginning_amount) : 0;
+
+    var cj = await CashJournalModel.getAllByClientIdTypeId(client_id, type_id)
+    cj.forEach(element => {
+      total += parseFloat(element.total)
+    });
+    return total
+  },
   getSummary: async (params) => {
     var cj = await CashJournalModel.getAllByClientId(params.client_id)
     var begBalance = await BeginningBalanceModel.getAllByClientId(params.client_id)

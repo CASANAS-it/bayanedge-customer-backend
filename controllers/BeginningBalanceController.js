@@ -12,10 +12,11 @@ import CommonMessage from '../classes/CommonMessage'
 // Errors
 import Errors from '../classes/Errors'
 import ErrorManager from '../classes/ErrorManager'
-import { UserType } from '../classes/Constants'
+import { TransType, UserType } from '../classes/Constants'
 import { getPagination, getPagingData } from '../utils/CommonUtil'
 import { beginningBalanceService } from '../services/BeginningBalanceService'
 import { loansPayableService } from '../services/LoansPayableService'
+import { cashJournalService } from '../services/CashJournalService'
 
 const customControllers = {
     init: router => {
@@ -37,15 +38,17 @@ const customControllers = {
 
             const { pageIndex, pageSize, client_id } = req.body;
 
+            var total = await cashJournalService.getSummaryByType(client_id, TransType.MICROSAVINGS)
             const { limit, offset } = getPagination(pageIndex, pageSize);
             loansPayableService.getAllMicrosavingsItems(limit, offset, client_id).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
+                response.total = total
                 res.send(
                     new CommonMessage({
                         data: response
                     })
                 )
-            }).catch(ex =>{console.log(ex,'----------')})
+            }).catch(ex => { console.log(ex, '----------') })
 
         } catch (err) {
             const safeErr = ErrorManager.getSafeError(err)
