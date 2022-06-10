@@ -61,6 +61,7 @@ const OpexType = Object.freeze({
   REPAIRS_MAINTENANCE : "Repairs & Maintenance Expense",
   SUBSCRIPTION_FEES : "Subscription Fees",
   TAXES_LICENSES : "Taxes & Licenses",
+  OTHER_EXPENSE : "Other expenses"
 
 })
 

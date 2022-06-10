@@ -13,6 +13,8 @@ const customModel = {
     const transactionTypeSchema = new mongoose.Schema({
       name: {
         type: 'String'
+      }, sort: {
+        type: 'Number'
       }
     })
 
@@ -36,7 +38,7 @@ const customModel = {
   },
   getAll: async () => {
     return await customModel.getModel()
-      .find()
+      .find().sort({sort : 1})
       .select(['-_id', '-__v'])
       .lean()
   },
@@ -45,9 +47,10 @@ const customModel = {
       name: name,
     }).lean()
   },
-  createType: async ({ name}) => {
+  createType: async ({ name, sort }) => {
     const transactionType = new customModel.model({
       name: name,
+      sort: sort
     })
 
     return await transactionType.save()

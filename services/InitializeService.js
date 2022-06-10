@@ -36,20 +36,21 @@ const initializeService = {
     Logger.info('******************************')
     Logger.info('****Initializing Nopex Type****')
     Logger.info('******************************')
-    await OperatingExpenseTypeModel.createType({ name: OpexType.SALARIES_WAGES })
-    await OperatingExpenseTypeModel.createType({ name: OpexType.MONTH_PAY })
-    await OperatingExpenseTypeModel.createType({ name: OpexType.LIGHT_WATER })
-    await OperatingExpenseTypeModel.createType({ name: OpexType.RENTAL })
-    await OperatingExpenseTypeModel.createType({ name: OpexType.COMMUNICATIONS })
-    await OperatingExpenseTypeModel.createType({ name: OpexType.TRANSPORTATION })
-    await OperatingExpenseTypeModel.createType({ name: OpexType.REPRESENTATION })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.SALARIES_WAGES,sort : 1 })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.MONTH_PAY,sort : 2  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.RENTAL,sort : 3  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.LIGHT_WATER,sort : 4  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.TRANSPORTATION,sort : 5  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.REPRESENTATION,sort : 6  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.COMMUNICATIONS,sort : 7  })
 
-    await OperatingExpenseTypeModel.createType({ name: OpexType.ADVERTISING_PROMO })
-    await OperatingExpenseTypeModel.createType({ name: OpexType.OFFICE_SUPPLIES })
-    await OperatingExpenseTypeModel.createType({ name: OpexType.REPAIRS_MAINTENANCE })
-    await OperatingExpenseTypeModel.createType({ name: OpexType.SUBSCRIPTION_FEES })
-    await OperatingExpenseTypeModel.createType({ name: OpexType.TAXES_LICENSES })
-    
+    await OperatingExpenseTypeModel.createType({ name: OpexType.OFFICE_SUPPLIES,sort : 8  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.REPAIRS_MAINTENANCE,sort :9   })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.SUBSCRIPTION_FEES,sort : 10  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.ADVERTISING_PROMO,sort : 11  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.TAXES_LICENSES,sort : 12  })
+    // await OperatingExpenseTypeModel.createType({ name: OpexType.OTHER_EXPENSE,sort : 13  })
+
   },
 
   initializeData: async () => {
