@@ -47,12 +47,12 @@ function makeid(length) {
   var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   var charactersLength = characters.length;
   for (var i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() *
-          charactersLength));
+    result += characters.charAt(Math.floor(Math.random() *
+      charactersLength));
   }
   return result;
 }
-function generateDisplayId (){
+function generateDisplayId() {
   var id = "00000" + (Date.now()) + makeid(4)
   return id;
 }
@@ -62,14 +62,26 @@ function padZeroes(num, size = 6) {
   while (num.length < size) num = "0" + num;
   return num;
 }
-function compare( a, b, field ) {
-  if ( a[field] < b[field] ){
+function compare(a, b, field) {
+  if (a[field] < b[field]) {
     return -1;
   }
-  if ( a[field] > b[field] ){
+  if (a[field] > b[field]) {
     return 1;
   }
   return 0;
+}
+
+function isNumber(str) {
+  if (typeof str !== 'string') {
+    return false;
+  }
+
+  if (str.trim() === '') {
+    return false;
+  }
+
+  return !isNaN(str);
 }
 
 export {
@@ -81,5 +93,6 @@ export {
   getPagingData,
   generateDisplayId,
   padZeroes,
-  compare
+  compare,
+  isNumber
 }

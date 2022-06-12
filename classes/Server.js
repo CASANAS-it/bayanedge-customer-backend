@@ -3,6 +3,7 @@ import express from 'express'
 import http from 'http'
 import bodyParser from 'body-parser'
 import path from 'path'
+import CsvUpload from 'express-fileupload'
 
 // Swagger
 import swaggerUi from 'swagger-ui-express'
@@ -69,6 +70,10 @@ class Server {
     // End Init Database
 
     // Add parser
+    // const bodyParser = require("body-parser");
+    // const CsvUpload = require("express-fileupload");
+
+    this.app.use(CsvUpload());
     this.app.use(bodyParser.json())
     this.app.use(bodyParser.urlencoded({ extended: true }))
     this.app.use(Logger.expressMiddleware)

@@ -55,6 +55,7 @@ const ErrorMessages = Object.freeze({
   
   DUPLICATE_ENTRY: { status: 200, message: 'Name already exists', code: 601 },
   DUPLICATE_REF: { status: 200, message: 'REF already exists', code: 602 },
+  NO_DATA: { status: 200, message: 'No data found.', code: 603 },
   
 })
 

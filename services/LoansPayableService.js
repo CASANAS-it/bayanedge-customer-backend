@@ -253,7 +253,6 @@ const loansPayableService = {
     }
 
     var ap = await LoansPayableModel.pay(params)
-    console.log(newBalance, '---------')
     if (newBalance >= 0) {
       await LoansPayableModel.markAsCompleted(ap)
     }

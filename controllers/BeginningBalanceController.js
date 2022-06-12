@@ -57,7 +57,7 @@ const customControllers = {
                         data: response
                     })
                 )
-            }).catch(ex => { console.log(ex, '----------') })
+            }).catch(ex => { })
 
         } catch (err) {
             const safeErr = ErrorManager.getSafeError(err)

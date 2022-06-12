@@ -15,6 +15,9 @@ const customModel = {
       client_id: {
         type: 'String'
       },
+      product_code: {
+        type: 'String'
+      },
       name: {
         type: 'String'
       },
@@ -114,6 +117,18 @@ const customModel = {
       .lean()
     return item
   },
+  
+  getByProductCode: async (id, name, client_id) => {
+    const item = await customModel.model
+      .findOne({
+        product_code: name,
+        item_id: { $ne: id },
+        client_id: client_id,
+        is_active: true
+      })
+      .lean()
+    return item
+  },
   update: async (params) => {
     const user = await customModel.model.findOneAndUpdate({ item_id: params.item_id }, {
       name: params.name,
@@ -122,6 +137,7 @@ const customModel = {
       unit_of_measurement: params.unit_of_measurement,
       // quantity: params.quantity,
       // beginning_quantity: params.beginning_quantity,
+      product_code : params.product_code,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
@@ -171,6 +187,7 @@ const customModel = {
       unit_of_measurement: params.unit_of_measurement,
       quantity: params.beginning_quantity,
       beginning_quantity: params.beginning_quantity,
+      product_code : params.product_code,
       is_active: true,
       created_by: params.admin_id,
       created_date: new Date(),

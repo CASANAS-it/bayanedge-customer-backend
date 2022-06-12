@@ -16,6 +16,10 @@ import { inventoryService } from '../services/InventoryService'
 import { UserType } from '../classes/Constants'
 import { getPagination, getPagingData } from '../utils/CommonUtil'
 import JobsService from '../services/JobsService'
+import csv from 'csvtojson'
+import fs from 'fs'
+import { Readable } from 'stream'
+
 
 const customControllers = {
     init: router => {
@@ -25,9 +29,31 @@ const customControllers = {
         router.post(baseUrl + '/save', authorize(), customControllers.save)
         router.post(baseUrl + '/', authorize(), customControllers.getById)
         router.post(baseUrl + '/delete', authorize(), customControllers.delete)
+        router.post(baseUrl + '/upload', authorize(), customControllers.upload)
     },
 
 
+    upload: async (req, res) => {
+        try {
+
+            const { pageIndex, pageSize, client_id, search, admin_id } = req.body;
+
+            var stream = Readable.from(req.files.file.data.toString())
+            var payload = await csv().fromStream(stream)
+
+            var data = await inventoryService.uploadFile(admin_id, client_id, payload)
+            res.send(
+                new CommonMessage({
+                    data: data,
+                })
+            )
+            // })
+
+        } catch (err) {
+            const safeErr = ErrorManager.getSafeError(err)
+            res.status(safeErr.status).json(safeErr)
+        }
+    },
     get: async (req, res) => {
         try {
 

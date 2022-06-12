@@ -110,7 +110,6 @@ const accountReceivableService = {
       if (isRefExists)
         throw new Errors.DUPLICATE_REFERENCE()
     }
-    console.log(params, '------------')
     var ap = await SalesModel.pay(params);
     if (newBalance === 0) {
       await SalesModel.markAsComplete(params.transaction_id, params.admin_id)

@@ -262,7 +262,6 @@ const reportService = {
       cj = cj.filter(x => x.date >= params.dateFrom && x.date <= params.dateTo)
     }
     var allSalesCJ = cj.filter(x => x.type_id === TransType.SALES)
-    // console.log(allSalesCJ.length,'allSalesCount----')
     var allArCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE)
     var allInventoryLedgerCJ = cj.filter(x => x.type_id === TransType.LEDGER)
     var allApCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_PAYABLE)
@@ -607,8 +606,6 @@ const reportService = {
 
     allLedger.forEach(element => {
       if (element.trans_type == "On Credit") {
-        // console.log(element.balance, '------------')
-        // console.log(params.client_id, '------------')
         apTotal += parseFloat(element.total_unit_cost)
         if (element.balance)
           apBalance += parseFloat(element.balance)
@@ -776,7 +773,6 @@ const reportService = {
       cj = cj.filter(x => x.date < params.dateFrom)
     }
     var allSalesCJ = cj.filter(x => x.type_id === TransType.SALES)
-    // console.log(allSalesCJ.length,'allSalesCount----')
     var allArCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_RECEIVABLE)
     var allInventoryLedgerCJ = cj.filter(x => x.type_id === TransType.LEDGER)
     var allApCJ = cj.filter(x => x.type_id === TransType.ACCOUNTS_PAYABLE)
@@ -933,7 +929,6 @@ const reportService = {
 
     }
 
-    console.log(begBalance, '-----------')
 
     salesBeginning = begBalance.find(x => x.type_id == TransType.SALES)
     salesBeginning = salesBeginning ? parseFloat(salesBeginning.total) : 0;
