@@ -18,6 +18,7 @@ const ErrorMessages = Object.freeze({
   LASTNAME_IS_REQUIRED: { status: 200, message: 'Last Name is required', code: 110 },
   SITENAME_IS_REQUIRED: { status: 200, message: 'Site Name is required', code: 111 },
   USERNAME_IS_REQUIRED: { status: 200, message: 'Account Reference is required', code: 112 },
+  RECORD_ALREADY_EXISTS: { status: 200, message: 'Record already exists.', code: 113 },
 
   // 200 series
   INVALID_MERCHANT_CODE: { status: 200, message: 'Invalid merchant code', code: 201 },
@@ -25,7 +26,10 @@ const ErrorMessages = Object.freeze({
   INVALID_VOUCHER_CODE: { status: 200, message: 'Invalid voucher code', code: 203 },
   INVALID_AMOUNT: { status: 200, message: 'Invalid amount', code: 204 },
   DUPLICATE_REFERENCE: { status: 200, message: 'Duplicate reference number', code: 205 },
-
+  NO_BEGINNING_BALANCE: { status: 200, message: 'Please set beginning balance first.',code : 206 },
+  BEGINNING_BALANCE_DELETE_ERROR_DATA: { status: 200, message: 'Can not delete beginning balance. Transaction already exists.',code : 207 },
+  EDIT_ERROR_WITH_EXISTING_DATA: { status: 200, message: 'Can not update data. Transaction already exists.',code : 208 },
+  INSUFFICIENT_QUANTITY: { status: 200, message: 'Insufficient Quantity.',code : 209 },
   // 300 series
   API_RESPONSE: { status: 200, message: '{}', code: 300 },
 
@@ -43,7 +47,16 @@ const ErrorMessages = Object.freeze({
   TRANSACTION_ERROR: { status: 500, message: 'Transaction Error Occured' },
   UNKNOWN_DB: { status: 500, message: 'Unknown DB error' },
   OLD_PWD_NOT_VALID: { status: 500, message: 'Old password not valid' },
-  PWD_ADMIN_NOT_VALID: { status: 500, message: 'Password admin not valid' }
+  PWD_ADMIN_NOT_VALID: { status: 500, message: 'Password admin not valid' },
+  INVALID_CURRENT_PASSWORD: { status: 500, message: 'Invalid Current Password' },
+  CHANGE_PASSWORD_FAILED: { status: 500, message: 'Change password failed' },
+  
+  TRANSACTION_DELETE_ERROR: { status: 400, message: 'Tranasaction Completed, cannot delete the transaction' },
+  
+  DUPLICATE_ENTRY: { status: 200, message: 'Name already exists', code: 601 },
+  DUPLICATE_REF: { status: 200, message: 'REF already exists', code: 602 },
+  NO_DATA: { status: 200, message: 'No data found.', code: 603 },
+  
 })
 
 export default ErrorMessages

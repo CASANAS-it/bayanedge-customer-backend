@@ -2,8 +2,8 @@ import Errors from '../classes/Errors'
 import AssetModel from '../models/AssetModel'
 
 const assetService = {
-  getAll: async (limit, offset) => {
-    return await AssetModel.getPaginatedItems(limit, offset)
+  getAll: async (limit, offset,client_id) => {
+    return await AssetModel.getPaginatedItems(limit, offset,client_id)
   },
   getById: async (id) => {
     var asset = await AssetModel.getByAssetId(id)
@@ -11,6 +11,10 @@ const assetService = {
       throw new Errors.NO_RECORDS_FOUND()
     }
     return asset
+  },
+  hasAssetByClient: async (id) => {
+    var assets = await AssetModel.getByClientId(id)
+    return assets !== null ? true  : false
   },
   update: async (params) => {
     return await AssetModel.update(params)

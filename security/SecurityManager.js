@@ -33,10 +33,12 @@ export const authorize = (accessLevel) => {
         let decodedUser = null
         try {
           decodedUser = jsonwebtoken.verify(token, properties.tokenSecret)
+          req.body.admin_id = decodedUser.id
+          req.body.client_id = decodedUser.client_id
         } catch (err) {
           // Token not valid
           const safeErr = ErrorManager.getSafeError(new Errors.JWT_INVALID())
-          return res.status(safeErr.status).json(safeErr.body)
+          return res.status(401).json(safeErr.body)
         }
 
         // const hasAccess = await AccessModel.getUserByAccessLevel({ accessLevel, loginId: decodedUser.login_id })

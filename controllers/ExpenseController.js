@@ -22,18 +22,18 @@ const customControllers = {
         router.post(baseUrl + '/get', authorize(), customControllers.get)
         router.post(baseUrl + '/save', authorize(), customControllers.save)
         router.post(baseUrl + '/', authorize(), customControllers.getById)
-        router.post(baseUrl + '/delete', customControllers.delete)
+        router.post(baseUrl + '/delete', authorize(), customControllers.delete)
     },
 
 
     get: async (req, res) => {
         try {
 
-            const { pageNo, pageSize } = req.body;
+            const { pageIndex, pageSize, client_id } = req.body;
 
-            const { limit, offset } = getPagination(pageNo, pageSize);
-            expenseService.getAll(limit, offset).then(data => {
-                const response = getPagingData(data, pageNo, limit);
+            const { limit, offset } = getPagination(pageIndex, pageSize);
+            expenseService.getAll(limit, offset,client_id).then(data => {
+                const response = getPagingData(data, pageIndex, limit);
                 res.send(
                     new CommonMessage({
                         data: response

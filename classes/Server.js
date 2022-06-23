@@ -3,6 +3,7 @@ import express from 'express'
 import http from 'http'
 import bodyParser from 'body-parser'
 import path from 'path'
+import CsvUpload from 'express-fileupload'
 
 // Swagger
 import swaggerUi from 'swagger-ui-express'
@@ -34,12 +35,28 @@ import ExpenseController from '../controllers/ExpenseController'
 import EquityController from '../controllers/EquityController'
 import LiabilityController from '../controllers/LiabilityController'
 import RevenueController from '../controllers/RevenueController'
+import EnterpriseController from '../controllers/EnterpriseController'
+import SalesController from '../controllers/SalesController'
+import LedgerController from '../controllers/LedgerController'
+import AccountPayableController from '../controllers/AccountPayableController'
+import AccountReceivableController from '../controllers/AccountReceivableController'
+import CashJournalController from '../controllers/CashJournalController'
+import LoansPayableController from '../controllers/LoansPayableController'
+import LoansPayableItemController from '../controllers/LoansPayableItemController'
+import CashInflowController from '../controllers/CashInflowController'
+import CashOutflowController from '../controllers/CashOutflowController'
+import LoansProceedController from '../controllers/LoansProceedController'
+import BeginningBalanceController from '../controllers/BeginningBalanceController'
+import LoansRepaymentController from '../controllers/LoansRepaymentController'
+import { loansProceedService } from '../services/LoansProceedService'
+import JobsService from '../services/JobsService'
+import ReportsController from '../controllers/ReportsController'
 
 const cron = require('node-cron')
 // End Import Controllers
 
 class Server {
-  constructor () {
+  constructor() {
     this.app = express()
   }
 
@@ -47,12 +64,16 @@ class Server {
    * Start the server
    * @returns {Promise<void>}
    */
-  async init () {
+  async init() {
     // Start Init Database
     Database.init()
     // End Init Database
 
     // Add parser
+    // const bodyParser = require("body-parser");
+    // const CsvUpload = require("express-fileupload");
+
+    this.app.use(CsvUpload());
     this.app.use(bodyParser.json())
     this.app.use(bodyParser.urlencoded({ extended: true }))
     this.app.use(Logger.expressMiddleware)
@@ -99,15 +120,30 @@ class Server {
     EquityController.init(router)
     LiabilityController.init(router)
     RevenueController.init(router)
+    EnterpriseController.init(router)
+    SalesController.init(router)
+    LedgerController.init(router)
+    AccountPayableController.init(router)
+    AccountReceivableController.init(router)
+    CashJournalController.init(router)
+    LoansPayableController.init(router)
+    LoansPayableItemController.init(router)
+    CashInflowController.init(router)
+    CashOutflowController.init(router)
+    LoansProceedController.init(router)
+    BeginningBalanceController.init(router)
+    LoansRepaymentController.init(router)
+    ReportsController.init(router)
     // End Init Controllers
 
     this.app.use('/', router)
 
     console.log('Started running Batch Job Process')
-    // cron.schedule('*/5 * * * *', async () => {
-    //   console.log('Running validating jobs')
-    //   await JobsService.updateJobs()
-    // })
+    cron.schedule('0 1 * * *', async () => {
+      console.log('Running validating jobs')
+
+      await JobsService.run()
+    })
   }
 }
 

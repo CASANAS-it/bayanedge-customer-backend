@@ -30,7 +30,6 @@ function validateStringValue(val) {
 function getPagination(page, size) {
   const limit = size ? +size : 3;
   const offset = page ? page * limit : 0;
-
   return { limit, offset };
 }
 
@@ -42,11 +41,58 @@ function getPagingData(data, page, limit) {
   return { totalItems, rows, totalPages, currentPage };
 }
 
+
+function makeid(length) {
+  var result = '';
+  var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() *
+      charactersLength));
+  }
+  return result;
+}
+function generateDisplayId() {
+  var id = "00000" + (Date.now()) + makeid(4)
+  return id;
+}
+
+function padZeroes(num, size = 6) {
+  num = num.toString();
+  while (num.length < size) num = "0" + num;
+  return num;
+}
+function compare(a, b, field) {
+  if (a[field] < b[field]) {
+    return -1;
+  }
+  if (a[field] > b[field]) {
+    return 1;
+  }
+  return 0;
+}
+
+function isNumber(str) {
+  if (typeof str !== 'string') {
+    return false;
+  }
+
+  if (str.trim() === '') {
+    return false;
+  }
+
+  return !isNaN(str);
+}
+
 export {
   getUserFromToken,
   getTransactionType,
   getUserType,
   validateStringValue,
   getPagination,
-  getPagingData
+  getPagingData,
+  generateDisplayId,
+  padZeroes,
+  compare,
+  isNumber
 }

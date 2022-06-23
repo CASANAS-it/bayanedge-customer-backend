@@ -3,7 +3,12 @@ import AssetTypeModel from '../models/AssetTypeModel'
 import LiabilityTypeModel from '../models/LiabilityTypeModel'
 import RevenueTypeModel from '../models/RevenueTypeModel';
 import EquityTypeModel from '../models/EquityTypeModel';
+import TransactionTypeModel from '../models/TransactionTypeModel';
+import CustomerModel from '../models/CustomerModel';
+import VendorModel from '../models/VendorModel'
 import { AssetType } from '../classes/Constants';
+import InventoryModel from '../models/InventoryModel';
+import NonOperatingExpenseTypeModel from '../models/OperatingExpenseTypeModel';
 
 
 const lookupService = {
@@ -13,15 +18,32 @@ const lookupService = {
   getAllExpenseType: async () => {
     return await ExpenseTypeModel.getAll()
   },
-   getAllEquityType: async () => {
+  getAllEquityType: async () => {
     return await EquityTypeModel.getAll()
-  }, 
+  },
   getAllLiabilityType: async () => {
     return await LiabilityTypeModel.getAll()
   },
-   getAllRevenueType: async () => {
+  getAllRevenueType: async () => {
     return await RevenueTypeModel.getAll()
   },
+  getAllTransactionType: async () => {
+    return await TransactionTypeModel.getAll()
+  },
+  getAllCustomer: async (clientId) => {
+    return await CustomerModel.getAllByClientId(clientId)
+  },
+  getAllVendor: async (clientId) => {
+    return await VendorModel.getAllByClientId(clientId)
+  },
+  getAllItem : async (clientId) => {
+    return await InventoryModel.getAllByClientId(clientId)
+  },
+  
+  getAllOpexType : async (clientId) => {
+    return await NonOperatingExpenseTypeModel.getAll(clientId)
+  },
+
 }
 
 

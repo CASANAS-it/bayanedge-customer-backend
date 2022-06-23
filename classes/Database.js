@@ -21,12 +21,21 @@ import LiabilityModel from '../models/LiabilityModel'
 import AssetModel from '../models/AssetModel'
 import ExpenseModel from '../models/ExpenseModel'
 import EquityModel from '../models/EquityModel'
-
-// Start Import Models
-
-
-// End Import Models
-
+import ClientUserModel from '../models/ClientUserModel'
+import EnterpriseModel from '../models/EnterpriseModel'
+import TransactionTypeModel from '../models/TransactionTypeModel'
+import SalesModel from '../models/SalesModel'
+import LedgerModel from '../models/LedgerModel'
+import CashJournalModel from '../models/CashJournalModel'
+import AccountPayableModel from '../models/AccountPayableModel'
+import AccountReceivableModel from '../models/AccountReceivableModel'
+import LoansPayableItemModel from '../models/LoansPayableItemModel'
+import LoansPayableModel from '../models/LoansPayableModel'
+import LoansProceedModel from '../models/LoansProceedModel'
+import BeginningBalanceModel from '../models/BeginningBalanceModel'
+import LoansRepaymentModel from '../models/LoansRepaymentModel'
+import JobsModel from '../models/JobsModel'
+import OperatingExpenseTypeModel from '../models/OperatingExpenseTypeModel'
 /**
  * Connection to DB
  */
@@ -57,6 +66,21 @@ class Database {
     ExpenseModel.init()
     EquityModel.init()
     LiabilityModel.init()
+    ClientUserModel.init()
+    EnterpriseModel.init()
+    TransactionTypeModel.init()
+    SalesModel.init()
+    LedgerModel.init()
+    CashJournalModel.init()
+    AccountPayableModel.init()
+    AccountReceivableModel.init()
+    LoansPayableItemModel.init()
+    LoansPayableModel.init()
+    LoansProceedModel.init()
+    BeginningBalanceModel.init()
+    LoansRepaymentModel.init()
+    OperatingExpenseTypeModel.init()
+    JobsModel.init()
     // End Init Models
   }
 

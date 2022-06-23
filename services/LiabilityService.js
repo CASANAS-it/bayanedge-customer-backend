@@ -2,8 +2,12 @@ import Errors from '../classes/Errors'
 import LiabilityModel from '../models/LiabilityModel'
 
 const liabilityService = {
-  getAll: async (limit, offset) => {
-    return await LiabilityModel.getPaginatedItems(limit, offset)
+  getAll: async (limit, offset,client_id) => {
+    return await LiabilityModel.getPaginatedItems(limit, offset,client_id)
+  },
+  hasLiabilityByClient: async (id) => {
+    var items = await LiabilityModel.getByClientId(id)
+    return items !== null ? true  : false
   },
   getById: async (id) => {
     var liability = await LiabilityModel.getByLiabilityId(id)

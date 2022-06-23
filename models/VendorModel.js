@@ -8,10 +8,16 @@ const customModel = {
   init() {
     const db = Database.getConnection()
     const vendorSchema = new mongoose.Schema({
-      id: {
+      vendor_id: {
         type: 'String'
       },
-      name: {
+      client_id: {
+        type: 'String'
+      },
+      vendor_name: {
+        type: 'String'
+      },
+      reference_no: {
         type: 'String'
       },
       address: {
@@ -19,6 +25,15 @@ const customModel = {
       },
       contact_information: {
         type: 'Object'
+      },
+      terms: {
+        type: "Number"
+      },
+      credit_limit: {
+        type: "Number"
+      },
+      available_credit: {
+        type: "Number"
       },
       account_number: {
         type: 'String'
@@ -57,32 +72,74 @@ const customModel = {
       .select(['-_id', '-__v'])
       .lean()
   },
-  getPaginatedItems: async (limit, offset) => {
-    return await customModel.getModel().paginate({ is_active: true }, { offset: offset, limit: limit })
 
+  getAllByClientId: async (id) => {
+    const items = await customModel.model
+      .find({
+        client_id: id,
+        is_active: true
+      }, [], { sort: { vendor_name: 1 } })
+      .lean()
+    return items
+  },
+  getByClientId: async (id) => {
+    const items = await customModel.model
+      .findOne({
+        client_id: id,
+      })
+      .lean()
+    return items
+  },
+  getPaginatedItems: async (limit, offset, client_id) => {
+    return await customModel.getModel().paginate({ is_active: true, client_id: client_id }, { offset: offset, limit: limit, sort: { vendor_name: 1 } })
   },
   getByVendorId: async (id) => {
     const vendor = await customModel.model
       .findOne({
-        id: id,
-        is_active : true
+        vendor_id: id,
+        is_active: true
       })
       .lean()
     return vendor
   },
+
+
+  getByVendorName: async (id, name, clientId) => {
+    const customer = await customModel.model
+      .findOne({
+        vendor_id: { $ne: id },
+        vendor_name: name,
+        client_id: clientId,
+        is_active: true
+      })
+      .lean()
+    return customer
+  },
+  updateCredit: async (params) => {
+    const item = await customModel.model.findOneAndUpdate({ vendor_id: params.vendor_id }, {
+      available_credit: params.available_credit,
+      modified_by: params.admin_id,
+      modified_date: new Date(),
+    })
+    return item
+  },
   update: async (params) => {
-    const item = await customModel.model.findOneAndUpdate({ id: params.id }, {
-      name: params.name,
+    const item = await customModel.model.findOneAndUpdate({ vendor_id: params.vendor_id }, {
+      vendor_name: params.vendor_name,
       address: params.address,
       contact_information: params.contact_information,
       account_number: params.account_number,
+      terms: params.terms,
+      credit_limit: params.credit_limit,
+      reference_no: params.reference_no,
+      available_credit: params.credit_limit,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })
     return item
   },
   delete: async (params) => {
-    const item = await customModel.model.findOneAndUpdate({ id: params.id }, {
+    const item = await customModel.model.findOneAndUpdate({ vendor_id: params.vendor_id }, {
       is_active: false,
       modified_by: params.admin_id,
       modified_date: new Date(),
@@ -90,17 +147,22 @@ const customModel = {
     return item
   },
   create: async (params) => {
-    Logger.info('Creating vendor ' + params.name)
+    Logger.info('Creating vendor ' + params.vendor_name)
     const id = generateId()
     const vendor = new customModel.model({
-      id: id,
-      name: params.name,
+      vendor_id: id,
+      vendor_name: params.vendor_name,
+      client_id: params.client_id,
       address: params.address,
+      reference_no: params.reference_no,
       contact_information: params.contact_information,
-      account_number : params.account_number,
+      account_number: params.account_number,
       is_active: true,
       created_by: params.admin_id,
-      create_date: new Date(),
+      created_date: new Date(),
+      terms: params.terms,
+      available_credit: params.credit_limit,
+      credit_limit: params.credit_limit,
       modified_by: params.admin_id,
       modified_date: new Date(),
     })

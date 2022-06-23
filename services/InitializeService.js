@@ -5,6 +5,7 @@ import LiabilityTypeModel from '../models/LiabilityTypeModel'
 import ExpenseTypeModel from '../models/ExpenseTypeModel'
 import EquityTypeModel from '../models/EquityTypeModel'
 import UserModel from '../models/UserModel'
+import TransactionTypeModel from '../models/TransactionTypeModel'
 import {
   AssetType,
   LiabilityType,
@@ -12,26 +13,44 @@ import {
   ExpenseType,
   UserType,
   EquityType,
+  TransactionType,
+  OpexType,
 } from '../classes/Constants'
+import OperatingExpenseTypeModel from '../models/OperatingExpenseTypeModel'
 
 const initializeService = {
 
   init: async () => {
-    Logger.info('CHECKING')
-    const adminCount = await UserModel.getAll()
-    if (adminCount.length === 0) {
-      Logger.info('****************************')
-      Logger.info('****Create Admin Account****')
-      Logger.info('****************************')
-      await UserModel.createAdminUser()
-    }
+    const count = await TransactionTypeModel.getAll()
 
-    const count = await AssetTypeModel.getAll()
-
-    if (count.length === 0) {
-      Logger.info('INITIALIZATION STARTED')
-      await initializeService.initializeData()
+    // if (count.length === 0) {
+    //   Logger.info('INITIALIZATION STARTED')
+    //   await initializeService.initializeData()
+    // }
+    var countType = await OperatingExpenseTypeModel.getAll()
+    if (countType.length === 0) {
+      await initializeService.initializeNopexType()
     }
+  },
+  initializeNopexType: async () => {
+    Logger.info('******************************')
+    Logger.info('****Initializing Nopex Type****')
+    Logger.info('******************************')
+    await OperatingExpenseTypeModel.createType({ name: OpexType.SALARIES_WAGES,sort : 1 })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.MONTH_PAY,sort : 2  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.RENTAL,sort : 3  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.LIGHT_WATER,sort : 4  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.TRANSPORTATION,sort : 5  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.REPRESENTATION,sort : 6  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.COMMUNICATIONS,sort : 7  })
+
+    await OperatingExpenseTypeModel.createType({ name: OpexType.OFFICE_SUPPLIES,sort : 8  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.REPAIRS_MAINTENANCE,sort :9   })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.SUBSCRIPTION_FEES,sort : 10  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.ADVERTISING_PROMO,sort : 11  })
+    await OperatingExpenseTypeModel.createType({ name: OpexType.TAXES_LICENSES,sort : 12  })
+    // await OperatingExpenseTypeModel.createType({ name: OpexType.OTHER_EXPENSE,sort : 13  })
+
   },
 
   initializeData: async () => {
@@ -42,7 +61,8 @@ const initializeService = {
     Logger.info('********************************')
 
 
-    await initAssetType()
+    await initTransactionType()
+    // await initAssetType()
     await initRevenueType()
     await initLiabilityType()
     await initExpenseType()
@@ -70,6 +90,16 @@ async function initAssetType() {
   await AssetTypeModel.createAssetType({ name: AssetType.FIXED_ASSET })
   await AssetTypeModel.createAssetType({ name: AssetType.ACCUMULATED_DEPRECIATION })
   await AssetTypeModel.createAssetType({ name: AssetType.OTHER_ASSETS })
+}
+
+
+async function initTransactionType() {
+  Logger.info('******************************')
+  Logger.info('****Initializing Transaction Type****')
+  Logger.info('******************************')
+
+  await TransactionTypeModel.createTransactionType({ name: TransactionType.CASH })
+  await TransactionTypeModel.createTransactionType({ name: TransactionType.ACCOUNT })
 }
 
 async function initRevenueType() {
