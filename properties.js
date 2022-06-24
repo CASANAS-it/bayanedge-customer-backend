@@ -3,7 +3,8 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 module.exports = {
-  butler_db_dbUrl: (process.env.DB_HOST || 'localhost:27017/bayan_edge_db'),
+  butler_db_dbUrl: (process.env.DB_HOST || '114.198.129.250:27017/bayan_edge_db'),
+  butler_db_string: "mongodb://moneyflowAdmin:*m0n3y_flow001!DB@localhost:27018/bayan_edge_db?readPreference=primary&directConnection=true&ssl=false",
   publicPath: '../client/build',
   port: process.env.NODE_PORT || 6110,
   tokenSecret: 'B@y@an3Dge!!M()n3yFl()w',

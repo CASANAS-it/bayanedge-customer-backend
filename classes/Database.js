@@ -90,8 +90,9 @@ class Database {
   async authenticate() {
     Logger.info('Authenticating to the databases...')
     try {
+      console.log('mongodb://' + properties.butler_db_credentials + "@" + properties.butler_db_dbUrl)
       this.dbConnection_eVoucher_db = await mongoose.connect(
-        'mongodb://' + properties.butler_db_dbUrl,
+        properties.butler_db_string,
         { useNewUrlParser: true }
       )
     } catch (err) {
