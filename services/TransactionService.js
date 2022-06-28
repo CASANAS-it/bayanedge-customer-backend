@@ -350,7 +350,8 @@ const reportService = {
 
 
     allLoansProceeds.forEach(element => {
-      loansProceed += parseFloat(element.total)
+
+      loansProceed += parseFloat(element.total) - parseFloat(element.service_fee ? element.service_fee : 0)
       // if (element.service_fee)
       // nonFinancial += parseFloat(element.service_fee)
     });
@@ -619,7 +620,7 @@ const reportService = {
 
 
     allLoansProceeds.forEach(element => {
-      loansProceed += parseFloat(element.total)
+      loansProceed += parseFloat(element.total) - parseFloat(element.service_fee ? element.service_fee : 0)
       loansProceedBalance += parseFloat(element.balance)
       // if (element.service_fee)
       // nonFinancial += parseFloat(element.service_fee)
@@ -861,7 +862,7 @@ const reportService = {
 
 
     allLoansProceeds.forEach(element => {
-      loansProceed += parseFloat(element.total)
+      loansProceed += parseFloat(element.total) - parseFloat(element.service_fee ? element.service_fee : 0)
       // if (element.service_fee)
       // nonFinancial += parseFloat(element.service_fee)
     });
