@@ -90,12 +90,17 @@ const accountReceivableService = {
   //   return ap
   // },
   pay: async (params) => {
-    var current = await SalesModel.getById(params.transaction_id)
+    var current = await SalesModel.getById(params.parent_id)
+    var oldBalance = 0
+    var previous = await CashJournalModel.getById(params.transaction_id);
+    oldBalance = previous ? previous.total : 0;
+
     var customer = await CustomerModel.getByCustomerId(current.customer_id)
     var date = moment(params.date).add(customer.terms, 'days').format("YYYY-MM-DD")
-    var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
+    var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid) + parseFloat(oldBalance);
     params.next_payment_date = date;
     params.balance = newBalance
+    current.balance = newBalance
 
     if (current.previous_payment_date == null || params.date > current.previous_payment_date)
       params.previous_payment_date = params.date
@@ -110,21 +115,27 @@ const accountReceivableService = {
       if (isRefExists)
         throw new Errors.DUPLICATE_REFERENCE()
     }
-    var ap = await SalesModel.pay(params);
+    var ap = await SalesModel.pay(current);
+
     if (newBalance === 0) {
       await SalesModel.markAsComplete(params.transaction_id, params.admin_id)
+    } else {
+      await SalesModel.markAsInComplete(params.transaction_id, params.admin_id)
     }
     var cashJournal = JSON.parse(JSON.stringify(params));
 
-    cashJournal.reference_id = current.transaction_id;
+    cashJournal.reference_id = params.parent_id;
     cashJournal.total = params.amount_paid;
     cashJournal.details = current;
     cashJournal.display_id = params.display_id;
     cashJournal.type_id = TransType.ACCOUNTS_RECEIVABLE;
     cashJournal.flow_type_id = FlowType.INFLOW
+    if (previous) {
+      await CashJournalModel.permanentDelete(params.transaction_id)
+    }
     await CashJournalModel.create(cashJournal)
     if (customer.credit_limit) {
-      customer.available_credit = parseFloat(customer.available_credit) + parseFloat(params.amount_paid)
+      customer.available_credit = parseFloat(customer.available_credit) + parseFloat(params.amount_paid) - parseFloat(oldBalance)
       await CustomerModel.updateCredit(customer)
     }
 

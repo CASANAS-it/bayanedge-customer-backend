@@ -303,6 +303,14 @@ const customModel = {
     })
     return user
   },
+  markAsInComplete: async (id, admin_id) => {
+    const user = await customModel.model.findOneAndUpdate({ transaction_id: id }, {
+      is_completed: false,
+      modified_by: admin_id,
+      modified_date: new Date(),
+    })
+    return user
+  },
 
   deleteBeginning: async (params) => {
     const user = await customModel.model.deleteMany(

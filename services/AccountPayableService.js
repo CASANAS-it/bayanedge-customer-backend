@@ -87,16 +87,20 @@ const accountPayableService = {
   //   return ap
   // },
   pay: async (params) => {
-    var current = await LedgerModel.getById(params.transaction_id)
+    var current = await LedgerModel.getById(params.parent_id)
+    var oldBalance = 0
+    var previous = await CashJournalModel.getById(params.transaction_id);
+    oldBalance = previous ? previous.total : 0;
     var vendor = await VendorModel.getByVendorId(current.vendor_id)
     var date = moment(params.date).add(vendor.terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
     current.next_payment_date = date
-    if (current.previous_payment_date == null || params.date > current.previous_payment_date)
+    if (previous) {
+    } else if (current.previous_payment_date == null || params.date > current.previous_payment_date)
       params.previous_payment_date = params.date
     else params.previous_payment_date = current.previous_payment_date
 
-    var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
+    var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid) + parseFloat(oldBalance);
     params.balance = newBalance
     current.balance = newBalance
 
@@ -124,26 +128,35 @@ const accountPayableService = {
     }
 
 
-    var ap = await LedgerModel.pay(params);
+    var ap = await LedgerModel.pay(current);
     if (newBalance === 0) {
       await LedgerModel.markAsComplete(params.transaction_id, params.admin_id)
+    } else {
+      await LedgerModel.markAsInComplete(params.transaction_id, params.admin_id)
     }
+
     var cashJournal = JSON.parse(JSON.stringify(params));
 
-    cashJournal.reference_id = current.transaction_id;
+    cashJournal.reference_id = params.parent_id;
     cashJournal.total = params.amount_paid;
     cashJournal.display_id = params.display_id;
     cashJournal.details = current;
     cashJournal.type_id = TransType.ACCOUNTS_PAYABLE;
     cashJournal.flow_type_id = FlowType.OUTFLOW
+    if (previous) {
+      await CashJournalModel.permanentDelete(params.transaction_id)
+    }
+
     await CashJournalModel.create(cashJournal)
     if (vendor.credit_limit) {
-      vendor.available_credit = parseFloat(vendor.available_credit) + parseFloat(params.amount_paid)
+      vendor.available_credit = parseFloat(vendor.available_credit) + parseFloat(params.amount_paid) - parseFloat(oldBalance)
       await VendorModel.updateCredit(vendor)
     }
 
     return ap
   },
+
+
 
   beginningPay: async (params) => {
     var current = await BeginningBalanceModel.getById(params.transaction_id)

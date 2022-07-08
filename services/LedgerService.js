@@ -38,6 +38,8 @@ const ledgerService = {
     if (!ledger) {
       throw new Errors.NO_RECORDS_FOUND()
     }
+    var childTrans = await CashJournalModel.getAllByClientIdRefId(ledger.client_id,id)
+    ledger.childTrans = childTrans;
     return ledger
   },
   getSummary: async (client_id) => {
@@ -136,10 +138,15 @@ const ledgerService = {
   },
   delete: async (params) => {
     var oldSales = await LedgerModel.getById(params.id);
+    var vendor = await VendorModel.getByVendorId(oldSales.vendor_id)
+  
     for (let index = 0; index < oldSales.details.length; index++) {
       const item = oldSales.details[index];
       var inventor = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: item.item_id, quantity: item.quantity })
     }
+    
+    vendor.available_credit = (parseFloat(vendor.available_credit) + parseFloat(oldSales.total_unit_cost))
+    await VendorModel.updateCredit(vendor)
 
     await CashJournalModel.permanentDeleteByRefId(params.id)
     return await LedgerModel.delete(params)

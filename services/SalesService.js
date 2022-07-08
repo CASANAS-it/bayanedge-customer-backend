@@ -39,6 +39,9 @@ const salesService = {
     if (!sales) {
       throw new Errors.NO_RECORDS_FOUND()
     }
+
+    var childTrans = await CashJournalModel.getAllByClientIdRefId(sales.client_id, id)
+    sales.childTrans = childTrans;
     return sales
   },
 
@@ -144,12 +147,15 @@ const salesService = {
   },
   delete: async (params) => {
     var oldSales = await SalesModel.getById(params.id);
+    var customer = await CustomerModel.getByCustomerId(oldSales.customer_id)
+  
     if (oldSales.details)
       for (let index = 0; index < oldSales.details.length; index++) {
         const item = oldSales.details[index];
         var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: item.item_id, quantity: item.quantity })
       }
-
+    customer.available_credit = (parseFloat(customer.available_credit) + parseFloat(oldSales.total_unit_selling))
+    await CustomerModel.updateCredit(customer)
     await CashJournalModel.permanentDeleteByRefId(params.id)
     return await SalesModel.delete(params)
   },
@@ -181,7 +187,7 @@ const salesService = {
     var customer = await CustomerModel.getByCustomerId(params.customer_id)
     if (params.trans_type == "On Credit") {
       var date = moment(params.date).add(customer.terms, 'days').format("YYYY-MM-DD")
-      console.log(date,customer.terms)
+      console.log(date, customer.terms)
       params.next_payment_date = date;
 
       params.balance = params.total_unit_selling
