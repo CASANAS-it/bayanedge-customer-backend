@@ -164,11 +164,11 @@ const ledgerService = {
         throw new Errors.NO_BEGINNING_BALANCE()
       }
     } else {
-      var hasSales = await beginningBalanceService.hasDataByClient({ client_id: params.client_id, type_id: TransType.ACCOUNTS_PAYABLE })
+      // var hasSales = await beginningBalanceService.hasDataByClient({ client_id: params.client_id, type_id: TransType.ACCOUNTS_PAYABLE })
 
-      if (!hasSales) {
-        throw new Errors.NO_BEGINNING_BALANCE()
-      }
+      // if (!hasSales) {
+      //   throw new Errors.NO_BEGINNING_BALANCE()
+      // }
     }
     var isRefExists = await LedgerModel.getByRef(0, params.reference_no, params.client_id)
 

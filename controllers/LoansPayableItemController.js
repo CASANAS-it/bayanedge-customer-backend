@@ -2,9 +2,6 @@
 // Properties
 import Properties from '../properties'
 
-// Database
-import UserModel from '../models/UserModel'
-
 // Security
 import { authorize } from '../security/SecurityManager'
 

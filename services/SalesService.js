@@ -169,11 +169,11 @@ const salesService = {
       }
 
     } else {
-      var hasSales = await beginningBalanceService.hasDataByClient({ client_id: params.client_id, type_id: TransType.ACCOUNTS_RECEIVABLE })
+      // var hasSales = await beginningBalanceService.hasDataByClient({ client_id: params.client_id, type_id: TransType.ACCOUNTS_RECEIVABLE })
 
-      if (!hasSales) {
-        throw new Errors.NO_BEGINNING_BALANCE()
-      }
+      // if (!hasSales) {
+      //   throw new Errors.NO_BEGINNING_BALANCE()
+      // }
     }
     var isRefExists = await SalesModel.getByRef(0, params.reference_no, params.client_id)
 

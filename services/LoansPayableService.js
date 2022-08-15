@@ -76,7 +76,9 @@ const loansPayableService = {
       name: params.name + ' (Service Fee)',
       description: params.description + '(Service Fee)'
     };
-    nf.display_id = oldNF.display_id
+    if(oldNF.display_id){
+      nf.display_id = oldNF.display_id
+    }
     nf.flow_type_id = FlowType.OUTFLOW
     await CashJournalModel.create(nf)
 
@@ -150,6 +152,7 @@ const loansPayableService = {
     var ms = JSON.parse(JSON.stringify(params));
     ms.reference_id = current.transaction_id;
     ms.total = params.microsavings;
+    ms.date = current.date
     ms.display_id = "MS" + ap.display_id.substring(2);
     ms.details = current;
     ms.details.name = "Microsavings"
@@ -260,6 +263,7 @@ const loansPayableService = {
 
     var ms = JSON.parse(JSON.stringify(params));
     ms.reference_id = current.transaction_id;
+    ms.date = current.date;
     ms.total = params.microsavings;
     ms.display_id = "MS" + ap.display_id.substring(2);
     ms.details = current;
