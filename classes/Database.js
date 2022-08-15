@@ -36,6 +36,7 @@ import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import LoansRepaymentModel from '../models/LoansRepaymentModel'
 import JobsModel from '../models/JobsModel'
 import OperatingExpenseTypeModel from '../models/OperatingExpenseTypeModel'
+import ClientModel from '../models/ClientModel'
 /**
  * Connection to DB
  */
@@ -81,6 +82,7 @@ class Database {
     LoansRepaymentModel.init()
     OperatingExpenseTypeModel.init()
     JobsModel.init()
+    ClientModel.init()
     // End Init Models
   }
 

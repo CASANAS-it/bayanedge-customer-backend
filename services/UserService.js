@@ -12,6 +12,8 @@ import { equityService } from "./EquityService"
 import { customerService } from "./CustomerService"
 import { vendorService } from "./VendorService"
 import { inventoryService } from "./InventoryService"
+import ClientModel from "../models/ClientModel"
+import moment from "moment"
 
 
 const userService = {
@@ -31,9 +33,29 @@ const userService = {
         if (client_user) {
             user.client_id = client_user.client_id
         }
+
+        // Check subscription
+        var client = await ClientModel.getById(client_user.client_id)
+        if (!client)
+            throw new Errors.INVALID_LOGIN()
+
+        if (!client.to && !client.from)
+            throw new Errors.NO_SUBSCRIPTION()
+
+        if (moment().isAfter(moment(client.to))) {
+            throw new Errors.SUBSCRIPTION_EXPIRED()
+        }
+        if (moment().isBefore(moment(client.from))) {
+            throw new Errors.SUBSCRIPTION_NOT_STARTED()
+        }
+
+        // SUBSCRIPTION_EXPIRED
+
         const token = jsonwebtoken.sign(user, properties.tokenSecret, {
             expiresIn: 28800 // 8 hours
         })
+        user.from = client.from
+        user.to = client.to
         user.token = token
         return user
     },

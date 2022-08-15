@@ -53,9 +53,13 @@ const ErrorMessages = Object.freeze({
   
   TRANSACTION_DELETE_ERROR: { status: 400, message: 'Tranasaction Completed, cannot delete the transaction' },
   
-  DUPLICATE_ENTRY: { status: 200, message: 'Name already exists', code: 601 },
+  DUPLICATE_ENTRY: { status: 400, message: 'Name already exists', code: 601 },
   DUPLICATE_REF: { status: 200, message: 'REF already exists', code: 602 },
   NO_DATA: { status: 200, message: 'No data found.', code: 603 },
+  
+  SUBSCRIPTION_EXPIRED: { status: 200, message: 'Your Subscription has ended.', code: 604 },
+  SUBSCRIPTION_NOT_STARTED: { status: 200, message: 'Your Subscription is not yet started.', code: 605 },
+  NO_SUBSCRIPTION: { status: 200, message: 'You are not yet subscribe.', code: 606 },
   
 })
 
