@@ -216,7 +216,7 @@ const customControllers = {
     },
     beginningPayDelete: async (req, res) => {
         try {
-            var data = await loansPayableService.beginningPay(req.body)
+            var data = await loansPayableService.beginningDeletePay(req.body)
 
             res.send(
                 new CommonMessage({

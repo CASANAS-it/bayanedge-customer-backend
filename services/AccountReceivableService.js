@@ -118,9 +118,9 @@ const accountReceivableService = {
     var ap = await SalesModel.pay(current);
 
     if (newBalance === 0) {
-      await SalesModel.markAsComplete(params.transaction_id, params.admin_id)
+      await SalesModel.markAsComplete(params.parent_id, params.admin_id)
     } else {
-      await SalesModel.markAsInComplete(params.transaction_id, params.admin_id)
+      await SalesModel.markAsInComplete(params.parent_id, params.admin_id)
     }
     var cashJournal = JSON.parse(JSON.stringify(params));
 
@@ -136,6 +136,9 @@ const accountReceivableService = {
     await CashJournalModel.create(cashJournal)
     if (customer.credit_limit) {
       customer.available_credit = parseFloat(customer.available_credit) + parseFloat(params.amount_paid) - parseFloat(oldBalance)
+      if(parseFloat(customer.available_credit > parseFloat(customer.credit_limit))){
+        customer.available_credit = parseFloat(customer.credit_limit)
+      }
       await CustomerModel.updateCredit(customer)
     }
 

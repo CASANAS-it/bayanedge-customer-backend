@@ -130,9 +130,9 @@ const accountPayableService = {
 
     var ap = await LedgerModel.pay(current);
     if (newBalance === 0) {
-      await LedgerModel.markAsComplete(params.transaction_id, params.admin_id)
+      await LedgerModel.markAsComplete(params.parent_id, params.admin_id)
     } else {
-      await LedgerModel.markAsInComplete(params.transaction_id, params.admin_id)
+      await LedgerModel.markAsInComplete(params.parent_id, params.admin_id)
     }
 
     var cashJournal = JSON.parse(JSON.stringify(params));

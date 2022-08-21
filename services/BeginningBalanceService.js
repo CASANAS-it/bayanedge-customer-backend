@@ -138,10 +138,13 @@ const beginningBalanceService = {
     return beginningBalance
   },
   delete: async (id) => {
+    var checkTransaction = true
     var data = await BeginningBalanceModel.getById(id)
     if (data.type_id == TransType.ACCOUNTS_PAYABLE) {
+      checkTransaction = false;
       await LedgerModel.deleteBeginning(data)
     } else if (data.type_id == TransType.ACCOUNTS_RECEIVABLE) {
+      checkTransaction = false;
       await SalesModel.deleteBeginning(data)
     } else if (data.type_id == TransType.LOANS_PAYABLE) {
       var allCJ = await CashJournalModel.getAllByClientIdRefId(data.client_id, id)
@@ -159,7 +162,7 @@ const beginningBalanceService = {
       }
     }
     var hasData = await CashJournalModel.getByClientIdTypeId(data.client_id, data.type_id)
-    if (hasData) {
+    if (hasData && checkTransaction) {
       throw new Errors.BEGINNING_BALANCE_DELETE_ERROR_DATA()
     }
 
