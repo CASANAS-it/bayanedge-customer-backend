@@ -104,10 +104,6 @@ const loansPayableService = {
     var oldData = await CashJournalModel.getById(details.transaction_id)
     var oldMicro = await CashJournalModel.getById(details.details.microsaving_id)
 
-    //----------deleting old data
-    await CashJournalModel.permanentDelete(details.transaction_id)
-    await CashJournalModel.permanentDelete(oldMicro.transaction_id)
-
     var current = await LoansPayableModel.getById(details.reference_id)
     var oldPrincipal = parseFloat(oldData.total) - parseFloat(oldData.details.interest_fixed_amount)
     var newBalance = (parseFloat(current.balance) + parseFloat(oldPrincipal)) - parseFloat(params.amount_paid);
@@ -117,7 +113,9 @@ const loansPayableService = {
     current.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
     var summary = await cashJournalService.getSummary(params)
     var currentDate = moment().format("YYYY-MM-DD")
-
+    if (parseFloat(current.balance) < parseFloat(params.amount_paid)) {
+      throw new Errors.AMOUNT_EXCEEDED()
+    }
     if (summary) {
       if (current.interest > summary.total) {
         throw new SafeError({
@@ -138,6 +136,11 @@ const loansPayableService = {
       throw new Errors.NO_BEGINNING_BALANCE()
 
     }
+
+    //----------deleting old data
+    await CashJournalModel.permanentDelete(details.transaction_id)
+    await CashJournalModel.permanentDelete(oldMicro.transaction_id)
+
 
     var ap = await LoansPayableModel.pay(current)
     if (newBalance === 0) {
@@ -231,6 +234,10 @@ const loansPayableService = {
       if (isRefExists)
         throw new Errors.DUPLICATE_REFERENCE()
     }
+
+    if (parseFloat(current.balance) < parseFloat(params.amount_paid)) {
+      throw new Errors.AMOUNT_EXCEEDED()
+    }
     current.interest_fixed_amount = params.interest_fixed_amount;
     current.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
     var summary = await cashJournalService.getSummary(params)
@@ -311,6 +318,10 @@ const loansPayableService = {
     current.details.interest_fixed_amount = params.interest_fixed_amount;
     current.details.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
 
+    if (parseFloat(current.details.balance) < parseFloat(params.amount_paid)) {
+      throw new Errors.AMOUNT_EXCEEDED()
+    }
+
     var summary = await cashJournalService.getSummary(params)
 
     if (summary) {
@@ -333,7 +344,7 @@ const loansPayableService = {
     } else {
       throw new Errors.NO_BEGINNING_BALANCE()
 
-    } 
+    }
 
     current.details.is_completed = newBalance === 0
 
@@ -386,10 +397,6 @@ const loansPayableService = {
     var oldData = await CashJournalModel.getById(details.transaction_id)
     var oldMicro = await CashJournalModel.getById(details.details.microsaving_id)
 
-    //----------deleting old data
-    await CashJournalModel.permanentDelete(details.transaction_id)
-    await CashJournalModel.permanentDelete(oldMicro.transaction_id)
-
     var current = await BeginningBalanceModel.getById(details.reference_id)
     var oldPrincipal = parseFloat(oldData.total) - parseFloat(oldData.details.details.interest_fixed_amount)
     var newBalance = (parseFloat(current.details.balance) + parseFloat(oldPrincipal)) - parseFloat(params.amount_paid);
@@ -399,6 +406,11 @@ const loansPayableService = {
     current.details.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
     var summary = await cashJournalService.getSummary(params)
     var currentDate = moment().format("YYYY-MM-DD")
+
+
+    if (parseFloat(current.details.balance) < parseFloat(params.amount_paid)) {
+      throw new Errors.AMOUNT_EXCEEDED()
+    }
 
     if (summary) {
       if (current.interest > summary.total) {
@@ -420,6 +432,11 @@ const loansPayableService = {
       throw new Errors.NO_BEGINNING_BALANCE()
 
     }
+
+    //----------deleting old data
+    await CashJournalModel.permanentDelete(details.transaction_id)
+    await CashJournalModel.permanentDelete(oldMicro.transaction_id)
+
 
     current.details.is_completed = newBalance === 0
 
