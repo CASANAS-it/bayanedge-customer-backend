@@ -95,7 +95,9 @@ const accountPayableService = {
     var date = moment(params.date).add(vendor.terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
     current.next_payment_date = date
-    
+    if (parseFloat(current.balance) < parseFloat(params.amount_paid)) {
+      throw new Errors.AMOUNT_EXCEEDED()
+    }
     if (current.previous_payment_date == null || params.date > current.previous_payment_date)
       params.previous_payment_date = params.date
     else params.previous_payment_date = current.previous_payment_date
@@ -164,6 +166,9 @@ const accountPayableService = {
     var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
     var summary = await cashJournalService.getSummary(params)
 
+    if (parseFloat(current.details.balance) < parseFloat(params.amount_paid)) {
+      throw new Errors.AMOUNT_EXCEEDED()
+    }
     if (summary) {
       if (params.amount_paid > summary.total) {
         throw new SafeError({
