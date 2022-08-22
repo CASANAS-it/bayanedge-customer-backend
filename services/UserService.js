@@ -36,18 +36,18 @@ const userService = {
 
         // Check subscription
         var client = await ClientModel.getById(client_user.client_id)
-        if (!client)
-            throw new Errors.INVALID_LOGIN()
+        // if (!client)
+        //     throw new Errors.INVALID_LOGIN()
 
-        if (!client.to && !client.from)
-            throw new Errors.NO_SUBSCRIPTION()
+        // if (!client.to && !client.from)
+        //     throw new Errors.NO_SUBSCRIPTION()
 
-        if (moment().isAfter(moment(client.to))) {
-            throw new Errors.SUBSCRIPTION_EXPIRED()
-        }
-        if (moment().isBefore(moment(client.from))) {
-            throw new Errors.SUBSCRIPTION_NOT_STARTED()
-        }
+        // if (moment().isAfter(moment(client.to))) {
+        //     throw new Errors.SUBSCRIPTION_EXPIRED()
+        // }
+        // if (moment().isBefore(moment(client.from))) {
+        //     throw new Errors.SUBSCRIPTION_NOT_STARTED()
+        // }
 
         // SUBSCRIPTION_EXPIRED
 

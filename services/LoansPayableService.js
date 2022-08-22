@@ -55,7 +55,7 @@ const loansPayableService = {
 
     var loansPayable = await LoansPayableModel.update(params)
 
-    var oldNF = await CashJournalModel.getByClientIdTypeIdRefId(params.client_id, TransType.NON_FINANCIAL_CHARGES, loansPayable.transaction_id)
+    var oldNF = await CashJournalModel.getByClientIdTypeIdRefId(params.client_id, TransType.NON_FINANCIAL_CHARGES, params.transaction_id)
     await CashJournalModel.permanentDeleteByRefId(loansPayable.transaction_id)
     var transaction = JSON.parse(JSON.stringify(params));
     transaction.total = parseFloat(params.total) - parseFloat(params.service_fee)

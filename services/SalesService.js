@@ -102,7 +102,7 @@ const salesService = {
       var oldInv = oldSales.details.find(x => x.item_id == inv.item_id)
       var quantity = parseFloat(inv.quantity) + parseFloat(oldInv ? oldInv.quantity : 0)
 
-      if (quantity < item.quantity) {
+      if (quantity < item.quantity && item.quantity > 0) {
         var error = new SafeError({
           status: 200,
           code: 209,
@@ -206,7 +206,7 @@ const salesService = {
     for (let index = 0; index < params.details.length; index++) {
       const item = params.details[index];
       var inv = await InventoryModel.getByItemId(item.item_id)
-      if (inv.quantity < item.quantity) {
+      if (inv.quantity < item.quantity && item.quantity > 0) {
         var error = new SafeError({
           status: 200,
           code: 209,
