@@ -60,7 +60,7 @@ const customControllers = {
             const { limit, offset } = getPagination(pageIndex, pageSize);
             var beginning;
             if (pageIndex == 0)
-                beginning = await beginningBalanceService.getByTypeId(client_id, TransType.LOANS_PAYABLE)
+                beginning = await beginningBalanceService.getByTypeIdV2(client_id, TransType.LOANS_PAYABLE)
             loansPayableService.getAll(limit, offset, client_id).then(data => {
                 const response = getPagingData(data, pageIndex, limit);
                 if (beginning) {

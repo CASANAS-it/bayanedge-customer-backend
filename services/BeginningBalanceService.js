@@ -32,6 +32,12 @@ const beginningBalanceService = {
     }
     return beginningBalance
   },
+  
+  getByTypeIdV2: async (clientId, typeId) => {
+    var beginningBalance = await BeginningBalanceModel.getByTypeIdClientId(clientId, typeId)
+    return beginningBalance
+  },
+
   getByTypeId: async (clientId, typeId) => {
     var beginningBalance = await BeginningBalanceModel.getByTypeIdClientId(clientId, typeId)
     if (!beginningBalance) {

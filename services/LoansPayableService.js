@@ -152,7 +152,7 @@ const loansPayableService = {
     var ms = JSON.parse(JSON.stringify(params));
     ms.reference_id = current.transaction_id;
     ms.total = params.microsavings;
-    ms.date = current.date
+    ms.date = oldMicro.date
     ms.display_id = "MS" + ap.display_id.substring(2);
     ms.details = current;
     ms.details.name = "Microsavings"
@@ -173,6 +173,7 @@ const loansPayableService = {
     cashJournal.details.description = "Total Amortization"
     cashJournal.details.reference_no = params.reference_no;
     cashJournal.type_id = TransType.LOANS_PROCEED;
+    cashJournal.date = oldData.date
     cashJournal.flow_type_id = FlowType.OUTFLOW
     cashJournal.is_posted = postToCashJournal;
     await CashJournalModel.create(cashJournal)
@@ -265,12 +266,12 @@ const loansPayableService = {
 
     var ms = JSON.parse(JSON.stringify(params));
     ms.reference_id = current.transaction_id;
-    ms.date = current.date;
     ms.total = params.microsavings;
     ms.display_id = "MS" + ap.display_id.substring(2);
     ms.details = current;
     ms.details.name = "Microsavings"
     ms.details.description = "Microsavings"
+    ms.date = params.date;
     ms.type_id = TransType.MICROSAVINGS;
     ms.flow_type_id = FlowType.OUTFLOW
     ms.is_posted = postToCashJournal;
@@ -285,6 +286,8 @@ const loansPayableService = {
     cashJournal.details = current;
     cashJournal.details.name = "Total Amortization"
     cashJournal.details.description = "Total Amortization"
+    cashJournal.date = params.date;
+
     cashJournal.details.reference_no = params.reference_no;
     cashJournal.type_id = TransType.LOANS_PROCEED;
     cashJournal.flow_type_id = FlowType.OUTFLOW
@@ -330,7 +333,7 @@ const loansPayableService = {
     } else {
       throw new Errors.NO_BEGINNING_BALANCE()
 
-    }
+    } 
 
     current.details.is_completed = newBalance === 0
 
