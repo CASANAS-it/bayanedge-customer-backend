@@ -12,12 +12,17 @@ const inventoryService = {
   getSummary: async (client_id) => {
     var items = await InventoryModel.getAllByClientId(client_id)
     var total = 0;
-    items.forEach(element => {
-      total += element.unit_cost * element.quantity
-    });
+    for (let index = 0; index < items.length; index++) {
+      const element = items[index];
+      if (element.unit_cost && element.quantity)
+        total += element.unit_cost * element.quantity
+      else{
+        console.log(element,'hello')
+      }
+    }
     return total
   },
-  uploadFile: async (admin_id,client_id, datas) => {
+  uploadFile: async (admin_id, client_id, datas) => {
     if (datas.length == 0) {
       throw new Errors.NO_DATA()
     } else {

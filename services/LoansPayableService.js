@@ -108,14 +108,15 @@ const loansPayableService = {
     var oldPrincipal = parseFloat(oldData.total) - parseFloat(oldData.details.interest_fixed_amount)
     var newBalance = (parseFloat(current.balance) + parseFloat(oldPrincipal)) - parseFloat(params.amount_paid);
 
+    if (parseFloat(current.balance) < parseFloat(params.amount_paid)) {
+      throw new Errors.AMOUNT_EXCEEDED()
+    }
     current.balance = newBalance
     current.interest_fixed_amount = params.interest_fixed_amount;
     current.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
     var summary = await cashJournalService.getSummary(params)
     var currentDate = moment().format("YYYY-MM-DD")
-    if (parseFloat(current.balance) < parseFloat(params.amount_paid)) {
-      throw new Errors.AMOUNT_EXCEEDED()
-    }
+  
     if (summary) {
       if (current.interest > summary.total) {
         throw new SafeError({
@@ -226,6 +227,9 @@ const loansPayableService = {
     params.next_payment_date = date;
     params.balance = newBalance
 
+    if (parseFloat(current.balance) < parseFloat(params.amount_paid)) {
+      throw new Errors.AMOUNT_EXCEEDED()
+    }
     current.next_payment_date = date;
     current.balance = newBalance
     current.reference_no = params.reference_no;
@@ -235,9 +239,6 @@ const loansPayableService = {
         throw new Errors.DUPLICATE_REFERENCE()
     }
 
-    if (parseFloat(current.balance) < parseFloat(params.amount_paid)) {
-      throw new Errors.AMOUNT_EXCEEDED()
-    }
     current.interest_fixed_amount = params.interest_fixed_amount;
     current.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
     var summary = await cashJournalService.getSummary(params)
@@ -311,6 +312,11 @@ const loansPayableService = {
     var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
     var currentDate = moment(params.date).format("YYYY-MM-DD")
 
+
+    if (parseFloat(current.details.balance) < parseFloat(params.amount_paid)) {
+      throw new Errors.AMOUNT_EXCEEDED()
+    }
+
     current.details.next_payment_date = date;
     current.details.balance = newBalance
     // current.details.reference_no = params.reference_no
@@ -318,9 +324,7 @@ const loansPayableService = {
     current.details.interest_fixed_amount = params.interest_fixed_amount;
     current.details.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
 
-    if (parseFloat(current.details.balance) < parseFloat(params.amount_paid)) {
-      throw new Errors.AMOUNT_EXCEEDED()
-    }
+
 
     var summary = await cashJournalService.getSummary(params)
 
@@ -401,6 +405,10 @@ const loansPayableService = {
     var oldPrincipal = parseFloat(oldData.total) - parseFloat(oldData.details.details.interest_fixed_amount)
     var newBalance = (parseFloat(current.details.balance) + parseFloat(oldPrincipal)) - parseFloat(params.amount_paid);
 
+    
+    if (parseFloat(current.details.balance) < parseFloat(params.amount_paid)) {
+      throw new Errors.AMOUNT_EXCEEDED()
+    }
     current.details.balance = newBalance
     current.details.interest_fixed_amount = params.interest_fixed_amount;
     current.details.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
@@ -408,9 +416,6 @@ const loansPayableService = {
     var currentDate = moment().format("YYYY-MM-DD")
 
 
-    if (parseFloat(current.details.balance) < parseFloat(params.amount_paid)) {
-      throw new Errors.AMOUNT_EXCEEDED()
-    }
 
     if (summary) {
       if (current.interest > summary.total) {
