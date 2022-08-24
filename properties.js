@@ -17,7 +17,7 @@ module.exports = {
     password: 'ozqimtpufurjpycl'
   },  
   // hostName : "https://casanas.io/moneyflow/agent/"
-  hostName : "http://114.198.129.249:4000/moneyflow/agent/"
+  hostName : "https://moneyflow.com.ph/"
   
 }
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
