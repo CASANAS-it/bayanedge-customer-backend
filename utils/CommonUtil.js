@@ -84,6 +84,13 @@ function isNumber(str) {
   return !isNaN(str);
 }
 
+
+function calc(value) {
+  var num = value
+  var with2Decimals = num.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0]
+  return with2Decimals
+}
+
 export {
   getUserFromToken,
   getTransactionType,
@@ -94,5 +101,6 @@ export {
   generateDisplayId,
   padZeroes,
   compare,
-  isNumber
+  isNumber,
+  calc
 }

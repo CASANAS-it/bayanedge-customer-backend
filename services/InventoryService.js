@@ -17,7 +17,6 @@ const inventoryService = {
       if (element.unit_cost && element.quantity)
         total += element.unit_cost * element.quantity
       else{
-        console.log(element,'hello')
       }
     }
     return total

@@ -101,7 +101,7 @@ const accountReceivableService = {
     params.next_payment_date = date;
     params.balance = newBalance
     current.balance = newBalance
-    if (parseFloat(current.balance) < parseFloat(params.amount_paid)) {
+    if (calc(current.balance) < calc(params.amount_paid)) {
       throw new Errors.AMOUNT_EXCEEDED()
     }
     if (current.previous_payment_date == null || params.date > current.previous_payment_date)
@@ -153,7 +153,7 @@ const accountReceivableService = {
     var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
 
 
-    if (parseFloat(current.details.balance) < parseFloat(params.amount_paid)) {
+    if (calc(current.details.balance) < calc(params.amount_paid)) {
       throw new Errors.AMOUNT_EXCEEDED()
     }
     if (current.details.previous_payment_date == null || params.date > current.details.previous_payment_date)

@@ -7,6 +7,7 @@ import CashJournalModel from '../models/CashJournalModel'
 import InventoryModel from '../models/InventoryModel'
 import LedgerModel from '../models/LedgerModel'
 import VendorModel from '../models/VendorModel'
+import { calc } from '../utils/CommonUtil'
 import { generateId } from '../utils/Crypto'
 import { beginningBalanceService } from './BeginningBalanceService'
 import { cashJournalService } from './CashJournalService'
@@ -95,7 +96,7 @@ const accountPayableService = {
     var date = moment(params.date).add(vendor.terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
     current.next_payment_date = date
-    if (parseFloat(current.balance) < parseFloat(params.amount_paid)) {
+    if (calc(current.balance) < calc(params.amount_paid)) {
       throw new Errors.AMOUNT_EXCEEDED()
     }
     if (current.previous_payment_date == null || params.date > current.previous_payment_date)
@@ -119,7 +120,7 @@ const accountPayableService = {
     var summary = await cashJournalService.getSummary(params)
 
     if (summary) {
-      if (params.amount_paid > summary.total) {
+      if (calc(params.amount_paid) > calc(summary.total)) {
         throw new SafeError({
           status: 200,
           code: 209,
@@ -166,11 +167,11 @@ const accountPayableService = {
     var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
     var summary = await cashJournalService.getSummary(params)
 
-    if (parseFloat(current.details.balance) < parseFloat(params.amount_paid)) {
+    if (calc(current.details.balance) < calc(params.amount_paid)) {
       throw new Errors.AMOUNT_EXCEEDED()
     }
     if (summary) {
-      if (params.amount_paid > summary.total) {
+      if (calc(params.amount_paid )> calc(summary.total)) {
         throw new SafeError({
           status: 200,
           code: 209,
