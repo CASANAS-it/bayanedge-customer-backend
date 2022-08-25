@@ -420,7 +420,7 @@ const reportService = {
         detail: Number.isNaN(otherCashIncome) ? 0 : otherCashIncome
       },
       {
-        label: "Total Cash Inflow",
+        label: "Total Cash Inflows",
         detail: Number.isNaN(retCashInflow) ? 0 : retCashInflow,
         className: "large-font report-highlight"
       },
@@ -453,7 +453,7 @@ const reportService = {
         detail: Number.isNaN(nonFinancial) ? 0 : nonFinancial
       },
       {
-        label: "Total Cash Outflow",
+        label: "Total Cash Outflows",
         detail: Number.isNaN(retCashOutflow) ? 0 : retCashOutflow,
         className: "large-font report-highlight"
       },
