@@ -7,6 +7,7 @@ import CashJournalModel from '../models/CashJournalModel'
 import CustomerModel from '../models/CustomerModel'
 import InventoryModel from '../models/InventoryModel'
 import SalesModel from '../models/SalesModel'
+import { calc } from '../utils/CommonUtil'
 import { generateId } from '../utils/Crypto'
 import { beginningBalanceService } from './BeginningBalanceService'
 
@@ -100,14 +101,14 @@ const accountReceivableService = {
     var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid) + parseFloat(oldBalance);
     params.next_payment_date = date;
     params.balance = newBalance
-    current.balance = newBalance
     if (calc(current.balance) < calc(params.amount_paid)) {
       throw new Errors.AMOUNT_EXCEEDED()
     }
     if (current.previous_payment_date == null || params.date > current.previous_payment_date)
-      params.previous_payment_date = params.date
+    params.previous_payment_date = params.date
     else params.previous_payment_date = current.previous_payment_date
-
+    
+    current.balance = newBalance
     current.next_payment_date = date;
     current.balance = newBalance
     current.reference_no = params.reference_no;
