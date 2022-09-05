@@ -8,7 +8,8 @@ import { Config, FlowType, TransactionType, TransType } from '../classes/Constan
 import moment from 'moment'
 import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import { cashJournalService } from './CashJournalService'
-import { padZeroes } from '../utils/CommonUtil'
+import { calc, padZeroes } from '../utils/CommonUtil'
+import SafeError from '../classes/SafeError'
 const loansPayableService = {
   getAll: async (limit, offset, client_id) => {
     return await LoansPayableModel.getPaginatedItems(limit, offset, client_id)
@@ -312,8 +313,7 @@ const loansPayableService = {
     var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
     var currentDate = moment(params.date).format("YYYY-MM-DD")
 
-
-    if (calc(current.details.balance) < calc(params.amount_paid)) {
+    if (calc(current.details.balance) < calc (params.amount_paid)) {
       throw new Errors.AMOUNT_EXCEEDED()
     }
 
