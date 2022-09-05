@@ -10,6 +10,7 @@ import BeginningBalanceModel from '../models/BeginningBalanceModel'
 import { cashJournalService } from './CashJournalService'
 import { calc, padZeroes } from '../utils/CommonUtil'
 import SafeError from '../classes/SafeError'
+import { beginningBalanceService } from './BeginningBalanceService'
 const loansPayableService = {
   getAll: async (limit, offset, client_id) => {
     return await LoansPayableModel.getPaginatedItems(limit, offset, client_id)
@@ -88,17 +89,29 @@ const loansPayableService = {
 
   getSummary: async (client_id) => {
     var lp = await LoansPayableModel.getAllByClientId(client_id)
-    var msBalance = await BeginningBalanceModel.getByClientIdTypeId(client_id, TransType.MICROSAVINGS)
-    var balance = 0, microsavings = 0;
-    microsavings = msBalance ? msBalance.total : 0
+    var pif =  await CashJournalModel.getAllPaginatedItemsByTypeIdFlowTypeId(client_id, TransType.LOANS_PROCEED,FlowType.OUTFLOW,false)
+    var beginning = await beginningBalanceService.getByTypeIdV2(client_id, TransType.LOANS_PAYABLE)
+       
+    var balance = 0;
+    var pifTotal = 0;
+    var microsavingTotal =0;
+    var totalLoan = 0;
     lp.forEach(element => {
-      balance += element.balance
+      totalLoan += element.total
+       balance += element.balance
     });
-    var result = {
-      balance,
-      microsavings
+    
+    totalLoan += beginning.total
+    balance += beginning.details.balance
+    pif.forEach(element => {
+      pifTotal += element.total+ element.microsaving.total
+      microsavingTotal += element.microsaving.total
+    });
+
+
+    return {
+      balance,pifTotal,microsavingTotal,totalLoan
     }
-    return result
   },
   payEdit: async (params) => {
     const { details } = params

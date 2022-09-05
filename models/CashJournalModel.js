@@ -270,6 +270,30 @@ const customModel = {
     // return await customModel.getModel().find().select().populate('item').populate('customer').lean()
   },
 
+  getAllPaginatedItemsByTypeIdFlowTypeId: async (client_id, type_id, flow_type_id, is_beginning) => {
+
+    var options = {
+      populate: ['item', 'customer', 'vendor', 'microsaving'],
+      lean: true,
+      sort: { date: 1 }
+    }
+
+    var condition = {
+      client_id:client_id,
+      flow_type_id: flow_type_id,
+      type_id: type_id,
+    };
+    if (is_beginning) {
+      condition['$or'] = [
+        { is_beginning: is_beginning },
+        { is_beginning: { $exists: is_beginning } }
+      ]
+    }
+
+    
+    return await customModel.getModel().find(condition).populate('microsaving').lean()
+  },
+
   getPaginatedItemsByTypeId: async (limit, offset, client_id, type_id, is_beginning_balance_included = false) => {
 
     var options = {
