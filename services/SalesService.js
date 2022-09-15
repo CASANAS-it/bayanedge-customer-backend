@@ -63,6 +63,11 @@ const salesService = {
   },
   update: async (params) => {
     if (!params.customer_id) {
+
+      var isCustomerExist = await CustomerModel.getByCustomerName(0, params.customer_name, params.client_id)
+
+      if (isCustomerExist)
+        throw new Errors.RECORD_ALREADY_EXISTS()
       var customer = await CustomerModel.create(params)
       params.customer_id = customer.customer_id
     }
@@ -148,7 +153,7 @@ const salesService = {
   delete: async (params) => {
     var oldSales = await SalesModel.getById(params.id);
     var customer = await CustomerModel.getByCustomerId(oldSales.customer_id)
-  
+
     if (oldSales.details)
       for (let index = 0; index < oldSales.details.length; index++) {
         const item = oldSales.details[index];
@@ -181,6 +186,11 @@ const salesService = {
       throw new Errors.DUPLICATE_REFERENCE()
 
     if (!params.customer_id) {
+
+      var isCustomerExist = await CustomerModel.getByCustomerName(0, params.customer_name, params.client_id)
+
+      if (isCustomerExist)
+        throw new Errors.RECORD_ALREADY_EXISTS()
       var customer = await CustomerModel.create(params)
       params.customer_id = customer.customer_id
     }
