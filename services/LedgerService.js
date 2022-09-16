@@ -149,8 +149,10 @@ const ledgerService = {
       var inventor = await InventoryModel.subtractQuantity({ admin_id: params.admin_id, item_id: item.item_id, quantity: item.quantity })
     }
 
-    vendor.available_credit = (parseFloat(vendor.available_credit) + parseFloat(oldSales.total_unit_cost))
-    await VendorModel.updateCredit(vendor)
+    if (vendor.available_credit) {
+      vendor.available_credit = (parseFloat(vendor.available_credit) + parseFloat(oldSales.total_unit_cost))
+      await VendorModel.updateCredit(vendor)
+    }
 
     await CashJournalModel.permanentDeleteByRefId(params.id)
     return await LedgerModel.delete(params)

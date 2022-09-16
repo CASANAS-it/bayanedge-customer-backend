@@ -159,8 +159,10 @@ const salesService = {
         const item = oldSales.details[index];
         var inventor = await InventoryModel.addQuantity({ admin_id: params.admin_id, item_id: item.item_id, quantity: item.quantity })
       }
-    customer.available_credit = (parseFloat(customer.available_credit) + parseFloat(oldSales.total_unit_selling))
-    await CustomerModel.updateCredit(customer)
+    if (customer.available_credit) {
+      customer.available_credit = (parseFloat(customer.available_credit) + parseFloat(oldSales.total_unit_selling))
+      await CustomerModel.updateCredit(customer)
+    }
     await CashJournalModel.permanentDeleteByRefId(params.id)
     return await SalesModel.delete(params)
   },
