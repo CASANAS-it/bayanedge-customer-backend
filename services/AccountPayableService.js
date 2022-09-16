@@ -96,14 +96,14 @@ const accountPayableService = {
     var date = moment(params.date).add(vendor.terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
     current.next_payment_date = date
-    if (calc(current.balance) < calc(params.amount_paid)) {
+    if (calc(parseFloat(params.amount_paid) + parseFloat(oldBalance)) < calc(params.amount_paid)) {
       throw new Errors.AMOUNT_EXCEEDED()
     }
     if (current.previous_payment_date == null || params.date > current.previous_payment_date)
       params.previous_payment_date = params.date
     else params.previous_payment_date = current.previous_payment_date
-
     var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid) + parseFloat(oldBalance);
+
     params.balance = newBalance
     current.balance = newBalance
 
