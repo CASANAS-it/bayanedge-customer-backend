@@ -89,28 +89,54 @@ const loansPayableService = {
 
   getSummary: async (client_id) => {
     var lp = await LoansPayableModel.getAllByClientId(client_id)
-    var pif =  await CashJournalModel.getAllPaginatedItemsByTypeIdFlowTypeId(client_id, TransType.LOANS_PROCEED,FlowType.OUTFLOW,false)
+    var pif = await CashJournalModel.getAllPaginatedItemsByTypeIdFlowTypeId(client_id, TransType.LOANS_PROCEED, FlowType.OUTFLOW, false)
     var beginning = await beginningBalanceService.getByTypeIdV2(client_id, TransType.LOANS_PAYABLE)
-       
+    var beginningMicrosaving = await beginningBalanceService.getByTypeIdV2(client_id, TransType.MICROSAVINGS)
+
+    var microsavingDeposit = await CashJournalModel.getAllPaginatedItemsByTypeIdFlowTypeId(client_id, TransType.MICROSAVINGS, FlowType.OUTFLOW, false)
+    var microsavingWithdrawal = await CashJournalModel.getAllPaginatedItemsByTypeIdFlowTypeId(client_id, TransType.MICROSAVINGS, FlowType.INFLOW, false)
+
     var balance = 0;
     var pifTotal = 0;
-    var microsavingTotal =0;
+    var microsavingTotal = 0;
     var totalLoan = 0;
+    var principalTotal = 0;
+    var interestTotal = 0;
+    var loanPayment = 0
+    var beginningBalance = beginningMicrosaving.details.beginning_amount;
+    var microsavingDepositTotal = 0;
+    var microsavingWithdrawalTotal = 0;
+    microsavingDeposit.forEach(element => {
+      microsavingDepositTotal += element.total
+    })
+
+    microsavingWithdrawal.forEach(element => {
+      microsavingWithdrawalTotal += element.total
+    })
     lp.forEach(element => {
       totalLoan += element.total
-       balance += element.balance
+      balance += element.balance
     });
-    
+
     totalLoan += beginning.total
     balance += beginning.details.balance
+
+    loanPayment = totalLoan - balance
     pif.forEach(element => {
-      pifTotal += element.total+ element.microsaving.total
+      pifTotal += element.total + element.microsaving.total
       microsavingTotal += element.microsaving.total
+      principalTotal += element.total
+      if (element.details && element.details.service_fee)
+        interestTotal += parseFloat(element.details.service_fee)
+      if (element.is_beginning) {
+        interestTotal += parseFloat(element.details.details.interest_fixed_amount)
+      }
     });
 
 
     return {
-      balance,pifTotal,microsavingTotal,totalLoan
+      balance, pifTotal, microsavingTotal, totalLoan, principalTotal, interestTotal,
+      loanPayment, beginningBalance,microsavingDepositTotal,microsavingWithdrawalTotal
     }
   },
   payEdit: async (params) => {
@@ -130,7 +156,7 @@ const loansPayableService = {
     current.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
     var summary = await cashJournalService.getSummary(params)
     var currentDate = moment().format("YYYY-MM-DD")
-  
+
     if (summary) {
       if (current.interest > summary.total) {
         throw new SafeError({
@@ -326,7 +352,7 @@ const loansPayableService = {
     var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
     var currentDate = moment(params.date).format("YYYY-MM-DD")
 
-    if (calc(current.details.balance) < calc (params.amount_paid)) {
+    if (calc(current.details.balance) < calc(params.amount_paid)) {
       throw new Errors.AMOUNT_EXCEEDED()
     }
 
@@ -418,7 +444,7 @@ const loansPayableService = {
     var oldPrincipal = parseFloat(oldData.total) - parseFloat(oldData.details.details.interest_fixed_amount)
     var newBalance = (parseFloat(current.details.balance) + parseFloat(oldPrincipal)) - parseFloat(params.amount_paid);
 
-    
+
     if (calc(current.details.balance) < calc(params.amount_paid)) {
       throw new Errors.AMOUNT_EXCEEDED()
     }
