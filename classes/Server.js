@@ -84,7 +84,7 @@ class Server {
 
     // Redirect frontend
     this.app.use('*', (req, res, next) => {
-      res.set("Content-Security-Policy", "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self'; frame-ancestors 'self';form-action 'self';");
+      res.set("Content-Security-Policy", "default-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self'; style-src 'self'; frame-ancestors 'self';form-action 'self';");
       if (req.originalUrl) {
         const url = req.originalUrl
         if (!url.startsWith('/api/') && url.indexOf('.') === -1) {
