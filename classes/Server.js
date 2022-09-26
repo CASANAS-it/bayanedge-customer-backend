@@ -81,7 +81,7 @@ class Server {
     // Securitiy
     // this.app.use(helmet());
     this.app.use(cors({
-      origin :"https://moneyflow.com.ph"
+      origin :"moneyflow.com.ph"
     }))
 
     // Redirect frontend
