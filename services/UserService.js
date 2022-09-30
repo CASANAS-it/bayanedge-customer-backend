@@ -41,8 +41,8 @@ const userService = {
 
         if (!client.to && !client.from)
             throw new Errors.NO_SUBSCRIPTION()
-
-        if (moment().isAfter(moment(client.to))) {
+        
+        if (moment().isAfter(moment(client.to).add(1,'days'))) {
             throw new Errors.SUBSCRIPTION_EXPIRED()
         }
         if (moment().isBefore(moment(client.from))) {
