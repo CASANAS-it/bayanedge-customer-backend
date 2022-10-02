@@ -80,12 +80,16 @@ class Server {
 
     // Securitiy
     // this.app.use(helmet());
+    var corsOptions = {
+      origin: 'http://moneyflow.com.ph',
+      optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+    }
     this.app.use(cors({
-      // origin :"moneyflow.com.ph"
+      origin :"moneyflow.com.ph"
     }))
 
     // Redirect frontend
-    this.app.use('*', (req, res, next) => {
+    this.app.use('*',cors(corsOptions), (req, res, next) => {
       if (req.originalUrl) {
         const url = req.originalUrl
         if (!url.startsWith('/api/') && url.indexOf('.') === -1) {
