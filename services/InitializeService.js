@@ -144,5 +144,4 @@ async function initExpenseType() {
   await ExpenseTypeModel.createExpenseType({ name: ExpenseType.OPERATING_EXPENSE })
 }
 
-
 export default initializeService
