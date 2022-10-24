@@ -49,18 +49,18 @@ const loansPayableService = {
       throw new Errors.EDIT_ERROR_WITH_EXISTING_DATA()
     }
 
-    params.interest = parseFloat(params.total) + parseFloat(params.interest_fixed_amount)
+    params.interest = calc(params.total) + calc(params.interest_fixed_amount)
     var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
 
-    // params.service_fee = parseFloat(params.total) * parseFloat(Config.SERVICE_FEE_PERCENT)
+    // params.service_fee = calc(params.total) * calc(Config.SERVICE_FEE_PERCENT)
 
     var loansPayable = await LoansPayableModel.update(params)
 
     var oldNF = await CashJournalModel.getByClientIdTypeIdRefId(params.client_id, TransType.NON_FINANCIAL_CHARGES, params.transaction_id)
     await CashJournalModel.permanentDeleteByRefId(loansPayable.transaction_id)
     var transaction = JSON.parse(JSON.stringify(params));
-    transaction.total = parseFloat(params.total) - parseFloat(params.service_fee)
+    transaction.total = calc(params.total) - calc(params.service_fee)
     transaction.reference_id = loansPayable.transaction_id;
     transaction.type_id = TransType.LOANS_PROCEED;
     transaction.details = loansPayable;
@@ -70,7 +70,7 @@ const loansPayableService = {
 
     var nf = JSON.parse(JSON.stringify(params));
 
-    nf.total = parseFloat(params.service_fee)
+    nf.total = calc(params.service_fee)
     nf.reference_id = loansPayable.transaction_id;
     nf.type_id = TransType.NON_FINANCIAL_CHARGES;
     nf.details = {
@@ -127,9 +127,9 @@ const loansPayableService = {
       microsavingTotal += element.microsaving.total
       principalTotal += element.total
       if (element.details && element.details.service_fee)
-        interestTotal += parseFloat(element.details.service_fee)
+        interestTotal += calc(element.details.service_fee)
       if (element.is_beginning) {
-        interestTotal += parseFloat(element.details.details.interest_fixed_amount)
+        interestTotal += calc(element.details.details.interest_fixed_amount)
       }
     });
 
@@ -145,15 +145,15 @@ const loansPayableService = {
     var oldMicro = await CashJournalModel.getById(details.details.microsaving_id)
 
     var current = await LoansPayableModel.getById(details.reference_id)
-    var oldPrincipal = parseFloat(oldData.total) - parseFloat(oldData.details.interest_fixed_amount)
-    var newBalance = (parseFloat(current.balance) + parseFloat(oldPrincipal)) - parseFloat(params.amount_paid);
+    var oldPrincipal = calc(oldData.total) - calc(oldData.details.interest_fixed_amount)
+    var newBalance = (calc(current.balance) + calc(oldPrincipal)) - calc(params.amount_paid);
 
     if (calc(current.balance) < calc(params.amount_paid)) {
       throw new Errors.AMOUNT_EXCEEDED()
     }
     current.balance = newBalance
     current.interest_fixed_amount = params.interest_fixed_amount;
-    current.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
+    current.interest = calc(params.interest_fixed_amount) + calc(params.amount_paid)
     var summary = await cashJournalService.getSummary(params)
     var currentDate = moment().format("YYYY-MM-DD")
 
@@ -171,7 +171,7 @@ const loansPayableService = {
     var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(params.client_id, TransType.MICROSAVINGS)
     if (msBeginning) {
 
-      msBeginning.total = (parseFloat(msBeginning.total) - parseFloat(oldMicro.total)) + parseFloat(params.microsavings);
+      msBeginning.total = (calc(msBeginning.total) - calc(oldMicro.total)) + calc(params.microsavings);
       await BeginningBalanceModel.update(msBeginning)
     } else {
       throw new Errors.NO_BEGINNING_BALANCE()
@@ -233,17 +233,17 @@ const loansPayableService = {
     var oldMicro = await CashJournalModel.getById(details.details.microsaving_id)
 
     var current = await LoansPayableModel.getById(details.reference_id)
-    var oldPrincipal = parseFloat(oldData.total) - parseFloat(oldData.details.interest_fixed_amount)
-    var newBalance = (parseFloat(current.balance) + parseFloat(oldPrincipal))
+    var oldPrincipal = calc(oldData.total) - calc(oldData.details.interest_fixed_amount)
+    var newBalance = (calc(current.balance) + calc(oldPrincipal))
 
     current.balance = newBalance
     current.interest_fixed_amount = params.interest_fixed_amount;
-    current.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
+    current.interest = calc(params.interest_fixed_amount) + calc(params.amount_paid)
     current.next_payment_date = oldData.date
 
     var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(params.client_id, TransType.MICROSAVINGS)
     if (msBeginning) {
-      msBeginning.total = (parseFloat(msBeginning.total) - parseFloat(oldMicro.total));
+      msBeginning.total = (calc(msBeginning.total) - calc(oldMicro.total));
       await BeginningBalanceModel.update(msBeginning)
     }
 
@@ -261,7 +261,7 @@ const loansPayableService = {
   pay: async (params) => {
     var current = await LoansPayableModel.getById(params.transaction_id)
 
-    var newBalance = parseFloat(current.balance) - parseFloat(params.amount_paid);
+    var newBalance = calc(current.balance) - calc(params.amount_paid);
     var currentDate = moment().format("YYYY-MM-DD")
     var date = moment().add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
@@ -280,7 +280,7 @@ const loansPayableService = {
     }
 
     current.interest_fixed_amount = params.interest_fixed_amount;
-    current.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
+    current.interest = calc(params.interest_fixed_amount) + calc(params.amount_paid)
     var summary = await cashJournalService.getSummary(params)
 
     if (summary) {
@@ -297,7 +297,7 @@ const loansPayableService = {
     var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(params.client_id, TransType.MICROSAVINGS)
     if (msBeginning) {
 
-      msBeginning.total = parseFloat(msBeginning.total) + parseFloat(params.microsavings);
+      msBeginning.total = calc(msBeginning.total) + calc(params.microsavings);
       await BeginningBalanceModel.update(msBeginning)
     } else {
       throw new Errors.NO_BEGINNING_BALANCE()
@@ -348,7 +348,7 @@ const loansPayableService = {
   beginningPay: async (params) => {
     var current = await BeginningBalanceModel.getById(params.transaction_id)
 
-    var newBalance = parseFloat(current.details.balance) - parseFloat(params.amount_paid);
+    var newBalance = calc(current.details.balance) - calc(params.amount_paid);
     var date = moment().add(current.details.payment_terms, 'days').format("YYYY-MM-DD")
     var currentDate = moment(params.date).format("YYYY-MM-DD")
 
@@ -360,8 +360,8 @@ const loansPayableService = {
     current.details.balance = newBalance
     // current.details.reference_no = params.reference_no
     current.date = params.date;
-    current.details.interest_fixed_amount = params.interest_fixed_amount;
-    current.details.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
+    current.details.interest_fixed_amount = calc(params.interest_fixed_amount);
+    current.details.interest = calc(params.interest_fixed_amount) + calc(params.amount_paid)
 
 
 
@@ -382,7 +382,7 @@ const loansPayableService = {
     var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(params.client_id, TransType.MICROSAVINGS)
     if (msBeginning) {
 
-      msBeginning.total = parseFloat(msBeginning.total) + parseFloat(params.microsavings);
+      msBeginning.total = calc(msBeginning.total) + calc(params.microsavings);
       await BeginningBalanceModel.update(msBeginning)
     } else {
       throw new Errors.NO_BEGINNING_BALANCE()
@@ -441,8 +441,8 @@ const loansPayableService = {
     var oldMicro = await CashJournalModel.getById(details.details.microsaving_id)
 
     var current = await BeginningBalanceModel.getById(details.reference_id)
-    var oldPrincipal = parseFloat(oldData.total) - parseFloat(oldData.details.details.interest_fixed_amount)
-    var newBalance = (parseFloat(current.details.balance) + parseFloat(oldPrincipal)) - parseFloat(params.amount_paid);
+    var oldPrincipal = calc(oldData.total) - calc(oldData.details.details.interest_fixed_amount)
+    var newBalance = (calc(current.details.balance) + calc(oldPrincipal)) - calc(params.amount_paid);
 
 
     if (calc(current.details.balance) < calc(params.amount_paid)) {
@@ -450,7 +450,7 @@ const loansPayableService = {
     }
     current.details.balance = newBalance
     current.details.interest_fixed_amount = params.interest_fixed_amount;
-    current.details.interest = parseFloat(params.interest_fixed_amount) + parseFloat(params.amount_paid)
+    current.details.interest = calc(params.interest_fixed_amount) + calc(params.amount_paid)
     var summary = await cashJournalService.getSummary(params)
     var currentDate = moment().format("YYYY-MM-DD")
 
@@ -470,7 +470,7 @@ const loansPayableService = {
     var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(params.client_id, TransType.MICROSAVINGS)
     if (msBeginning) {
 
-      msBeginning.total = (parseFloat(msBeginning.total) - parseFloat(oldMicro.total)) + parseFloat(params.microsavings);
+      msBeginning.total = (calc(msBeginning.total) - calc(oldMicro.total)) + calc(params.microsavings);
       await BeginningBalanceModel.update(msBeginning)
     } else {
       throw new Errors.NO_BEGINNING_BALANCE()
@@ -540,12 +540,12 @@ const loansPayableService = {
     await CashJournalModel.permanentDelete(oldMicro.transaction_id)
 
     var current = await BeginningBalanceModel.getById(details.reference_id)
-    var oldPrincipal = parseFloat(oldData.total) - parseFloat(oldData.details.details.interest_fixed_amount)
-    var newBalance = (parseFloat(current.details.balance) + parseFloat(oldPrincipal));
+    var oldPrincipal = calc(oldData.total) - calc(oldData.details.details.interest_fixed_amount)
+    var newBalance = (calc(current.details.balance) + calc(oldPrincipal));
 
     current.details.balance = newBalance
-    current.details.interest_fixed_amount = parseFloat(current.details.interest_fixed_amount) - parseFloat(oldData.details.details.interest_fixed_amount)
-    current.details.interest = parseFloat(current.details.interest) - parseFloat(oldData.details.details.interest)
+    current.details.interest_fixed_amount = calc(current.details.interest_fixed_amount) - calc(oldData.details.details.interest_fixed_amount)
+    current.details.interest = calc(current.details.interest) - calc(oldData.details.details.interest)
     var currentDate = moment().format("YYYY-MM-DD")
 
     current.details.is_completed = newBalance === 0
@@ -557,7 +557,7 @@ const loansPayableService = {
 
     var msBeginning = await BeginningBalanceModel.getByClientIdTypeId(params.client_id, TransType.MICROSAVINGS)
     if (msBeginning) {
-      msBeginning.total = (parseFloat(msBeginning.total) - parseFloat(oldMicro.total));
+      msBeginning.total = (calc(msBeginning.total) - calc(oldMicro.total));
       await BeginningBalanceModel.update(msBeginning)
     }
     return ap
@@ -592,15 +592,15 @@ const loansPayableService = {
     await CashJournalModel.permanentDeleteByRefId(params.transaction_id)
   },
   create: async (params) => {
-    // params.interest = parseFloat(params.total) + parseFloat(params.interest_fixed_amount)
+    // params.interest = calc(params.total) + calc(params.interest_fixed_amount)
     var date = moment(params.date, "YYYY-MM-DD").add(params.payment_terms, 'days').format("YYYY-MM-DD")
     params.next_payment_date = date;
-    // params.service_fee = parseFloat(params.total) * parseFloat(Config.SERVICE_FEE_PERCENT)
+    // params.service_fee = calc(params.total) * calc(Config.SERVICE_FEE_PERCENT)
     var loansPayable = await LoansPayableModel.create(params)
 
     var transaction = JSON.parse(JSON.stringify(params));
 
-    transaction.total = parseFloat(params.total) - parseFloat(params.service_fee)
+    transaction.total = calc(params.total) - calc(params.service_fee)
     transaction.reference_id = loansPayable.transaction_id;
     transaction.type_id = TransType.LOANS_PROCEED;
     transaction.details = loansPayable;
@@ -619,7 +619,7 @@ const loansPayableService = {
       displayId = "NF" + padZeroes(disId)
     }
 
-    nf.total = parseFloat(params.service_fee)
+    nf.total = calc(params.service_fee)
     nf.reference_id = loansPayable.transaction_id;
     nf.type_id = TransType.NON_FINANCIAL_CHARGES;
     nf.details = {
