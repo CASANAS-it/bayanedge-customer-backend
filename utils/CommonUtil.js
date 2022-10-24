@@ -88,7 +88,8 @@ function isNumber(str) {
 function calc(value) {
   var num = value
   var with2Decimals = num.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0]
-  return parseFloat(parseFloat(with2Decimals).toFixed(2))
+  // console.log(parseFloat(value).toFixed(2));
+  return parseFloat(parseFloat(value).toFixed(2))
 }
 
 export {
